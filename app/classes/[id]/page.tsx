@@ -46,8 +46,6 @@ export default async function ClassDetailPage({
   const tCls = await getTranslations("Classes");
   const tNav = await getTranslations("Navigation");
   const role = user.role as UserRole;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const clsRes = await getClassAction(id);
   if (!clsRes.success || !clsRes.data) {
@@ -83,11 +81,7 @@ export default async function ClassDetailPage({
   const myMember = memberRows.at(0) ?? null;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={cls.name}
