@@ -21,7 +21,7 @@ export default async function InvitationsPage() {
           refName: inv.targetName,
           refPicture: null,
           role: inv.roleInTarget,
-          message: inv.message,
+          message: inv.message ?? undefined,
           status: inv.status as InvitationItem["status"],
           invitedBy: {
             id: "",

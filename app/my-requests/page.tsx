@@ -24,7 +24,7 @@ export default async function MyRequestsPage() {
           refId: r.refId,
           refName: r.refName,
           role: r.role,
-          message: r.message,
+          message: r.message ?? undefined,
           status: r.status as JoinRequestItem["status"],
           requestedBy: {
             id: user.id,

@@ -7,10 +7,12 @@ import { TutorAvailabilityEditor } from "@/components/tutoring/tutor-availabilit
 import {
   getTutorProfileAction,
   getAvailabilityAction,
+  getTutorProfileByIdAction,
 } from "@/server/actions/tutoring";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 /**
  * §5.15 — Tutor profile editor page (bio, subjects, hourly rate, location, availability).
@@ -29,9 +31,13 @@ export default async function TutorProfilePage() {
     })(),
   ]);
 
-  const profile = profileRes.success ? profileRes.data : null;
   const subjects = subjectsRes.success ? subjectsRes.data : [];
   const availabilities = availRes.success ? availRes.data : [];
+
+  if (!profileRes.success || !profileRes.data) redirect("/tutor/dashboard");
+
+  const profileData = await getTutorProfileByIdAction(profileRes.data.id);
+  const profile = profileData.success ? profileData.data : null;
 
   return (
     <DashboardShell>

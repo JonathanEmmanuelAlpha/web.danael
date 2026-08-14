@@ -121,7 +121,9 @@ export function InvoiceList({ invoices, loading }: InvoiceListProps) {
         <TableHeader>
           <TableRow>
             <TableHead>{t("invoiceNumber")}</TableHead>
-            <TableHead className="hidden sm:table-cell">{t("issuedAt")}</TableHead>
+            <TableHead className="hidden sm:table-cell">
+              {t("issuedAt")}
+            </TableHead>
             <TableHead>{t("amount")}</TableHead>
             <TableHead>{t("status")}</TableHead>
             <TableHead className="text-right">{t("download")}</TableHead>
@@ -130,15 +132,19 @@ export function InvoiceList({ invoices, loading }: InvoiceListProps) {
         <TableBody>
           {invoices.map((inv) => (
             <TableRow key={inv.id}>
-              <TableCell className="font-mono text-xs font-medium">{inv.number}</TableCell>
+              <TableCell className="font-mono text-xs font-medium">
+                {inv.number}
+              </TableCell>
               <TableCell className="hidden sm:table-cell whitespace-nowrap text-sm">
                 {new Date(inv.issuedAt).toLocaleDateString("fr-FR")}
               </TableCell>
               <TableCell className="font-medium">
-                {new Intl.NumberFormat("fr-FR").format(Number(inv.amount))} {inv.currency}
+                {new Intl.NumberFormat("fr-FR").format(Number(inv.amount))}
               </TableCell>
               <TableCell>
-                <Badge variant={(STATUS_VARIANT[inv.status] ?? "default") as never}>
+                <Badge
+                  variant={(STATUS_VARIANT[inv.status] ?? "default") as never}
+                >
                   {tStatus(inv.status as never)}
                 </Badge>
               </TableCell>

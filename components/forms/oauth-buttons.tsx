@@ -22,7 +22,7 @@ export interface OAuthButtonsProps {
 const STRATEGIES: Array<{
   strategy: OAuthStrategy;
   key: "google" | "apple" | "facebook";
-  Icon: typeof IconBrandApple;
+  Icon: typeof IconBrandApple | typeof GoogleIcon;
   brandClass: string;
 }> = [
   { strategy: "oauth_google", key: "google", Icon: GoogleIcon, brandClass: "" },

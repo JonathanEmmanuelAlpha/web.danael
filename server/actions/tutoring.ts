@@ -59,7 +59,9 @@ async function requireTutor(): Promise<{ userId: string; profileId: string }> {
   await requireSession();
   const dbUser = await getCurrentDbUser();
   if (!dbUser) {
-    throw AppError.notFound("User profile not found. Please complete onboarding.");
+    throw AppError.notFound(
+      "User profile not found. Please complete onboarding.",
+    );
   }
   requireRole(dbUser.role, "tutor", "platform_admin");
   const db = await getDb();
@@ -70,7 +72,9 @@ async function requireTutor(): Promise<{ userId: string; profileId: string }> {
     .limit(1);
   const profile = rows.at(0);
   if (!profile) {
-    throw AppError.notFound("Profil de tuteur introuvable. Complétez votre profil.");
+    throw AppError.notFound(
+      "Profil de tuteur introuvable. Complétez votre profil.",
+    );
   }
   return { userId: dbUser.id, profileId: profile.id };
 }
@@ -91,7 +95,9 @@ async function requireBookerOrStudent(
   await requireSession();
   const dbUser = await getCurrentDbUser();
   if (!dbUser) {
-    throw AppError.notFound("User profile not found. Please complete onboarding.");
+    throw AppError.notFound(
+      "User profile not found. Please complete onboarding.",
+    );
   }
   const booking = await tutoringService.getBooking(bookingId);
   if (!booking) throw AppError.notFound("Réservation introuvable");
@@ -155,7 +161,10 @@ export async function updateTutorProfileAction(
     if (!parsed.success) {
       throw AppError.validation("Entrée invalide", parsed.error.flatten());
     }
-    const updated = await tutoringService.updateTutorProfile(userId, parsed.data);
+    const updated = await tutoringService.updateTutorProfile(
+      userId,
+      parsed.data,
+    );
     revalidatePath("/profile");
     revalidatePath("/dashboard");
     return { success: true, data: updated };
@@ -183,7 +192,9 @@ export async function verifyTutorAction(
 
 export async function addTutorSubjectAction(
   input: z.input<typeof addTutorSubjectSchema>,
-): Promise<ApiResponse<{ id: string; subjectId: string; level: string | null }>> {
+): Promise<
+  ApiResponse<{ id: string; subjectId: string; level: string | null }>
+> {
   try {
     const parsed = addTutorSubjectSchema.safeParse(input);
     if (!parsed.success) {
@@ -261,12 +272,7 @@ export async function createBookingAction(
     await requireSession();
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
-    requireRole(
-      dbUser.role,
-      "student",
-      "parent",
-      "platform_admin",
-    );
+    requireRole(dbUser.role, "student", "parent", "platform_admin");
 
     const parsed = createBookingSchema.safeParse(input);
     if (!parsed.success) {
@@ -417,11 +423,7 @@ export async function moderateReviewAction(
     await requireSession();
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
-    requireRole(
-      dbUser.role,
-      "platform_admin",
-      "content_moderator",
-    );
+    requireRole(dbUser.role, "platform_admin", "content_moderator");
     const parsed = moderateReviewSchema.safeParse(input);
     if (!parsed.success) {
       throw AppError.validation("Entrée invalide", parsed.error.flatten());
@@ -442,7 +444,7 @@ export async function getTutorProfileAction(): Promise<
     await requireSession();
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
-    const profile = await tutoringService.getTutorProfile(dbUser.id);
+    const profile = await tutoringService.getTutorProfileById(dbUser.id);
     return { success: true, data: profile };
   } catch (err) {
     return handleErr(err, "getTutorProfileAction");
@@ -529,9 +531,7 @@ export async function listTutorBookingsAction(
   }
 }
 
-export async function listStudentBookingsAction(
-  studentId: string,
-): Promise<
+export async function listStudentBookingsAction(studentId: string): Promise<
   ApiResponse<
     Array<{
       id: string;

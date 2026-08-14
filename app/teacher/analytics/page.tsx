@@ -13,15 +13,5 @@ export default async function TeacherAnalyticsPage() {
   if (!user) redirect("/sign-in");
   if (user.role !== "teacher") redirect("/dashboard");
 
-  return (
-    <TeacherDashboard
-      user={{
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        role: user.role,
-      }}
-    />
-  );
+  return <TeacherDashboard />;
 }

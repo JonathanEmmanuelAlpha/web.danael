@@ -3,9 +3,8 @@
 import { useCallback, useRef, useState } from "react";
 import { UploadCloud, File as FileIcon, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import type { ApiResponse, ApiSuccess } from "@/lib/api-response";
+import type { ApiResponse } from "@/lib/api-response";
 import { useUploadThing } from "@/utils/uploadthing";
 import { confirmUploadAction } from "@/server/actions/files";
 
@@ -78,7 +77,7 @@ export function FileUploader({
         `/api/files/upload-url?category=${category}&contentType=${encodeURIComponent(file.type)}&size=${file.size}`,
         { method: "POST" },
       );
-      const json = (await res.json()) as ApiSuccess<{
+      const json = (await res.json()) as ApiResponse<{
         method: "PUT" | "POST";
         uploadUrl: string;
         headers: Record<string, string>;

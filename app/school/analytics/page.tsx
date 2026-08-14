@@ -14,15 +14,5 @@ export default async function AnalyticsPage() {
   if (!user) redirect("/sign-in");
   if (user.role !== "school_admin") redirect("/dashboard");
 
-  return (
-    <SchoolDashboard
-      user={{
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        role: user.role,
-      }}
-    />
-  );
+  return <SchoolDashboard />;
 }
