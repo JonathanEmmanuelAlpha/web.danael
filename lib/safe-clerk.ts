@@ -10,6 +10,7 @@
 
 "use client";
 
+import { useClerk, useSignIn, useSignUp } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 // Lazy loader for Clerk hooks — only imports @clerk/nextjs when needed
@@ -38,31 +39,13 @@ function useClerkHooks() {
 }
 
 export function useSafeSignIn() {
-  const hooks = useClerkHooks();
-  if (!hooks) {
-    return;
-  }
-  return hooks.useSignIn() as ReturnType<
-    typeof import("@clerk/nextjs").useSignIn
-  >;
+  return useSignIn();
 }
 
 export function useSafeSignUp() {
-  const hooks = useClerkHooks();
-  if (!hooks) {
-    return;
-  }
-  return hooks.useSignUp() as ReturnType<
-    typeof import("@clerk/nextjs").useSignUp
-  >;
+  return useSignUp();
 }
 
 export function useSafeClerk() {
-  const hooks = useClerkHooks();
-  if (!hooks) {
-    return;
-  }
-  return hooks.useClerk() as ReturnType<
-    typeof import("@clerk/nextjs").useClerk
-  >;
+  return useClerk();
 }

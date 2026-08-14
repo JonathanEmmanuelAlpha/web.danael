@@ -1,6 +1,7 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getCurrentDbUserByClerkId } from "./lib/clerk";
+import { getUserDashboardRoadByRole } from "./lib/utils";
 
 // Types d'onboarding (à partager avec la base de données)
 export const ONBOARDING_STATUS = [
@@ -155,7 +156,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // 2. Authentifié sur une page d'auth (sign-in, etc.) → dashboard
   if (userId && isAuth && !pathname.startsWith("/sso-callback")) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/settings", req.url));
   }
 
   // 3. Routes protégées (non publiques, non API)
@@ -175,7 +176,9 @@ export default clerkMiddleware(async (auth, req) => {
     if (isOnboarding) {
       // Si l'onboarding est déjà terminé, rediriger vers le dashboard
       if (status === "completed") {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+        return NextResponse.redirect(
+          new URL(getUserDashboardRoadByRole(role!), req.url),
+        );
       }
       const redirectUrl = getOnboardingRedirect(
         pathname,

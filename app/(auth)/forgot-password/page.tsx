@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useSignIn } from "@clerk/nextjs";
 import { useSafeSignIn } from "@/lib/safe-clerk";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -17,10 +16,6 @@ import { TextField, FormError } from "@/components/forms/form-field";
 import { SubmitButton } from "@/components/forms/submit-button";
 import type { ClerkError } from "@/types";
 
-/**
- * §5.2 — Forgot password page.
- * Uses Clerk's reset_password_email_code flow.
- */
 export default function ForgotPasswordPage() {
   const t = useTranslations("Auth");
   const { fetchStatus, signIn } = useSafeSignIn();
@@ -33,7 +28,10 @@ export default function ForgotPasswordPage() {
   const schema = useMemo(
     () =>
       z.object({
-        email: z.string().min(1, t("errors.emailRequired")).email(t("errors.emailInvalid")),
+        email: z
+          .string()
+          .min(1, t("errors.emailRequired"))
+          .email(t("errors.emailInvalid")),
       }),
     [t],
   );
@@ -47,20 +45,17 @@ export default function ForgotPasswordPage() {
 
       try {
         await signIn.create({
-          strategy: "reset_password_email_code",
           identifier: value.email,
         });
 
-        await signIn.resetPasswordEmailCode.prepareVerification({
-          email: value.email,
-          strategy: "reset_password_email_code",
-        });
+        await signIn.resetPasswordEmailCode.sendCode();
 
         toast.success(t("resetPassword.emailSent"));
         window.location.href = `/reset-password?email=${encodeURIComponent(value.email)}`;
       } catch (err) {
         const clerkError = err as ClerkError;
-        const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
+        const msg =
+          clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
         setGlobalError(msg);
       }
     },
@@ -81,7 +76,9 @@ export default function ForgotPasswordPage() {
           <AuthHeader title={t("resetPassword.title")} />
 
           <div className="mt-8">
-            {globalError && <FormError message={globalError} className="mb-4" />}
+            {globalError && (
+              <FormError message={globalError} className="mb-4" />
+            )}
 
             <form
               onSubmit={(e) => {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useClerk, useSignUp } from "@clerk/nextjs";
 import { useSafeClerk, useSafeSignUp } from "@/lib/safe-clerk";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -43,7 +42,10 @@ export default function VerifyAccountPage() {
   const hasSentCode = useRef(false);
 
   useEffect(() => {
-    const tick = setInterval(() => setCooldown((c) => (c > 0 ? c - 1 : 0)), 1000);
+    const tick = setInterval(
+      () => setCooldown((c) => (c > 0 ? c - 1 : 0)),
+      1000,
+    );
     return () => clearInterval(tick);
   }, []);
 
@@ -88,7 +90,9 @@ export default function VerifyAccountPage() {
     if (!isLoaded || !signUp) return;
     setPending(true);
     try {
-      const completeSignUp = await signUp.verifications.verifyEmailCode({ code });
+      const completeSignUp = await signUp.verifications.verifyEmailCode({
+        code,
+      });
 
       if (!completeSignUp.error) {
         await signUp.finalize();
