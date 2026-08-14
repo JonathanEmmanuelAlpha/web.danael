@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentDbUser, toUserSessionData } from "@/lib/clerk";
+import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { MyJoinRequestsList } from "@/components/memberships/my-join-requests-list";
 import { listMyJoinRequestsAction } from "@/server/actions/memberships";
@@ -12,7 +12,8 @@ export default async function MyRequestsPage() {
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
+  const userName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const requestsRes = await listMyJoinRequestsAction();
   const myRequests: JoinRequestItem[] =
@@ -37,13 +38,7 @@ export default async function MyRequestsPage() {
       : [];
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-      userEmail={user.email}
-      user={toUserSessionData(user)}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">

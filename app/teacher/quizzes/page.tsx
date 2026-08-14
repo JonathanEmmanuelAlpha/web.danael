@@ -21,26 +21,10 @@ export default async function TeacherQuizzesPage() {
   const user = await getCurrentDbUser();
   if (!user) redirect("/sign-in");
 
-  const role = user.role as UserRole;
-  if (
-    role !== "teacher" &&
-    role !== "school_admin" &&
-    role !== "platform_admin"
-  ) {
-    redirect("/dashboard");
-  }
-
-  const tNav = await getTranslations("Navigation");
   const tQuiz = await getTranslations("Quizzes");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tQuiz("myQuizzes")}

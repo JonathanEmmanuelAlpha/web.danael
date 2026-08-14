@@ -59,20 +59,9 @@ export default async function QuizSessionResultsPage({
   const results = resultsRes.data;
 
   const viewer: "student" | "teacher" = isOwner ? "student" : "teacher";
-  const shellRole: UserRole =
-    role === "platform_admin" || role === "school_admin" || role === "teacher"
-      ? role
-      : "student";
-
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={shellRole}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="mx-auto max-w-3xl">
         <QuizResultsView results={results} viewer={viewer} />
       </div>

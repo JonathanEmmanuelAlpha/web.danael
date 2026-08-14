@@ -11,7 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { getCurrentDbUser, toUserSessionData } from "@/lib/clerk";
+import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +71,10 @@ function estimateDaysToTarget(
   trend: number,
 ): number {
   const rate = Math.max(0.5, Math.max(0.1, trend + 1));
-  return Math.max(1, Math.min(90, Math.round((targetMastery - currentMastery) / rate)));
+  return Math.max(
+    1,
+    Math.min(90, Math.round((targetMastery - currentMastery) / rate)),
+  );
 }
 
 /** Build a ProjectionSkill row from a weak skill + a captured `now` timestamp. */
@@ -99,9 +102,18 @@ function buildProjectionSkill(
 /** Build a 4-point synthetic mastery history from the current average. */
 function buildMasteryHistory(avgMastery: number, now: number) {
   return [
-    { date: new Date(now - 30 * MS_PER_DAY).toISOString(), mastery: Math.max(0, avgMastery - 15) },
-    { date: new Date(now - 20 * MS_PER_DAY).toISOString(), mastery: Math.max(0, avgMastery - 10) },
-    { date: new Date(now - 10 * MS_PER_DAY).toISOString(), mastery: Math.max(0, avgMastery - 5) },
+    {
+      date: new Date(now - 30 * MS_PER_DAY).toISOString(),
+      mastery: Math.max(0, avgMastery - 15),
+    },
+    {
+      date: new Date(now - 20 * MS_PER_DAY).toISOString(),
+      mastery: Math.max(0, avgMastery - 10),
+    },
+    {
+      date: new Date(now - 10 * MS_PER_DAY).toISOString(),
+      mastery: Math.max(0, avgMastery - 5),
+    },
     { date: new Date(now).toISOString(), mastery: avgMastery },
   ];
 }
@@ -165,16 +177,9 @@ export default async function LearningPage() {
     flatSkills.length > 0 ? buildMasteryHistory(avgMastery, now) : [];
 
   const streak = user.currentStreak ?? 0;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
   return (
-    <DashboardShell
-      role={user.role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-      user={toUserSessionData(user)}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         {/* ── Top: page header + streak + weekly progress ─────────────── */}
         <PageHeader
@@ -211,7 +216,9 @@ export default async function LearningPage() {
                 <TrendingUp className="size-5" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">{t("currentMastery")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("currentMastery")}
+                </p>
                 <p className="font-display text-xl font-bold text-foreground">
                   {avgMastery}%
                 </p>
@@ -229,7 +236,9 @@ export default async function LearningPage() {
                 <Target className="size-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{t("weeklyGoal")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("weeklyGoal")}
+                </p>
                 <div className="flex items-center gap-2">
                   <Progress className="h-1.5 flex-1" value={weeklyPct} />
                   <span className="font-mono text-xs font-medium text-foreground">
@@ -250,7 +259,9 @@ export default async function LearningPage() {
                 <CalendarDays className="size-5" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">{t("targetProgress")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("targetProgress")}
+                </p>
                 <p className="font-display text-xl font-bold text-foreground">
                   {targetProgress}%
                 </p>

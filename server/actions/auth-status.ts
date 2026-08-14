@@ -22,14 +22,17 @@ export async function getAuthStatusAction(): Promise<ApiResponse<AuthStatus>> {
   try {
     const session = await getSessionUser();
     if (!session) {
-      return { success: true, data: { authenticated: false, onboardingCompleted: false } };
+      return {
+        success: true,
+        data: { authenticated: false, onboardingCompleted: false },
+      };
     }
     const dbUser = await getCurrentDbUser();
     return {
       success: true,
       data: {
         authenticated: true,
-        onboardingCompleted: dbUser?.onboardingCompleted ?? false,
+        onboardingCompleted: dbUser?.onboardingStatus === "completed",
         role: dbUser?.role,
       },
     };

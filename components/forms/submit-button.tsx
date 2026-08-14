@@ -2,32 +2,17 @@
 
 import { type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import type { ComponentProps } from "react";
 
-/* ─────────────────────────────────────────────────────────────
-   SubmitButton — ergonomic submit button bound to TanStack Form.
-   
-   Two usage patterns:
-   
-   1) Inside a <form.Field> subtree, pass the `form` instance:
-      const form = useForm({ ... });
-      <SubmitButton form={form} idleLabel="Sign in" pendingLabel="Signing in…" />
-   
-   2) Outside a form context (raw):
-      <SubmitButtonRaw isSubmitting={isSubmitting} idleLabel="Submit" />
-   ───────────────────────────────────────────────────────────── */
+type ButtonProps = ComponentProps<typeof Button>;
 
-// Minimal form instance shape we need (avoids coupling to TanStack internals).
-interface FormSubscribeLike {
-  Subscribe: (props: {
-    selector: (s: { canSubmit: boolean; isSubmitting: boolean }) => unknown;
-    children: (state: { canSubmit: boolean; isSubmitting: boolean }) => ReactNode;
-  }) => ReactNode;
-}
-
-export interface SubmitButtonProps extends Omit<ButtonProps, "type" | "onClick"> {
+export interface SubmitButtonProps extends Omit<
+  ButtonProps,
+  "type" | "onClick"
+> {
   /** TanStack Form instance (from useForm()). */
-  form: FormSubscribeLike;
+  form: any; // Le typage exact est trop complexe, on utilise any
   /** Label shown when idle. */
   idleLabel: ReactNode;
   /** Label shown when submitting (default: idleLabel). */
@@ -39,7 +24,7 @@ export interface SubmitButtonProps extends Omit<ButtonProps, "type" | "onClick">
 }
 
 /**
- * Submit button bound to a TanStack Form instance via form.Subscribe.
+ * Submit button bound to a TanStack Form instance via form.useStore.
  * Renders a native <button type="submit"> that's disabled while submitting
  * or when the form can't be submitted (validation errors).
  */
@@ -52,33 +37,30 @@ export function SubmitButton({
   variant = "brand",
   ...props
 }: SubmitButtonProps) {
+  // Utilisation de form.useStore (non déprécié)
+  const canSubmit = form.useStore((state: any) => state.canSubmit);
+  const isSubmitting = form.useStore((state: any) => state.isSubmitting);
+
+  const disabled = !canSubmit || isSubmitting || disabledExtra;
+
   return (
-    <form.Subscribe
-      selector={(s) => ({
-        canSubmit: s.canSubmit,
-        isSubmitting: s.isSubmitting,
-      })}
-    >
-      {({ canSubmit, isSubmitting }) => {
-        const disabled = !canSubmit || isSubmitting || disabledExtra;
-        return (
-          <Button type="submit" variant={variant} disabled={disabled} {...props}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                {pendingLabel ?? idleLabel}
-              </>
-            ) : (
-              children ?? idleLabel
-            )}
-          </Button>
-        );
-      }}
-    </form.Subscribe>
+    <Button type="submit" variant={variant} disabled={disabled} {...props}>
+      {isSubmitting ? (
+        <>
+          <Loader2 className="size-4 animate-spin" />
+          {pendingLabel ?? idleLabel}
+        </>
+      ) : (
+        (children ?? idleLabel)
+      )}
+    </Button>
   );
 }
 
-export interface SubmitButtonRawProps extends Omit<ButtonProps, "type" | "onClick"> {
+export interface SubmitButtonRawProps extends Omit<
+  ButtonProps,
+  "type" | "onClick"
+> {
   isSubmitting: boolean;
   canSubmit?: boolean;
   idleLabel: ReactNode;

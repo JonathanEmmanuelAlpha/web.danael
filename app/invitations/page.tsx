@@ -1,18 +1,14 @@
 import { redirect } from "next/navigation";
-import { getCurrentDbUser, toUserSessionData } from "@/lib/clerk";
+import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { InvitationsList } from "@/components/memberships/invitations-list";
 import { listMyInvitationsAction } from "@/server/actions/memberships";
 import { Mail } from "lucide-react";
 import type { InvitationItem } from "@/stores/notifications-store";
-import type { UserRole } from "@/types";
 
 export default async function InvitationsPage() {
   const user = await getCurrentDbUser();
   if (!user) redirect("/sign-in");
-
-  const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Fetch invitations on the server
   const invitationsRes = await listMyInvitationsAction();
@@ -38,13 +34,7 @@ export default async function InvitationsPage() {
       : [];
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-      userEmail={user.email}
-      user={toUserSessionData(user)}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">

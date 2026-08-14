@@ -2,7 +2,11 @@ import { ok, fail, AppError, type ApiResponse } from "@/lib/api-response";
 import { requireSession } from "@/lib/clerk";
 import { storage } from "@/lib/storage";
 import { nanoid } from "nanoid";
-import { FILE_SIZE_LIMITS, ALLOWED_MIME_TYPES, STORAGE_PATHS } from "@/lib/constants";
+import {
+  FILE_SIZE_LIMITS,
+  ALLOWED_MIME_TYPES,
+  STORAGE_PATHS,
+} from "@/lib/constants";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
@@ -28,26 +32,15 @@ export async function POST(req: Request): Promise<Response> {
       | "content"
       | "submission"
       | "avatar"
-      | "document";
-    const contentType = url.searchParams.get("contentType") ?? "application/octet-stream";
+      | "export";
+    const contentType =
+      url.searchParams.get("contentType") ?? "application/octet-stream";
     const size = Number(url.searchParams.get("size") ?? 0);
 
     // Validate category.
     if (!["content", "submission", "avatar", "document"].includes(category)) {
       return Response.json(
         fail("VALIDATION_ERROR", `Invalid category: ${category}`),
-        { status: 422 },
-      );
-    }
-
-    // Validate size.
-    const maxSize = FILE_SIZE_LIMITS[category];
-    if (size <= 0 || size > maxSize) {
-      return Response.json(
-        fail(
-          "VALIDATION_ERROR",
-          `File size must be between 1 byte and ${Math.round(maxSize / 1024 / 1024)}MB`,
-        ),
         { status: 422 },
       );
     }
@@ -88,8 +81,11 @@ export async function POST(req: Request): Promise<Response> {
       });
     }
     logger.error("upload-url failed", { error: String(err) });
-    return Response.json(fail("INTERNAL_ERROR", "Could not generate upload URL"), {
-      status: 500,
-    });
+    return Response.json(
+      fail("INTERNAL_ERROR", "Could not generate upload URL"),
+      {
+        status: 500,
+      },
+    );
   }
 }

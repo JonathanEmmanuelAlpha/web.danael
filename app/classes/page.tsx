@@ -25,7 +25,6 @@ export default async function ClassesPage() {
   const tNav = await getTranslations("Navigation");
   const tCls = await getTranslations("Classes");
   const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // school_admin path
   if (role === "school_admin") {
@@ -34,7 +33,7 @@ export default async function ClassesPage() {
 
     if (!school) {
       return (
-        <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+        <DashboardShell>
           <PageHeader
             title={tNav("classes")}
             description={tCls("createClassDescription")}
@@ -45,15 +44,13 @@ export default async function ClassesPage() {
     }
 
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <div className="space-y-6">
           <PageHeader
             title={tNav("classes")}
             description={tCls("createClassDescription")}
             icon={<School className="size-6" />}
-            actions={
-              <CreateClassDialog schoolId={school.id} />
-            }
+            actions={<CreateClassDialog schoolId={school.id} />}
           />
           <ClassesList
             schoolId={school.id}
@@ -69,7 +66,7 @@ export default async function ClassesPage() {
   // teacher path
   if (role === "teacher") {
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <div className="space-y-6">
           <PageHeader
             title={tNav("classes")}
@@ -77,7 +74,10 @@ export default async function ClassesPage() {
             icon={<School className="size-6" />}
             actions={
               <div className="flex gap-2">
-                <JoinClassDialog defaultRole="teacher" allowedRoles={["teacher"]} />
+                <JoinClassDialog
+                  defaultRole="teacher"
+                  allowedRoles={["teacher"]}
+                />
               </div>
             }
           />
@@ -93,13 +93,15 @@ export default async function ClassesPage() {
 
   // student path (and any other role)
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tNav("classes")}
           description={tCls("joinClassDescription")}
           icon={<School className="size-6" />}
-          actions={<JoinClassDialog defaultRole="student" allowedRoles={["student"]} />}
+          actions={
+            <JoinClassDialog defaultRole="student" allowedRoles={["student"]} />
+          }
         />
         <ClassesList
           studentId={user.id}

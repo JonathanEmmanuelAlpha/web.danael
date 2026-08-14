@@ -1,10 +1,7 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { Inbox } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 import { getMySchoolAction } from "@/server/actions/schools";
 import { listAccessRequestsAction } from "@/server/actions/school-access";
 import { AccessRequestsList } from "@/components/schools/access-requests-list";
@@ -22,19 +19,8 @@ import { Button } from "@/components/ui/button";
  * pending / approved / rejected / all.
  */
 export default async function AccessRequestsPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
   const t = await getTranslations("Schools");
   const tNav = await getTranslations("Navigation");
-
-  const role = user.role as UserRole;
-  if (role !== "school_admin" && role !== "platform_admin") {
-    redirect("/dashboard");
-  }
-
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const schoolRes = await getMySchoolAction();
   const school = schoolRes.success ? schoolRes.data : null;
@@ -42,11 +28,7 @@ export default async function AccessRequestsPage() {
   // No school yet → show empty state with CTA to create one.
   if (!school) {
     return (
-      <DashboardShell
-        role={role}
-        userName={userName}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <PageHeader
           title={tNav("accessRequests")}
           description={t("noSchoolForAccessCodes")}
@@ -72,11 +54,7 @@ export default async function AccessRequestsPage() {
   const requests = reqsRes.success ? reqsRes.data : [];
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tNav("accessRequests")}

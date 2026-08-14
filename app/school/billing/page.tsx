@@ -18,8 +18,6 @@ export default async function BillingPage() {
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const tNav = await getTranslations("Navigation");
   void tNav;
@@ -32,8 +30,11 @@ export default async function BillingPage() {
   }
 
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
-      <BillingView schoolId={schoolId} schoolMode={role === "school_admin" && Boolean(schoolId)} />
+    <DashboardShell>
+      <BillingView
+        schoolId={schoolId}
+        schoolMode={role === "school_admin" && Boolean(schoolId)}
+      />
     </DashboardShell>
   );
 }

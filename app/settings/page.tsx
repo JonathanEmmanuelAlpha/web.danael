@@ -23,21 +23,18 @@ export default async function SettingsPage() {
   const t = await getTranslations("Schools");
   const tNav = await getTranslations("Navigation");
   const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Non-school_admin → simple placeholder.
   if (role !== "school_admin" && role !== "platform_admin") {
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <PageHeader
           title={tNav("settings")}
           description={t("comingSoon")}
           icon={<SettingsIcon className="size-6" />}
         />
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-14 text-center">
-          <p className="text-sm text-muted-foreground">
-            {t("comingSoonHint")}
-          </p>
+          <p className="text-sm text-muted-foreground">{t("comingSoonHint")}</p>
         </div>
       </DashboardShell>
     );
@@ -49,7 +46,7 @@ export default async function SettingsPage() {
 
   if (!school) {
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <div className="mx-auto max-w-2xl">
           <PageHeader
             title={tNav("settings")}
@@ -63,7 +60,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title={t("schoolSettings")}

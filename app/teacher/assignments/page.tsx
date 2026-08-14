@@ -25,12 +25,15 @@ export default async function AssignmentsPage() {
 
   const t = await getTranslations("Assignments");
   const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Teacher view.
-  if (role === "teacher" || role === "school_admin" || role === "platform_admin") {
+  if (
+    role === "teacher" ||
+    role === "school_admin" ||
+    role === "platform_admin"
+  ) {
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <div className="space-y-6">
           <PageHeader
             title={t("title")}
@@ -54,7 +57,7 @@ export default async function AssignmentsPage() {
 
   // Student (and any other role) view.
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={t("title")}

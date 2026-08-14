@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CalendarClock, Gift, Users, Trophy } from "lucide-react";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -10,7 +8,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { JoinCompetitionButton } from "@/components/gamification/join-competition-button";
 import { CompetitionLeaderboard } from "@/components/gamification/competition-leaderboard";
 import { getCompetitionAction } from "@/server/actions/competitions";
-import type { UserRole } from "@/types";
 
 /**
  * §5.7 — Competition detail page (student view).
@@ -24,31 +21,14 @@ export default async function CompetitionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
-  const role = user.role as UserRole;
-  if (
-    role !== "student" &&
-    role !== "tutor" &&
-    role !== "teacher"
-  ) {
-    redirect("/dashboard");
-  }
 
   const tComp = await getTranslations("Competitions");
   const tCommon = await getTranslations("Common");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const res = await getCompetitionAction(id);
   if (!res.success) {
     return (
-      <DashboardShell
-        role={role}
-        userName={userName}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <EmptyState
           icon={Trophy}
           title={tComp("notFound")}
@@ -61,18 +41,17 @@ export default async function CompetitionDetailPage({
 
   const competition = res.data;
   const now = new Date();
-  const hasEnded = now > competition.endAt || competition.status === "ended" || competition.status === "cancelled";
+  const hasEnded =
+    now > competition.endAt ||
+    competition.status === "ended" ||
+    competition.status === "cancelled";
   const isActive =
     competition.status === "active" &&
     now >= competition.startAt &&
     now <= competition.endAt;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={competition.title}
@@ -93,7 +72,8 @@ export default async function CompetitionDetailPage({
               {tComp("dates")}
             </div>
             <p className="mt-2 text-sm font-medium text-foreground">
-              {formatDate(competition.startAt)} → {formatDate(competition.endAt)}
+              {formatDate(competition.startAt)} →{" "}
+              {formatDate(competition.endAt)}
             </p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
@@ -102,7 +82,9 @@ export default async function CompetitionDetailPage({
               {tComp("participantsLabel")}
             </div>
             <p className="mt-2 text-sm font-medium text-foreground">
-              {tComp("participantsCount", { count: competition.participantsCount })}
+              {tComp("participantsCount", {
+                count: competition.participantsCount,
+              })}
             </p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
@@ -119,7 +101,10 @@ export default async function CompetitionDetailPage({
         </div>
 
         {competition.prizeDescription ? (
-          <SectionCard title={tComp("prize")} icon={<Gift className="size-4" />}>
+          <SectionCard
+            title={tComp("prize")}
+            icon={<Gift className="size-4" />}
+          >
             <p className="text-sm text-muted-foreground">
               {competition.prizeDescription}
             </p>

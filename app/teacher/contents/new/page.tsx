@@ -1,12 +1,9 @@
-import { redirect } from "next/navigation";
 import { Upload } from "lucide-react";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentForm } from "@/components/contents/content-form";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 import type { Subject } from "@/server/db/schema/schools";
 
 export const dynamic = "force-dynamic";

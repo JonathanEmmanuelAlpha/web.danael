@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
@@ -12,8 +10,6 @@ import {
   listTeachersAction,
 } from "@/server/actions/users";
 
-import type { UserRole } from "@/types";
-
 /**
  * §5.3 — School admin: "Find a teacher" page.
  *
@@ -25,16 +21,7 @@ import type { UserRole } from "@/types";
  *  5. Hands off to <TeachersExplorer> for infinite scroll
  */
 export default async function FindTeachersPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
-  const role = user.role as UserRole;
-  if (role !== "school_admin" && role !== "platform_admin") {
-    redirect("/dashboard");
-  }
-
   const tUsers = await getTranslations("Users");
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Load the school the admin is acting on behalf of.
   const schoolRes = await getMySchoolAction();
@@ -42,11 +29,7 @@ export default async function FindTeachersPage() {
 
   if (!school) {
     return (
-      <DashboardShell
-        role={role}
-        userName={userName}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <PageHeader
           title={tUsers("findTeachers")}
           description={tUsers("findTeachersSubtitle")}
@@ -71,11 +54,7 @@ export default async function FindTeachersPage() {
   const subjects = subjectsRes.success ? subjectsRes.data : [];
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tUsers("findTeachers")}

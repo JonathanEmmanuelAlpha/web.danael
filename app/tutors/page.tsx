@@ -1,4 +1,4 @@
-import { getCurrentDbUser, toUserSessionData } from "@/lib/clerk";
+import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
 import { GraduationCap } from "lucide-react";
 
@@ -10,8 +10,6 @@ import {
   listSubjectsForFilterAction,
   listTutorsAction,
 } from "@/server/actions/users";
-
-import type { UserRole } from "@/types";
 
 /**
  * Public tutors listing — accessible to students AND parents (and any
@@ -56,17 +54,8 @@ export default async function TutorsPage() {
     );
   }
 
-  // Authenticated view — render under the dashboard shell for the user's role.
-  const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
-
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-      user={toUserSessionData(user)}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tUsers("findTutors")}

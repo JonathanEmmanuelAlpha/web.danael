@@ -1,31 +1,13 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser, toUserSessionData } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { JoinRequestsManager } from "@/components/memberships/join-requests-manager";
 import { getMySchoolAction } from "@/server/actions/schools";
 import { listReceivedJoinRequestsAction } from "@/server/actions/memberships";
 import { Inbox } from "lucide-react";
 import type { JoinRequestItem } from "@/stores/notifications-store";
-import type { UserRole } from "@/types";
 import { getTranslations } from "next-intl/server";
 
 export default async function RequestsPage() {
   const t = await getTranslations("Schools");
-
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
-  const role = user.role as UserRole;
-  if (
-    role !== "school_admin" &&
-    role !== "teacher" &&
-    role !== "platform_admin"
-  ) {
-    redirect("/dashboard");
-  }
-
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Get the school for this admin
   const schoolRes = await getMySchoolAction();
@@ -58,14 +40,7 @@ export default async function RequestsPage() {
   }
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-      userEmail={user.email}
-      user={toUserSessionData(user)}
-      receivedJoinRequests={requests}
-    >
+    <DashboardShell receivedJoinRequests={requests}>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">

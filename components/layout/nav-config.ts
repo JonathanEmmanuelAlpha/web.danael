@@ -90,6 +90,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           labelKey: "diagnostic",
           icon: ClipboardCheck,
         },
+        { href: "/classes", labelKey: "classes", icon: School },
         { href: "/tutors", labelKey: "tutors", icon: GraduationCap },
         { href: "/invitations", labelKey: "invitations", icon: Mail },
         { href: "/my-requests", labelKey: "myRequests", icon: Send },
@@ -112,7 +113,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
     {
       titleKey: "teach",
       items: [
-        { href: "/teacher/classes", labelKey: "classes", icon: School },
+        { href: "/classes", labelKey: "classes", icon: School },
         { href: "/teacher/quizzes", labelKey: "quizzes", icon: HelpCircle },
         {
           href: "/teacher/assignments",
@@ -166,7 +167,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           labelKey: "findStudents",
           icon: Search,
         },
-        { href: "/school/classes", labelKey: "classes", icon: School },
+        { href: "/classes", labelKey: "classes", icon: School },
         { href: "/school/requests", labelKey: "requests", icon: Inbox },
         {
           href: "/school/access-codes",

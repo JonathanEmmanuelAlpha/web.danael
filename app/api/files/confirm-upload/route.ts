@@ -1,11 +1,5 @@
-import { ok, fail, AppError, type ApiResponse } from "@/lib/api-response";
-import { requireDbUser } from "@/lib/clerk";
-import { getDb } from "@/server/db";
-import { files } from "@/server/db/schema";
-import { storage } from "@/lib/storage";
+import { fail, AppError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
-import { FILE_SIZE_LIMITS, ALLOWED_MIME_TYPES } from "@/lib/constants";
-import { eq } from "drizzle-orm";
 import { confirmUploadAction } from "@/server/actions/files";
 
 export const dynamic = "force-dynamic";

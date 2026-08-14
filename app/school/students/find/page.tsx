@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
@@ -9,8 +7,6 @@ import { StudentsExplorer } from "@/components/users/students-explorer";
 import { getMySchoolAction } from "@/server/actions/schools";
 import { listStudentsAction } from "@/server/actions/users";
 
-import type { UserRole } from "@/types";
-
 /**
  * §5.3 — School admin: "Find a student" page.
  *
@@ -18,16 +14,7 @@ import type { UserRole } from "@/types";
  * Stats on cards highlight "strong points" to encourage invitations.
  */
 export default async function FindStudentsPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
-  const role = user.role as UserRole;
-  if (role !== "school_admin" && role !== "platform_admin") {
-    redirect("/dashboard");
-  }
-
   const tUsers = await getTranslations("Users");
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Load the school the admin is acting on behalf of.
   const schoolRes = await getMySchoolAction();
@@ -35,11 +22,7 @@ export default async function FindStudentsPage() {
 
   if (!school) {
     return (
-      <DashboardShell
-        role={role}
-        userName={userName}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <PageHeader
           title={tUsers("findStudents")}
           description={tUsers("findStudentsSubtitle")}
@@ -59,11 +42,7 @@ export default async function FindStudentsPage() {
   const total = studentsRes.success ? studentsRes.data.total : 0;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tUsers("findStudents")}

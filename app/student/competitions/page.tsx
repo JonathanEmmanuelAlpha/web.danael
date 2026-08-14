@@ -17,24 +17,14 @@ export default async function StudentCompetitionsPage() {
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
-  if (
-    role !== "student" &&
-    role !== "tutor" &&
-    role !== "teacher"
-  ) {
+  if (role !== "student" && role !== "tutor" && role !== "teacher") {
     redirect("/dashboard");
   }
 
   const tComp = await getTranslations("Competitions");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tComp("title")}

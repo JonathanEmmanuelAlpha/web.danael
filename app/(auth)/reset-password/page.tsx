@@ -2,9 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useSignIn } from "@clerk/nextjs";
-import { useSafeSignIn } from "@/lib/safe-clerk";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSafeClerk, useSafeSignIn } from "@/lib/safe-clerk";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -30,6 +29,8 @@ export default function ResetPasswordPage() {
   const { fetchStatus, signIn } = useSafeSignIn();
   const isLoaded = fetchStatus === "idle";
 
+  const { setActive } = useSafeClerk();
+
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const schema = useMemo(
@@ -52,22 +53,33 @@ export default function ResetPasswordPage() {
       setGlobalError(null);
 
       try {
-        const result = await signIn.attemptVerification({
-          strategy: "reset_password_email_code",
-          code: value.code,
+        // Vérification du code OTP
+        await signIn.resetPasswordEmailCode.verifyCode({ code: value.code });
+
+        // Soumission du nouveau mot de passe
+        const result = await signIn.resetPasswordEmailCode.submitPassword({
+          password: value.password,
         });
 
-        if (result.status === "needs_new_password") {
-          await signIn.resetPassword({ password: value.password });
-          toast.success(t("resetPassword.success"));
-          const status = await getAuthStatusAction();
-          router.push(status.data?.onboardingCompleted ? "/dashboard" : "/onboarding/role");
-        } else {
-          setGlobalError(t("verifyAccount.invalidCode"));
-        }
+        // Remplacement de v7 pour setActive : On finalise le processus pour activer la session
+        await signIn.finalize();
+
+        if (result.error) setGlobalError(t("verifyAccount.invalidCode"));
+        else toast.success(t("resetPassword.success"));
+
+        const status = await getAuthStatusAction();
+
+        if (status.success)
+          router.push(
+            status.data.onboardingCompleted ? "/dashboard" : "/onboarding/role",
+          );
+
+        // Save the session
+        await setActive({ session: signIn.createdSessionId });
       } catch (err) {
         const clerkError = err as ClerkError;
-        const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
+        const msg =
+          clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
         setGlobalError(msg);
       }
     },
@@ -88,7 +100,9 @@ export default function ResetPasswordPage() {
           <AuthHeader title={t("resetPassword.title")} />
 
           <div className="mt-8">
-            {globalError && <FormError message={globalError} className="mb-4" />}
+            {globalError && (
+              <FormError message={globalError} className="mb-4" />
+            )}
 
             <form
               onSubmit={(e) => {
@@ -119,7 +133,8 @@ export default function ResetPasswordPage() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={
-                        field.state.meta.isTouched && field.state.meta.errors.length > 0
+                        field.state.meta.isTouched &&
+                        field.state.meta.errors.length > 0
                       }
                     />
                     <PasswordStrength password={field.state.value} />

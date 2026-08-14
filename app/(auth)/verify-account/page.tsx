@@ -82,7 +82,6 @@ export default function VerifyAccountPage() {
     await signUp?.finalize();
     await setActive({ session: signUp?.createdSessionId });
     toast.success(t("verifyAccount.success"));
-    // FIXED: /oboarding/role → /onboarding/role (typo in original).
     router.push("/onboarding/role");
   }
 

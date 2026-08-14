@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
 import { Users } from "lucide-react";
 
@@ -15,22 +13,10 @@ import { UsersTable } from "@/components/admin/users-table";
  * and a slide-over detail panel.
  */
 export default async function AdminUsersPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-  if (user.role !== "platform_admin" && user.role !== "support") {
-    redirect("/dashboard");
-  }
-
   const t = await getTranslations("Admin");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={user.role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={t("users")}

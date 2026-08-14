@@ -20,7 +20,11 @@ export default function SsoCallbackPage() {
     async function finalize() {
       try {
         const status = await getAuthStatusAction();
-        router.push(status.data?.onboardingCompleted ? "/dashboard" : "/onboarding/role");
+        if (status.success)
+          router.push(
+            status.data.onboardingCompleted ? "/dashboard" : "/onboarding/role",
+          );
+
         router.refresh();
       } catch {
         router.push("/sign-in");

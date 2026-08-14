@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ContentDetailView } from "@/components/contents/content-detail-view";
 import { getContentAction } from "@/server/actions/contents";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 
 export const dynamic = "force-dynamic";
 

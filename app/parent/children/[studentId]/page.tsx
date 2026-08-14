@@ -7,7 +7,6 @@ import { getDb } from "@/server/db";
 import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 
 /**
  * §5.14 — Parent view of a single child.
@@ -49,11 +48,9 @@ export default async function ChildDetailPage({
   }
 
   const t = await getTranslations("Parent");
-  const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <ChildDetailView studentId={studentId} />
       <p className="sr-only">{t("childOverview")}</p>
     </DashboardShell>

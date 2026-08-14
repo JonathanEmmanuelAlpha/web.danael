@@ -1,12 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentDbUser } from "@/lib/clerk";
-import {
-  getQuizAction,
-  getSessionAction,
-} from "@/server/actions/quizzes";
+import { getQuizAction, getSessionAction } from "@/server/actions/quizzes";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
-import { PageHeader } from "@/components/shared/page-header";
 import { QuizSessionView } from "@/components/quiz/quiz-session-view";
 import type { UserRole } from "@/types";
 
@@ -57,15 +53,8 @@ export default async function QuizSessionPage({
   }
   const quiz = quizRes.data;
 
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
-
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="mx-auto max-w-3xl space-y-6">
         <QuizSessionView quiz={quiz} session={session} />
       </div>

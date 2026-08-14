@@ -12,8 +12,14 @@ import { SubmissionStatusBadge } from "@/components/assignments/submission-statu
 import { SubmissionsList } from "@/components/assignments/submissions-list";
 import { SubmissionForm } from "@/components/assignments/submission-form";
 import { StudentSubmissionActions } from "@/components/assignments/student-submission-actions";
-import { PublishAssignmentButton, ArchiveAssignmentButton } from "@/components/assignments/publish-archive-buttons";
-import { getAssignmentAction, getSubmissionAction } from "@/server/actions/assignments";
+import {
+  PublishAssignmentButton,
+  ArchiveAssignmentButton,
+} from "@/components/assignments/publish-archive-buttons";
+import {
+  getAssignmentAction,
+  getSubmissionAction,
+} from "@/server/actions/assignments";
 import { isClassMember, isClassTeacher } from "@/server/permissions";
 import { getDb } from "@/server/db";
 import { eq, and } from "drizzle-orm";
@@ -57,7 +63,6 @@ export default async function AssignmentDetailPage({
   const t = await getTranslations("Assignments");
   const tNav = await getTranslations("Navigation");
   const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const res = await getAssignmentAction(id);
   if (!res.success || !res.data) {
@@ -70,7 +75,11 @@ export default async function AssignmentDetailPage({
 
   /* ── Teacher / school admin / platform admin view ───────── */
 
-  if (role === "teacher" || role === "school_admin" || role === "platform_admin") {
+  if (
+    role === "teacher" ||
+    role === "school_admin" ||
+    role === "platform_admin"
+  ) {
     const canManage =
       assignment.teacherId === user.id ||
       role === "platform_admin" ||
@@ -84,7 +93,7 @@ export default async function AssignmentDetailPage({
         .join(" ");
 
     return (
-      <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+      <DashboardShell>
         <div className="space-y-6">
           <PageHeader
             title={assignment.title}
@@ -92,11 +101,16 @@ export default async function AssignmentDetailPage({
             icon={<ClipboardList className="size-6" />}
             breadcrumbs={
               <nav className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                <Link href="/teacher-assignments" className="hover:text-foreground hover:underline">
+                <Link
+                  href="/teacher-assignments"
+                  className="hover:text-foreground hover:underline"
+                >
                   {tNav("assignments")}
                 </Link>
                 <span aria-hidden>/</span>
-                <span className="truncate text-foreground">{assignment.title}</span>
+                <span className="truncate text-foreground">
+                  {assignment.title}
+                </span>
               </nav>
             }
             actions={
@@ -153,7 +167,8 @@ export default async function AssignmentDetailPage({
             ) : null}
             {teacherName ? (
               <span className="text-xs">
-                {t("student")}: <span className="text-foreground">{teacherName}</span>
+                {t("student")}:{" "}
+                <span className="text-foreground">{teacherName}</span>
               </span>
             ) : null}
           </div>
@@ -249,10 +264,7 @@ export default async function AssignmentDetailPage({
     .select()
     .from(submissions)
     .where(
-      and(
-        eq(submissions.assignmentId, id),
-        eq(submissions.studentId, user.id),
-      ),
+      and(eq(submissions.assignmentId, id), eq(submissions.studentId, user.id)),
     )
     .limit(1);
   const mySubmissionRow = subRows.at(0) ?? null;
@@ -264,10 +276,11 @@ export default async function AssignmentDetailPage({
 
   const isGraded =
     mySubmission?.status === "graded" || mySubmission?.status === "returned";
-  const canSubmit = assignment.status === "published" || assignment.status === "closed";
+  const canSubmit =
+    assignment.status === "published" || assignment.status === "closed";
 
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={assignment.title}
@@ -275,11 +288,16 @@ export default async function AssignmentDetailPage({
           icon={<ClipboardList className="size-6" />}
           breadcrumbs={
             <nav className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-              <Link href="/teacher-assignments" className="hover:text-foreground hover:underline">
+              <Link
+                href="/teacher-assignments"
+                className="hover:text-foreground hover:underline"
+              >
                 {tNav("assignments")}
               </Link>
               <span aria-hidden>/</span>
-              <span className="truncate text-foreground">{assignment.title}</span>
+              <span className="truncate text-foreground">
+                {assignment.title}
+              </span>
             </nav>
           }
           actions={
@@ -352,7 +370,9 @@ export default async function AssignmentDetailPage({
           >
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">{t("score")}:</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("score")}:
+                </span>
                 <Badge variant="success" size="lg">
                   {mySubmission.score ?? t("noGrade")}
                   {assignment.points ? ` / ${assignment.points}` : ""}
@@ -368,7 +388,9 @@ export default async function AssignmentDetailPage({
                   </p>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">{t("noFeedback")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("noFeedback")}
+                </p>
               )}
               <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
                 <Button asChild variant="ghost" size="sm">
@@ -412,7 +434,10 @@ export default async function AssignmentDetailPage({
 
         {/* Files submitted (read-only) */}
         {mySubmission && mySubmission.files.length > 0 && !isGraded && (
-          <SectionCard title={t("files")} icon={<CheckCircle2 className="size-4" />}>
+          <SectionCard
+            title={t("files")}
+            icon={<CheckCircle2 className="size-4" />}
+          >
             <ul className="space-y-1.5">
               {mySubmission.files.map((file) => (
                 <li

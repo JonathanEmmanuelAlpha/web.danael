@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
 import { DollarSign } from "lucide-react";
 
@@ -14,22 +12,10 @@ import { PaymentsTable } from "@/components/admin/payments-table";
  * Lists all platform payments with status + provider filter + pagination.
  */
 export default async function AdminPaymentsPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-  if (user.role !== "platform_admin" && user.role !== "support") {
-    redirect("/dashboard");
-  }
-
   const t = await getTranslations("Admin");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={user.role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={t("payments")}

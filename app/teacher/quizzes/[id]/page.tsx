@@ -12,7 +12,10 @@ import {
   Users,
 } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { getQuizAction, listSessionsForQuizAction } from "@/server/actions/quizzes";
+import {
+  getQuizAction,
+  listSessionsForQuizAction,
+} from "@/server/actions/quizzes";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -43,20 +46,10 @@ export default async function QuizDetailPage({
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
-  if (
-    role !== "teacher" &&
-    role !== "school_admin" &&
-    role !== "platform_admin"
-  ) {
-    redirect("/dashboard");
-  }
 
   const tQuiz = await getTranslations("Quizzes");
   const tCommon = await getTranslations("Common");
   const tClasses = await getTranslations("Classes");
-  const tNav = await getTranslations("Navigation");
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const quizRes = await getQuizAction(id);
   if (!quizRes.success) {
@@ -100,16 +93,10 @@ export default async function QuizDetailPage({
       : 0;
 
   const level = quiz.level as Level | null;
-  const levelLabel = level
-    ? tClasses(`levelLabels.${level}` as const)
-    : null;
+  const levelLabel = level ? tClasses(`levelLabels.${level}` as const) : null;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={quiz.title}
@@ -179,7 +166,10 @@ export default async function QuizDetailPage({
         </div>
 
         {/* Quiz metadata */}
-        <SectionCard title={tQuiz("title")} icon={<FileText className="size-5" />}>
+        <SectionCard
+          title={tQuiz("title")}
+          icon={<FileText className="size-5" />}
+        >
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Meta label={tQuiz("subject")}>
               {quiz.subject ? quiz.subject.name : tQuiz("noSubject")}
@@ -294,7 +284,10 @@ export default async function QuizDetailPage({
             <QuizSessionsList
               sessions={sessions.map((s) => ({
                 id: s.id,
-                userName: [s.user.firstName, s.user.lastName].filter(Boolean).join(" ") || s.user.email,
+                userName:
+                  [s.user.firstName, s.user.lastName]
+                    .filter(Boolean)
+                    .join(" ") || s.user.email,
                 status: s.status,
                 totalScore: s.totalScore,
                 maxScore: s.maxScore,

@@ -1,14 +1,11 @@
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Library } from "lucide-react";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentFilters } from "@/components/contents/content-filters";
 import { LibraryContent } from "@/components/contents/library-content";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 import type { Subject } from "@/server/db/schema/schools";
 
 export const dynamic = "force-dynamic";

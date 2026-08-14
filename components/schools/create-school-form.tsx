@@ -24,7 +24,10 @@ interface CreateSchoolFormProps {
 }
 
 const createSchoolSchema = z.object({
-  name: z.string().min(2, "Le nom doit comporter au moins 2 caractères").max(100),
+  name: z
+    .string()
+    .min(2, "Le nom doit comporter au moins 2 caractères")
+    .max(100),
   city: z.string().max(100).optional().or(z.literal("")),
   region: z.string().max(100).optional().or(z.literal("")),
   type: z.enum(["public", "private", "parochial", "other"]),
@@ -66,8 +69,8 @@ export function CreateSchoolForm({ onCreated }: CreateSchoolFormProps) {
         contactEmail: value.contactEmail?.trim() || undefined,
         contactPhone: value.contactPhone?.trim() || undefined,
       });
-      if (!result.success || !result.data) {
-        toast.error(result.error?.message ?? t("createSchool"));
+      if (!result.success) {
+        toast.error(result.error.message ?? t("createSchool"));
         return;
       }
       toast.success(t("schoolCreated"));
@@ -180,7 +183,11 @@ export function CreateSchoolForm({ onCreated }: CreateSchoolFormProps) {
                   >
                     {tCommon("back")}
                   </Button>
-                  <SubmitButton pending={isSubmitting} disabled={!canSubmit} size="lg">
+                  <SubmitButton
+                    pending={isSubmitting}
+                    disabled={!canSubmit}
+                    size="lg"
+                  >
                     <Save className="size-4" />
                     {tCommon("create")}
                   </SubmitButton>

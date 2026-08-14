@@ -78,7 +78,14 @@ export default function SignInPage() {
           await setActive({ session: signIn.createdSessionId });
           // Resolve redirect based on onboarding status (server action, client-safe).
           const status = await getAuthStatusAction();
-          router.push(status.data?.onboardingCompleted ? "/dashboard" : "/onboarding/role");
+
+          if (status.success)
+            router.push(
+              status.data.onboardingCompleted
+                ? "/dashboard"
+                : "/onboarding/role",
+            );
+
           router.refresh();
         } else if (signIn.status === "needs_second_factor") {
           setNeedsSecondFactor(true);
@@ -88,7 +95,8 @@ export default function SignInPage() {
         }
       } catch (err) {
         const clerkError = err as ClerkError;
-        const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
+        const msg =
+          clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
         setGlobalError(msg);
       }
     },
@@ -103,12 +111,18 @@ export default function SignInPage() {
         await signIn.finalize();
         await setActive({ session: signIn.createdSessionId });
         const status = await getAuthStatusAction();
-        router.push(status.data?.onboardingCompleted ? "/dashboard" : "/onboarding/role");
+
+        if (status.success)
+          router.push(
+            status.data.onboardingCompleted ? "/dashboard" : "/onboarding/role",
+          );
+
         router.refresh();
       }
     } catch (err) {
       const clerkError = err as ClerkError;
-      const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.twoFactorInvalid");
+      const msg =
+        clerkError?.errors?.[0]?.longMessage ?? t("errors.twoFactorInvalid");
       setGlobalError(msg);
     }
   };
@@ -135,7 +149,8 @@ export default function SignInPage() {
       });
     } catch (err) {
       const clerkError = err as ClerkError;
-      const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.oauthFailed");
+      const msg =
+        clerkError?.errors?.[0]?.longMessage ?? t("errors.oauthFailed");
       setGlobalError(msg);
       setOauthPending(null);
     }
@@ -145,10 +160,15 @@ export default function SignInPage() {
     <AuthLayout>
       <AuthPanel>
         <div className="animate-fade-up">
-          <AuthHeader title={`${t("signIn.title")} 👋`} subtitle={t("signIn.subtitle")} />
+          <AuthHeader
+            title={`${t("signIn.title")} 👋`}
+            subtitle={t("signIn.subtitle")}
+          />
 
           <div className="mt-8">
-            {globalError && <FormError message={globalError} className="mb-4" />}
+            {globalError && (
+              <FormError message={globalError} className="mb-4" />
+            )}
 
             {!needsSecondFactor ? (
               <form
@@ -183,7 +203,8 @@ export default function SignInPage() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={
-                          field.state.meta.isTouched && field.state.meta.errors.length > 0
+                          field.state.meta.isTouched &&
+                          field.state.meta.errors.length > 0
                         }
                       />
                     </div>
@@ -212,7 +233,9 @@ export default function SignInPage() {
               </form>
             ) : (
               <div className="space-y-5">
-                <p className="text-sm text-white/70">{t("twoFactor.instruction")}</p>
+                <p className="text-sm text-white/70">
+                  {t("twoFactor.instruction")}
+                </p>
                 <Input
                   type="text"
                   inputMode="numeric"

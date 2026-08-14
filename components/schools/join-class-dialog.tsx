@@ -49,7 +49,10 @@ const joinClassSchema = z.object({
     .string()
     .min(4, "Code invalide")
     .max(20, "Code trop long")
-    .regex(/^[A-Z0-9]+$/, "Le code ne doit contenir que des majuscules et des chiffres"),
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Le code ne doit contenir que des majuscules et des chiffres",
+    ),
   role: z.enum(["admin", "teacher", "student", "parent", "staff"]),
 });
 
@@ -87,8 +90,8 @@ export function JoinClassDialog({
         code: value.inviteCode.toUpperCase(),
         role: value.role,
       });
-      if (!result.success || !result.data) {
-        toast.error(result.error?.message ?? t("invalidCode"));
+      if (!result.success) {
+        toast.error(result.error.message ?? t("invalidCode"));
         return;
       }
       toast.success(t("classJoined", { name: result.data.class.name }));

@@ -1,12 +1,9 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { MessageSquare } from "lucide-react";
 import { ThreadList } from "@/components/messaging/thread-list";
 import { NewConversationDialog } from "@/components/messaging/new-conversation-dialog";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 
 /**
  * §5.11 — Main messaging page.
@@ -22,21 +19,11 @@ import type { UserRole } from "@/types";
  * Both render the same `<NewConversationDialog />` (role-aware multi-step flow).
  */
 export default async function MessagesPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
   const tNav = await getTranslations("Navigation");
   const tMsg = await getTranslations("Messaging");
-  const role = user.role as UserRole;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tNav("messages")}

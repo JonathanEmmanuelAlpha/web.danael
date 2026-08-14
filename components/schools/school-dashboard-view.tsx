@@ -7,12 +7,10 @@ import { Loader2, School as SchoolIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageLoader } from "@/components/shared/loading";
-import { EmptyState } from "@/components/shared/empty-state";
 import { CreateSchoolForm } from "@/components/schools/create-school-form";
 import { getMySchoolAction } from "@/server/actions/schools";
 import type { SchoolWithCounts } from "@/server/services/schools";
 import type { User } from "@/server/db/schema/users";
-import type { UserRole } from "@/types";
 
 interface SchoolDashboardViewProps {
   user: Pick<User, "firstName" | "lastName" | "avatarUrl" | "role">;
@@ -30,7 +28,6 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
   const [school, setSchool] = useState<SchoolWithCounts | null | undefined>(
     undefined,
   );
-  const role = user.role as UserRole;
 
   useEffect(() => {
     let cancelled = false;
@@ -49,11 +46,7 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
 
   if (school === undefined) {
     return (
-      <DashboardShell
-        role={role}
-        userName={[user.firstName, user.lastName].filter(Boolean).join(" ") || undefined}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <PageLoader />
       </DashboardShell>
     );
@@ -61,11 +54,7 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
 
   if (!school) {
     return (
-      <DashboardShell
-        role={role}
-        userName={[user.firstName, user.lastName].filter(Boolean).join(" ") || undefined}
-        userImage={user.avatarUrl ?? undefined}
-      >
+      <DashboardShell>
         <CreateSchoolForm
           onCreated={(s) => {
             setSchool(s);
@@ -78,11 +67,7 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
   }
 
   return (
-    <DashboardShell
-      role={role}
-      userName={[user.firstName, user.lastName].filter(Boolean).join(" ") || undefined}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <SchoolOverview school={school} />
     </DashboardShell>
   );

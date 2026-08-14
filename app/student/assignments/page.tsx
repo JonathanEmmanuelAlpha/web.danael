@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -11,14 +9,10 @@ import { getTranslations } from "next-intl/server";
  * Lists all assignments the student needs to complete (with submission status).
  */
 export default async function StudentAssignmentsPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-
   const t = await getTranslations("Navigation");
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell role="student" userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <PageHeader
         title={t("assignments")}
         description="Vos devoirs à rendre"

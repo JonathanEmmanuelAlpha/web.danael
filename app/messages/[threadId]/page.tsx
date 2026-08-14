@@ -3,7 +3,6 @@ import { getCurrentDbUser } from "@/lib/clerk";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ThreadList } from "@/components/messaging/thread-list";
 import { ThreadView } from "@/components/messaging/thread-view";
-import type { UserRole } from "@/types";
 
 /**
  * §5.11 — Specific thread view.
@@ -21,16 +20,9 @@ export default async function ThreadPage({
   const user = await getCurrentDbUser();
   if (!user) redirect("/sign-in");
   const { threadId } = await params;
-  const role = user.role as UserRole;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="grid h-[calc(100vh-9rem)] grid-cols-1 overflow-hidden rounded-xl border border-border bg-card lg:grid-cols-[360px_1fr]">
         {/* List — desktop only. */}
         <div className="hidden border-r border-border lg:flex">

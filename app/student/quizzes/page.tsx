@@ -18,26 +18,16 @@ export default async function StudentQuizzesPage() {
 
   const role = user.role as UserRole;
   // Students (and tutors who act as learners) can take quizzes.
-  if (
-    role !== "student" &&
-    role !== "tutor" &&
-    role !== "teacher"
-  ) {
+  if (role !== "student" && role !== "tutor" && role !== "teacher") {
     redirect("/dashboard");
   }
 
   const tNav = await getTranslations("Navigation");
   const tQuiz = await getTranslations("Quizzes");
   void tNav;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={tQuiz("availableQuizzes")}

@@ -1,10 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentDbUser } from "@/lib/clerk";
-import {
-  getQuizAction,
-  updateQuizAction,
-} from "@/server/actions/quizzes";
+import { getQuizAction, updateQuizAction } from "@/server/actions/quizzes";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { QuizForm } from "@/components/quiz/quiz-form";
@@ -27,13 +24,6 @@ export default async function EditQuizPage({
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
-  if (
-    role !== "teacher" &&
-    role !== "school_admin" &&
-    role !== "platform_admin"
-  ) {
-    redirect("/dashboard");
-  }
 
   const tQuiz = await getTranslations("Quizzes");
   void tQuiz;
@@ -57,9 +47,6 @@ export default async function EditQuizPage({
 
   const subjectsRes = await listSubjectsAction();
   const subjects = subjectsRes.success ? subjectsRes.data : [];
-
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   // Adapt quiz shape for the form.
   const initialQuiz = {
@@ -88,9 +75,7 @@ export default async function EditQuizPage({
     })),
   }));
 
-  async function submitAction(
-    payload: CreateQuizInput & { id?: string },
-  ) {
+  async function submitAction(payload: CreateQuizInput & { id?: string }) {
     "use server";
     if (!payload.id) {
       return {
@@ -127,11 +112,7 @@ export default async function EditQuizPage({
   }
 
   return (
-    <DashboardShell
-      role={role}
-      userName={userName}
-      userImage={user.avatarUrl ?? undefined}
-    >
+    <DashboardShell>
       <QuizForm
         mode="edit"
         initialQuiz={initialQuiz}

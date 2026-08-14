@@ -7,7 +7,6 @@ import { ContentForm } from "@/components/contents/content-form";
 import { getContentAction } from "@/server/actions/contents";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { getTranslations } from "next-intl/server";
-import type { UserRole } from "@/types";
 import type { Subject } from "@/server/db/schema/schools";
 
 export const dynamic = "force-dynamic";
@@ -28,8 +27,6 @@ export default async function EditContentPage({
 
   const { id } = await params;
   const t = await getTranslations("Contents");
-  const role = user.role as UserRole;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   const res = await getContentAction(id);
   if (!res.success) {
@@ -51,7 +48,7 @@ export default async function EditContentPage({
   const subjects: Subject[] = subjectsRes.success ? subjectsRes.data : [];
 
   return (
-    <DashboardShell role={role} userName={userName} userImage={user.avatarUrl ?? undefined}>
+    <DashboardShell>
       <div className="space-y-6">
         <PageHeader
           title={t("editContent")}
