@@ -56,13 +56,8 @@ export default function DiagnosticPage() {
       {/* Header */}
       <div className="relative flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="shrink-0"
-          >
-            <Link href="/learning">
+          <Button asChild variant="ghost" size="sm" className="shrink-0">
+            <Link href="/student/learning">
               <ArrowLeft className="size-4" />
               {t("backToLearning")}
             </Link>
@@ -140,7 +135,7 @@ export default function DiagnosticPage() {
               {t("diagnosticEmpty")}
             </h2>
             <Button asChild variant="brand-outline" size="sm" className="mt-5">
-              <Link href="/learning">{t("backToLearning")}</Link>
+              <Link href="/student/learning">{t("backToLearning")}</Link>
             </Button>
           </Card>
         </div>

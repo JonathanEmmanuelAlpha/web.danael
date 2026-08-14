@@ -83,10 +83,10 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
     {
       titleKey: "me",
       items: [
-        { href: "/progress", labelKey: "progress", icon: TrendingUp },
-        { href: "/badges", labelKey: "badges", icon: Award },
+        { href: "/student/progress", labelKey: "progress", icon: TrendingUp },
+        { href: "/student/badges", labelKey: "badges", icon: Award },
         {
-          href: "/learning/diagnostic",
+          href: "/student/learning/diagnostic",
           labelKey: "diagnostic",
           icon: ClipboardCheck,
         },

@@ -54,3 +54,8 @@ export const ROUTES = {
   tutorDashboard: "/dashboard",
   adminDashboard: "/admin/dashboard",
 } as const;
+
+/** XP required per level (level = floor(totalXp / XP_PER_LEVEL) + 1). */
+export const XP_PER_LEVEL = 1000;
+/** Maximum streak freezes a user can use per rolling 7-day window. */
+export const MAX_STREAK_FREEZES_PER_WEEK = 2;

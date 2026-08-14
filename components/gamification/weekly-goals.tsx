@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Target } from "lucide-react";
 import { toast } from "sonner";
@@ -16,37 +16,23 @@ import {
   NumberField,
   SubmitButton,
 } from "@/components/forms/tanstack-fields";
-import {
-  createGoalAction,
-  getGoalsAction,
-} from "@/server/actions/gamification";
+import { createGoalAction } from "@/server/actions/gamification";
 import type { GoalWithProgress } from "@/server/services/gamification";
-import {
-  GOAL_TYPE_VALUES,
-  GOAL_PERIOD_VALUES,
-} from "@/server/db/schema/enums";
+import { GOAL_TYPE_VALUES, GOAL_PERIOD_VALUES } from "@/server/db/schema/enums";
+import { ApiError } from "@/lib/api-response";
 
-export function WeeklyGoals({ userId }: { userId: string }) {
+export function WeeklyGoals({
+  data,
+  error,
+}: {
+  error: ApiError | null;
+  data: GoalWithProgress[] | null;
+}) {
   const t = useTranslations("Gamification");
   const tCommon = useTranslations("Common");
 
-  const [goals, setGoals] = useState<GoalWithProgress[] | null>(null);
-  const [error, setError] = useState(false);
+  const [goals, setGoals] = useState<GoalWithProgress[] | null>(data);
   const [showForm, setShowForm] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    getGoalsAction()
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) setGoals(res.data);
-        else setError(true);
-      })
-      .catch(() => !cancelled && setError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
 
   const schema = z.object({
     type: z.enum(GOAL_TYPE_VALUES),
@@ -203,7 +189,9 @@ export function WeeklyGoals({ userId }: { userId: string }) {
           </div>
           <div className="mt-3 flex items-center justify-end gap-2">
             <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+              selector={(state) =>
+                [state.canSubmit, state.isSubmitting] as const
+              }
             >
               {([canSubmit, isSubmitting]) => (
                 <>

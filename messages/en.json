@@ -763,6 +763,7 @@
     "seriesLabel": "Series {series}",
     "subject": "Subject",
     "subjectPlaceholder": "Choose a subject",
+    "visibilityText": "Visibility",
     "visibility": {
       "public": "Public",
       "school_private": "School private",
@@ -771,6 +772,7 @@
       "draft": "Draft",
       "archived": "Archived"
     },
+    "statusText": "Status",
     "status": {
       "draft": "Draft",
       "in_review": "In review",
@@ -1245,6 +1247,7 @@
     "loadFailedHint": "Please try again in a moment",
     "noGoals": "No goals",
     "noGoalsHint": "Create your first goal to track your progress",
+    "createGoal": "Add a goal",
     "noActivities": "No recent activity",
     "noActivitiesHint": "View a content or complete a quiz to get started",
     "completed": "Completed",

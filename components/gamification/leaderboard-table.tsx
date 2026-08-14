@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Trophy, EyeOff } from "lucide-react";
 import {
@@ -15,8 +15,8 @@ import { Badge as UIBadge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getLeaderboardAction } from "@/server/actions/gamification";
 import type { LeaderboardEntry } from "@/server/services/gamification";
+import { ApiError } from "@/lib/api-response";
 
 const RANK_STYLES = [
   "bg-amber-400/15 text-amber-600 dark:text-amber-400",
@@ -25,29 +25,16 @@ const RANK_STYLES = [
 ];
 
 export function LeaderboardTable({
-  scope = "global",
+  data,
+  error,
   currentUserId,
 }: {
-  scope?: "class" | "school" | "regional" | "national" | "global";
+  error: ApiError | null;
+  data: LeaderboardEntry[] | null;
   currentUserId?: string;
 }) {
   const t = useTranslations("Gamification");
-  const [entries, setEntries] = useState<LeaderboardEntry[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    getLeaderboardAction({ scope, limit: 50 })
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) setEntries(res.data.entries);
-        else setError(true);
-      })
-      .catch(() => !cancelled && setError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [scope]);
+  const [entries, setEntries] = useState<LeaderboardEntry[] | null>(data);
 
   if (error) {
     return (
@@ -119,7 +106,10 @@ export function LeaderboardTable({
                   <div className="flex items-center gap-2">
                     <Avatar className="size-7">
                       {entry.avatarUrl ? (
-                        <AvatarImage src={entry.avatarUrl} alt={entry.displayName} />
+                        <AvatarImage
+                          src={entry.avatarUrl}
+                          alt={entry.displayName}
+                        />
                       ) : null}
                       <AvatarFallback className="text-[10px]">
                         {initials}

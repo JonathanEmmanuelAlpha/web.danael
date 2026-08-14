@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Flame, Snowflake, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -8,36 +8,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  freezeStreakAction,
-  getStreakAction,
-} from "@/server/actions/gamification";
+import { freezeStreakAction } from "@/server/actions/gamification";
 import type { StreakInfo } from "@/server/services/gamification";
-import { MAX_STREAK_FREEZES_PER_WEEK } from "@/server/services/gamification";
+import { ApiError } from "@/lib/api-response";
+import { MAX_STREAK_FREEZES_PER_WEEK } from "@/lib/constants";
 
 /**
  * §5.8 — Streak card: current streak (with flame icon), longest streak, and a
  * "Freeze streak" button (max 2 freezes per rolling 7-day window).
  */
-export function StreakCard({ userId }: { userId: string }) {
+export function StreakCard({
+  streakData,
+  error,
+}: {
+  streakData: StreakInfo | null;
+  error: ApiError | null;
+}) {
   const t = useTranslations("Gamification");
-  const [data, setData] = useState<StreakInfo | null>(null);
+  const [data, setData] = useState<StreakInfo | null>(streakData);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    getStreakAction()
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) setData(res.data);
-        else setError(true);
-      })
-      .catch(() => !cancelled && setError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
 
   async function handleFreeze() {
     setPending(true);
@@ -88,7 +77,10 @@ export function StreakCard({ userId }: { userId: string }) {
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {t("longestStreak")}: <span className="font-semibold">{data.longestStreak} {t("days")}</span>
+            {t("longestStreak")}:{" "}
+            <span className="font-semibold">
+              {data.longestStreak} {t("days")}
+            </span>
             {data.activeToday ? (
               <span className="ml-2 inline-flex items-center gap-1 text-success">
                 · {t("activeToday")}

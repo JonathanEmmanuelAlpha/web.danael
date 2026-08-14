@@ -41,13 +41,9 @@ import type {
   UserPoint,
   User,
 } from "@/server/db/schema";
+import { MAX_STREAK_FREEZES_PER_WEEK, XP_PER_LEVEL } from "@/lib/constants";
 
 /* ── Constants ─────────────────────────────────────────────── */
-
-/** XP required per level (level = floor(totalXp / XP_PER_LEVEL) + 1). */
-export const XP_PER_LEVEL = 1000;
-/** Maximum streak freezes a user can use per rolling 7-day window. */
-export const MAX_STREAK_FREEZES_PER_WEEK = 2;
 
 /* ── Types ─────────────────────────────────────────────────── */
 

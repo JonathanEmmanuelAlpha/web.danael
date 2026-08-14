@@ -214,7 +214,7 @@ export function ContentForm({
             {(field) => (
               <SelectField
                 field={field}
-                label={t("visibility")}
+                label={t("visibilityText")}
                 options={CONTENT_VISIBILITY_VALUES.map((v) => ({
                   value: v,
                   label: t(`visibility.${v}` as const),
@@ -226,7 +226,7 @@ export function ContentForm({
             {(field) => (
               <SelectField
                 field={field}
-                label={t("status")}
+                label={t("statusText")}
                 options={PUBLICATION_STATUS_VALUES.map((s) => ({
                   value: s,
                   label: t(`status.${s}` as const),

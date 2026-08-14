@@ -763,6 +763,7 @@
     "seriesLabel": "Série {series}",
     "subject": "Matière",
     "subjectPlaceholder": "Choisir une matière",
+    "visibilityText": "Visibilité",
     "visibility": {
       "public": "Public",
       "school_private": "Privé école",
@@ -771,6 +772,7 @@
       "draft": "Brouillon",
       "archived": "Archivé"
     },
+    "statusText": "Status",
     "status": {
       "draft": "Brouillon",
       "in_review": "En revue",
@@ -1245,6 +1247,7 @@
     "loadFailedHint": "Veuillez réessayer dans un instant",
     "noGoals": "Aucun objectif",
     "noGoalsHint": "Créez votre premier objectif pour suivre votre progression",
+    "createGoal": "Ajouter un objectif",
     "noActivities": "Aucune activité récente",
     "noActivitiesHint": "Consultez un contenu ou terminez un quiz pour démarrer",
     "completed": "Complété",

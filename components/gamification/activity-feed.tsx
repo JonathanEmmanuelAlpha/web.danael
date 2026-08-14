@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Activity,
@@ -16,9 +16,9 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge as UIBadge } from "@/components/ui/badge";
-import { getActivitiesAction } from "@/server/actions/gamification";
 import type { ActivityWithMeta } from "@/server/services/gamification";
 import type { ActivityTypeValue } from "@/server/db/schema/enums";
+import { ApiError } from "@/lib/api-response";
 
 const ACTIVITY_ICON: Partial<Record<ActivityTypeValue, typeof Activity>> = {
   view_content: BookOpen,
@@ -43,29 +43,14 @@ const ACTIVITY_BADGE_STYLES: Partial<Record<ActivityTypeValue, string>> = {
 };
 
 export function ActivityFeed({
-  userId,
-  limit = 15,
+  data,
+  error,
 }: {
-  userId: string;
-  limit?: number;
+  error: ApiError | null;
+  data: ActivityWithMeta[] | null;
 }) {
   const t = useTranslations("Gamification");
-  const [items, setItems] = useState<ActivityWithMeta[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    getActivitiesAction(limit)
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) setItems(res.data);
-        else setError(true);
-      })
-      .catch(() => !cancelled && setError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [userId, limit]);
+  const [items, setItems] = useState<ActivityWithMeta[] | null>(data);
 
   if (error) {
     return (

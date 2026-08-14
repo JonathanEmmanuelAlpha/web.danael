@@ -1,37 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Sparkles, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getPointsAction } from "@/server/actions/gamification";
 import type { UserPointsWithLevel } from "@/server/services/gamification";
+import { ApiError } from "@/lib/api-response";
 
 /**
  * §5.8 — XP card showing the user's total XP, level and progress bar to the
  * next level (1000 XP per level).
  */
-export function XpCard({ userId }: { userId: string }) {
+export function XpCard({
+  data,
+  error,
+}: {
+  error: ApiError | null;
+  data: UserPointsWithLevel | null;
+}) {
   const t = useTranslations("Gamification");
-  const [data, setData] = useState<UserPointsWithLevel | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    getPointsAction()
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) setData(res.data);
-        else setError(true);
-      })
-      .catch(() => !cancelled && setError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
 
   if (error) {
     return (
@@ -86,7 +75,10 @@ export function XpCard({ userId }: { userId: string }) {
             {data.progressPercent}%
           </span>
         </div>
-        <Progress value={data.progressPercent} aria-label={t("progressToNextLevel")} />
+        <Progress
+          value={data.progressPercent}
+          aria-label={t("progressToNextLevel")}
+        />
       </div>
     </Card>
   );
