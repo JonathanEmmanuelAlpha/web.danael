@@ -30,7 +30,7 @@ export default async function RequestsPage({
         refId: targetClass.id,
         refName: targetClass.name,
         role: r.role,
-        message: r.message,
+        message: r.message ?? undefined,
         status: r.status as JoinRequestItem["status"],
         requestedBy: {
           id: r.userId,
