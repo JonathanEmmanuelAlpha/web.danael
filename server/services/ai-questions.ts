@@ -1,20 +1,30 @@
 /**
  * §10.4 — AI question generation service (Adaptive Learning Loop).
  *
- * Generates quiz questions for a given skill node using the z-ai-web-dev-sdk
- * (server-side only). Generated questions are stored in `quiz_questions` with
+ * Generates quiz questions for a given skill node using the DeepSeek API
+ * (via the OpenAI SDK). Generated questions are stored in `quiz_questions` with
  * `source = "generated"`, the originating model name, and the target skill id,
  * so the teacher validation interface can list / verify them.
  *
- * The SDK is loaded dynamically so the rest of the platform keeps working in
- * environments where `z-ai-web-dev-sdk` is not installed (sandbox, CI, etc.).
- * In that case the service falls back to deterministic placeholder questions
- * so the teacher UI can still be exercised end-to-end.
+ * The service falls back to deterministic placeholder questions when the API key
+ * is missing, the call fails, or the response cannot be parsed, so the teacher UI
+ * can still be exercised end-to-end in sandbox or CI environments.
  *
  * Pure data-access layer — auth / RBAC is enforced by the server actions.
  */
 
-import { and, asc, count, desc, eq, ilike, inArray, isNull, or, SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNull,
+  SQL,
+} from "drizzle-orm";
+import OpenAI from "openai";
 
 import { getDb } from "@/server/db";
 import {
@@ -41,9 +51,12 @@ export type QuestionType =
   | "single_choice"
   | "multiple_choice"
   | "true_false"
-  | "short_answer";
+  | "short_answer"
+  | "essay";
 
 export type Difficulty = "easy" | "medium" | "hard";
+
+export type Locale = "en" | "fr";
 
 export interface GenerateQuestionsInput {
   skillId: string;
@@ -54,6 +67,8 @@ export interface GenerateQuestionsInput {
   questionTypes: QuestionType[];
   /** The teacher triggering the generation (recorded as the AI Bank quiz's creator). */
   teacherId: string;
+  /** Locale for the generated questions (default: 'en') */
+  locale?: Locale;
 }
 
 export interface GeneratedQuestion {
@@ -67,7 +82,7 @@ export interface GeneratedQuestion {
 export interface GenerateQuestionsResult {
   generated: number;
   questionIds: string[];
-  /** Whether the AI SDK was actually called or placeholders were used. */
+  /** Whether the AI API was actually called or placeholders were used. */
   source: "ai" | "placeholder";
   /** Model identifier recorded against each question (for the badge tooltip). */
   modelName: string;
@@ -99,7 +114,7 @@ export interface GeneratedQuestionListItem {
   quizTitle: string;
 }
 
-const AI_MODEL_NAME = "z-ai-web-dev-sdk";
+const AI_MODEL_NAME = "deepseek"; // identifies the model used for generation
 
 /* ── Public API ─────────────────────────────────────────────── */
 
@@ -107,8 +122,8 @@ const AI_MODEL_NAME = "z-ai-web-dev-sdk";
  * Generate quiz questions for a specific skill using the AI model, then persist
  * them with `source = "generated"`.
  *
- * NEVER throws — on any failure (SDK missing, parse error, DB error) it returns
- * `{ generated: 0, questionIds: [], source: "placeholder" | "ai", modelName }`.
+ * NEVER throws — on any failure (missing API key, API error, parse error, DB error)
+ * it returns `{ generated: 0, questionIds: [], source: "placeholder" | "ai", modelName }`.
  */
 export async function generateQuestionsForSkill(
   input: GenerateQuestionsInput,
@@ -118,6 +133,7 @@ export async function generateQuestionsForSkill(
     input.questionTypes.length > 0
       ? input.questionTypes
       : (["single_choice"] as QuestionType[]);
+  const locale = input.locale ?? "en";
 
   // 1. Build the prompt and call the AI model.
   const prompt = buildPrompt({
@@ -126,20 +142,22 @@ export async function generateQuestionsForSkill(
     count: safeCount,
     difficulty: input.difficulty,
     questionTypes: safeTypes,
+    locale,
   });
 
   let questions: GeneratedQuestion[] = [];
   let source: "ai" | "placeholder" = "ai";
   try {
-    questions = await callAIModel(prompt);
+    questions = await callDeepSeekAPI(prompt, locale);
     if (questions.length === 0) {
-      // SDK succeeded but returned nothing — fall back to placeholders.
+      // API succeeded but returned nothing — fall back to placeholders.
       source = "placeholder";
       questions = buildPlaceholderQuestions({
         skillName: input.skillName,
         count: safeCount,
         difficulty: input.difficulty,
         questionTypes: safeTypes,
+        locale,
       });
     }
   } catch (err) {
@@ -153,6 +171,7 @@ export async function generateQuestionsForSkill(
       count: safeCount,
       difficulty: input.difficulty,
       questionTypes: safeTypes,
+      locale,
     });
   }
 
@@ -218,67 +237,43 @@ export async function generateQuestionsForSkill(
   };
 }
 
-/* ── AI model call ──────────────────────────────────────────── */
+/* ── DeepSeek API call using OpenAI SDK ────────────────────── */
 
 /**
- * Type declarations for the z-ai-web-dev-sdk (optional dependency).
+ * Call the DeepSeek chat completion API using the official OpenAI SDK.
+ * The API key must be set in the environment variable `DEEPSEEK_API_KEY`.
+ * On any error (missing key, network failure, malformed response) the function
+ * throws — the caller decides whether to fall back to placeholders.
  */
-type ZaiModule = {
-  default?: { create: () => Promise<ZaiClientShape> };
-  create?: () => Promise<ZaiClientShape>;
-};
-
-type ZaiClientShape = {
-  chat: {
-    completions: {
-      create: (params: {
-        messages: Array<{ role: string; content: string }>;
-      }) => Promise<{
-        choices?: Array<{ message?: { content?: string } }>;
-      }>;
-    };
-  };
-};
-
-/**
- * Call the z-ai-web-dev-sdk to generate quiz questions in JSON format.
- *
- * The SDK is loaded via require() with try/catch so the platform still compiles
- * & runs when the package is not installed (sandbox). On any error (missing
- * package, network, JSON parse) the function throws — the caller decides
- * whether to fall back to placeholders.
- */
-async function callAIModel(prompt: string): Promise<GeneratedQuestion[]> {
-  // The z-ai-web-dev-sdk may not be installed in sandbox environments.
-  // We use a try/catch around a require-style lookup so Turbopack doesn't
-  // fail at build time when the package is absent.
-  let ZAI: { create: () => Promise<ZaiClientShape> } | null = null;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("z-ai-web-dev-sdk") as ZaiModule;
-    ZAI = mod.default ?? (mod as unknown as { create: () => Promise<ZaiClientShape> });
-  } catch {
-    // Package not installed — fall through to throw
+async function callDeepSeekAPI(
+  prompt: string,
+  locale: Locale,
+): Promise<GeneratedQuestion[]> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error("DEEPSEEK_API_KEY environment variable is not set");
   }
 
-  if (!ZAI) {
-    throw new Error("z-ai-web-dev-sdk is not installed");
-  }
-
-  const zai = await ZAI.create();
-  const response = await zai.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are an expert educational content creator. Generate quiz questions in JSON format only — no markdown, no prose.",
-      },
-      { role: "user", content: prompt },
-    ],
+  const client = new OpenAI({
+    baseURL: "https://api.deepseek.com/v1",
+    apiKey,
   });
 
-  const content: string =
-    response?.choices?.[0]?.message?.content ?? "[]";
+  const systemMessage =
+    locale === "fr"
+      ? "Vous êtes un expert en création de contenu éducatif. Générez des questions de quiz au format JSON uniquement — pas de markdown, pas de prose."
+      : "You are an expert educational content creator. Generate quiz questions in JSON format only — no markdown, no prose.";
+
+  const response = await client.chat.completions.create({
+    model: "deepseek-chat",
+    messages: [
+      { role: "system", content: systemMessage },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.7,
+  });
+
+  const content = response.choices?.[0]?.message?.content ?? "[]";
 
   // Strip accidental markdown code fences before parsing.
   const cleaned = content
@@ -291,7 +286,7 @@ async function callAIModel(prompt: string): Promise<GeneratedQuestion[]> {
   return parsed as GeneratedQuestion[];
 }
 
-/* ── Prompt builder ─────────────────────────────────────────── */
+/* ── Prompt builder with internationalization ──────────────── */
 
 function buildPrompt(params: {
   skillName: string;
@@ -299,6 +294,7 @@ function buildPrompt(params: {
   count: number;
   difficulty: Difficulty;
   questionTypes: QuestionType[];
+  locale: Locale;
 }): string {
   const {
     skillName,
@@ -306,8 +302,30 @@ function buildPrompt(params: {
     count,
     difficulty,
     questionTypes,
+    locale,
   } = params;
 
+  if (locale === "fr") {
+    return [
+      `Générez ${count} questions de quiz de niveau ${difficulty} sur le thème « ${skillName} ».`,
+      skillDescription ? `Contexte : ${skillDescription}` : "",
+      `Types de questions à inclure : ${questionTypes.join(", ")}.`,
+      "",
+      "Renvoie un tableau JSON où chaque question possède :",
+      "- type : un des types suivants : " + questionTypes.join(", "),
+      "- label : le texte de la question (chaîne)",
+      "- options : tableau de { label: string, isCorrect: boolean } (pour single_choice, multiple_choice, true_false). Pour true_false, fournissez exactement deux options : Vrai et Faux.",
+      "- explanation : brève explication de la réponse correcte (chaîne)",
+      `- difficulty : "${difficulty}"`,
+      "",
+      "Rendez les questions pédagogiquement solides, adaptées à l'âge des lycéens et culturellement pertinentes pour le système éducatif camerounais.",
+      "Renvoie UNIQUEMENT le tableau JSON, sans autre texte.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  // Default English
   return [
     `Generate ${count} ${difficulty} quiz questions about "${skillName}".`,
     skillDescription ? `Context: ${skillDescription}` : "",
@@ -327,10 +345,10 @@ function buildPrompt(params: {
     .join("\n");
 }
 
-/* ── Placeholder fallback ───────────────────────────────────── */
+/* ── Placeholder fallback with i18n ────────────────────────── */
 
 /**
- * Build deterministic placeholder questions when the AI SDK is unavailable.
+ * Build deterministic placeholder questions when the AI API is unavailable.
  * These still respect the requested question types and difficulty so the
  * teacher validation UI can be exercised end-to-end in sandbox mode.
  */
@@ -339,45 +357,89 @@ function buildPlaceholderQuestions(params: {
   count: number;
   difficulty: Difficulty;
   questionTypes: QuestionType[];
+  locale: Locale;
 }): GeneratedQuestion[] {
-  const { skillName, count, difficulty, questionTypes } = params;
+  const { skillName, count, difficulty, questionTypes, locale } = params;
   const out: GeneratedQuestion[] = [];
+
+  const isFr = locale === "fr";
+
   for (let i = 0; i < count; i++) {
     const type = questionTypes[i % questionTypes.length] ?? "single_choice";
-    const label = `[Placeholder ${i + 1}] Which of the following best describes "${skillName}"?`;
+
+    const label = isFr
+      ? `[Espace réservé ${i + 1}] Lequel des énoncés suivants décrit le mieux « ${skillName} » ?`
+      : `[Placeholder ${i + 1}] Which of the following best describes "${skillName}"?`;
+
+    const explanation = isFr
+      ? `Explication générique pour ${skillName} (élément ${i + 1}).`
+      : `Placeholder explanation for ${skillName} (item ${i + 1}).`;
+
     if (type === "true_false") {
       out.push({
         type,
         label,
         options: [
-          { label: "True", isCorrect: i % 2 === 0 },
-          { label: "False", isCorrect: i % 2 === 1 },
+          { label: isFr ? "Vrai" : "True", isCorrect: i % 2 === 0 },
+          { label: isFr ? "Faux" : "False", isCorrect: i % 2 === 1 },
         ],
-        explanation: `Placeholder explanation for ${skillName} (item ${i + 1}).`,
+        explanation,
         difficulty,
       });
     } else if (type === "short_answer") {
+      const shortLabel = isFr
+        ? `[Espace réservé ${i + 1}] En une phrase, définissez « ${skillName} ».`
+        : `[Placeholder ${i + 1}] In one sentence, define "${skillName}".`;
       out.push({
         type,
-        label: `[Placeholder ${i + 1}] In one sentence, define "${skillName}".`,
-        explanation: `Expected answer mentions the core definition of ${skillName}.`,
+        label: shortLabel,
+        explanation: isFr
+          ? `La réponse attendue mentionne la définition fondamentale de ${skillName}.`
+          : `Expected answer mentions the core definition of ${skillName}.`,
+        difficulty,
+      });
+    } else if (type === "essay") {
+      const essayLabel = isFr
+        ? `[Espace réservé ${i + 1}] Rédigez un court essai sur l'importance de « ${skillName} » dans l'éducation.`
+        : `[Placeholder ${i + 1}] Write a short essay on the importance of "${skillName}" in education.`;
+      out.push({
+        type,
+        label: essayLabel,
+        explanation: isFr
+          ? `L'essai devrait couvrir les concepts clés de ${skillName} et leurs applications.`
+          : `The essay should cover key concepts of ${skillName} and its applications.`,
         difficulty,
       });
     } else {
       // single_choice or multiple_choice
       const isMultiple = type === "multiple_choice";
+      const options = [
+        {
+          label: isFr
+            ? "Un énoncé correct"
+            : "A correct statement about the skill",
+          isCorrect: true,
+        },
+        {
+          label: isFr ? "Une idée fausse courante" : "A common misconception",
+          isCorrect: false,
+        },
+        {
+          label: isFr ? "Un fait sans rapport" : "An unrelated fact",
+          isCorrect: false,
+        },
+      ];
+      if (isMultiple) {
+        options.push({
+          label: isFr ? "Un autre angle correct" : "Another correct angle",
+          isCorrect: true,
+        });
+      }
       out.push({
         type,
         label,
-        options: [
-          { label: "A correct statement about the skill", isCorrect: true },
-          { label: "A common misconception", isCorrect: false },
-          { label: "An unrelated fact", isCorrect: false },
-          ...(isMultiple
-            ? [{ label: "Another correct angle", isCorrect: true }]
-            : []),
-        ],
-        explanation: `Placeholder explanation for ${skillName} (item ${i + 1}).`,
+        options,
+        explanation,
         difficulty,
       });
     }
@@ -414,8 +476,12 @@ function sanitizeGeneratedQuestion(
   const explanation =
     typeof raw.explanation === "string" ? raw.explanation.trim() : undefined;
 
-  // Options are required for MCQ / true_false.
-  if (type === "single_choice" || type === "multiple_choice" || type === "true_false") {
+  // Options are required only for MCQ / true_false.
+  if (
+    type === "single_choice" ||
+    type === "multiple_choice" ||
+    type === "true_false"
+  ) {
     if (!Array.isArray(raw.options) || raw.options.length < 2) return null;
     const options = raw.options
       .map((o) => ({
@@ -440,8 +506,13 @@ function sanitizeGeneratedQuestion(
     return { type, label, options, explanation, difficulty };
   }
 
-  // short_answer — no options needed.
-  return { type, label, explanation, difficulty };
+  // short_answer and essay require no options.
+  if (type === "short_answer" || type === "essay") {
+    return { type, label, explanation, difficulty };
+  }
+
+  // fallback (should never happen)
+  return null;
 }
 
 /* ── AI Bank quiz resolution ────────────────────────────────── */
@@ -602,7 +673,9 @@ export async function listGeneratedQuestions(
   }
 
   if (filters.skillId) {
-    conditions.push(eq(quizQuestions.generatedForSkillId, filters.skillId) as never);
+    conditions.push(
+      eq(quizQuestions.generatedForSkillId, filters.skillId) as never,
+    );
   }
   if (filters.subjectId) {
     conditions.push(eq(quizzes.subjectId, filters.subjectId) as never);
@@ -831,6 +904,3 @@ export async function listSkillsForFilter(
     type: r.type,
   }));
 }
-
-/* ── Suppress unused-import warnings for tree-shaken helpers ── */
-void or;
