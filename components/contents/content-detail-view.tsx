@@ -97,9 +97,6 @@ export function ContentDetailView({
     };
   }, [content.file?.key, isUploadthing]);
 
-  console.log("downloadUrl", downloadUrl);
-  console.log("content.file?.fileUrl", content.file?.fileUrl);
-
   async function handleDownload() {
     if (!content.file?.key || !downloadUrl) return;
     setLoadingUrl(true);

@@ -147,7 +147,6 @@ export function FileUploader({
   // Uploadthing Path
   const { startUpload, routeConfig } = useUploadThing("fileUploader", {
     onClientUploadComplete: async (files) => {
-      console.log("FILES UPLOADED: ", files);
       const results: UploadedFile[] = [];
 
       for (const file of files) {
@@ -183,11 +182,9 @@ export function FileUploader({
       }
     },
     onUploadError: () => {
-      toast.error("error occurred while uploading");
+      toast.error("An error occurred while uploading");
     },
-    onUploadBegin: (fileName) => {
-      console.log("upload has begun for", fileName);
-    },
+    onUploadBegin: (fileName) => {},
   });
 
   const handleFiles = useCallback(

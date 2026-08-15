@@ -138,6 +138,7 @@ export function ContentForm({
         tags: parseList(value.tags),
         skills: parseList(value.skills),
         fileId: value.fileId ?? undefined,
+        thumbnailFileId: value.thumbnailFileId ?? undefined,
       };
 
       const result =
@@ -405,16 +406,29 @@ export function ContentForm({
             category="content"
             hint={t("fileHint")}
             onUploaded={(file: UploadedFile) => {
-              if (file.id) form.setFieldValue("fileId", file.id);
+              if (file.id) {
+                if (file.contentType.includes("image"))
+                  form.setFieldValue("thumbnailFileId", file.id);
+                else form.setFieldValue("fileId", file.id);
+              }
             }}
           />
-          <form.Subscribe selector={(state) => state.values.fileId}>
-            {(fileId) =>
-              fileId ? (
-                <p className="text-xs text-success">{t("fileLinked")}</p>
-              ) : null
-            }
-          </form.Subscribe>
+          <div className="flex items-center gap-3">
+            <form.Subscribe selector={(state) => state.values.fileId}>
+              {(fileId) =>
+                fileId ? (
+                  <p className="text-xs text-success">{t("fileLinked")}</p>
+                ) : null
+              }
+            </form.Subscribe>
+            <form.Subscribe selector={(state) => state.values.thumbnailFileId}>
+              {(fileId) =>
+                fileId ? (
+                  <p className="text-xs text-info">{t("thumbnailLinked")}</p>
+                ) : null
+              }
+            </form.Subscribe>
+          </div>
         </div>
 
         {serverError && <FormErrorBanner message={serverError} />}

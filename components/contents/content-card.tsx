@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ContentTypeBadge } from "./content-type-badge";
 import type { ContentListItem } from "@/server/services/contents";
+import Image from "next/image";
 
 export interface ContentCardProps {
   content: ContentListItem;
@@ -22,14 +23,21 @@ export function ContentCard({ content, href, className }: ContentCardProps) {
   const t = useTranslations("Contents");
   const tClasses = useTranslations("Classes");
 
-  const detailHref = href ?? `/student/contents/${content.id}`;
+  const detailHref = href ?? `/contents/${content.id}`;
 
   return (
     <Card
       className={`group flex h-full flex-col gap-3 overflow-hidden p-0 transition hover:border-primary-500/40 hover:shadow-sm ${className ?? ""}`}
     >
       {/* Thumbnail placeholder (gradient by type) */}
-      <Link href={detailHref} className="block">
+      <Link href={detailHref} className="block relative">
+        {content.thumbnail && (
+          <Image
+            alt={`${content.title}-Thumbnail`}
+            src={content.thumbnail.fileUrl}
+            fill
+          />
+        )}
         <div className="relative flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-primary-500/15 via-primary-500/5 to-transparent">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-background/80 text-primary-700 backdrop-blur dark:text-primary-400">
             <BookOpen className="size-6" />

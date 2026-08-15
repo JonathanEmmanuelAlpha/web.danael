@@ -43,7 +43,7 @@ export default async function ContentDetailPage({
     <DashboardShell>
       <div className="space-y-6">
         <Link
-          href="/library"
+          href="/student/library"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />

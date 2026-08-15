@@ -850,6 +850,7 @@
     "file": "File",
     "fileHint": "PDF, image or video — max 256 MB",
     "fileLinked": "File linked successfully",
+    "thumbnailLinked": "Thumbnail linked successfully",
     "preview": "Preview",
     "noPreview": "No preview available for this file type",
     "noFile": "No file is associated with this content.",

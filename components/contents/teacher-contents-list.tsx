@@ -152,7 +152,7 @@ export function TeacherContentsList({ teacherId }: TeacherContentsListProps) {
                 )}
               </div>
               <Link
-                href={`/teacher/contents/${c.id}`}
+                href={`/contents/${c.id}`}
                 className="block truncate font-medium text-foreground hover:text-primary-700 dark:hover:text-primary-400"
               >
                 {c.title}
@@ -173,7 +173,7 @@ export function TeacherContentsList({ teacherId }: TeacherContentsListProps) {
             </div>
             <div className="flex shrink-0 flex-wrap gap-1">
               <Button asChild variant="ghost" size="sm">
-                <Link href={`/teacher/contents/${c.id}`}>
+                <Link href={`/contents/${c.id}`}>
                   <Eye className="size-4" />
                   <span className="sr-only">{tCommon("view")}</span>
                 </Link>

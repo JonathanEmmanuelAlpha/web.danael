@@ -850,6 +850,7 @@
     "file": "Fichier",
     "fileHint": "PDF, image ou vidéo — max 256 MB",
     "fileLinked": "Fichier lié avec succès",
+    "thumbnailLinked": "Vignette associée avec succès",
     "preview": "Aperçu",
     "noPreview": "Aucun aperçu disponible pour ce type de fichier",
     "noFile": "Aucun fichier n'est associé à ce contenu.",

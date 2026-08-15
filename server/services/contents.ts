@@ -32,6 +32,7 @@ import type {
   ContentReport,
   ContentVersion,
   File as ContentFileRow,
+  File,
 } from "@/server/db/schema/contents";
 import type { Subject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
@@ -85,6 +86,7 @@ export type ContentListItem = Pick<
 > & {
   subject: SubjectInfo | null;
   uploader: Pick<Uploader, "id" | "firstName" | "lastName"> | null;
+  thumbnail: Pick<File, "fileUrl" | "id"> | null;
 };
 
 export type ContentListResult = {
@@ -459,10 +461,12 @@ export async function listContents(
       updatedAt: contents.updatedAt,
       subject: subjects,
       uploader: users,
+      thumbnail: files,
     })
     .from(contents)
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
+    .leftJoin(files, eq(files.id, contents.thumbnailFileId))
     .where(where)
     .orderBy(...orderBy)
     .limit(filters.pageSize)
@@ -498,6 +502,9 @@ export async function listContents(
     subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
     uploader: r.uploader?.id
       ? (r.uploader as ContentListItem["uploader"])
+      : null,
+    thumbnail: r.thumbnail?.id
+      ? (r.thumbnail as ContentListItem["thumbnail"])
       : null,
   }));
 
@@ -559,10 +566,12 @@ export async function searchContents(
       updatedAt: contents.updatedAt,
       subject: subjects,
       uploader: users,
+      thumbnail: files,
     })
     .from(contents)
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
+    .leftJoin(files, eq(files.id, contents.thumbnailFileId))
     .where(where)
     .orderBy(desc(contents.viewsCount), desc(contents.createdAt))
     .limit(input.pageSize)
@@ -598,6 +607,9 @@ export async function searchContents(
     subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
     uploader: r.uploader?.id
       ? (r.uploader as ContentListItem["uploader"])
+      : null,
+    thumbnail: r.thumbnail?.id
+      ? (r.thumbnail as ContentListItem["thumbnail"])
       : null,
   }));
 
@@ -697,11 +709,13 @@ export async function listFavorites(
       updatedAt: contents.updatedAt,
       subject: subjects,
       uploader: users,
+      thumbnail: files,
     })
     .from(favorites)
     .innerJoin(contents, eq(contents.id, favorites.contentId))
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
+    .leftJoin(files, eq(files.id, contents.thumbnailFileId))
     .where(where)
     .orderBy(desc(favorites.createdAt))
     .limit(pageSize)
@@ -739,6 +753,9 @@ export async function listFavorites(
       subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
       uploader: r.uploader?.id
         ? (r.uploader as ContentListItem["uploader"])
+        : null,
+      thumbnail: r.thumbnail?.id
+        ? (r.thumbnail as ContentListItem["thumbnail"])
         : null,
     },
   }));
