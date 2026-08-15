@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { QuizQuestionWithOptions } from "@/server/services/quizzes";
 import type { QuizAnswerDraft } from "@/stores/quiz-session-store";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 interface QuestionTypesProps {
   question: QuizQuestionWithOptions;
@@ -20,7 +20,7 @@ interface QuestionTypesProps {
   disabled?: boolean;
 }
 
-/* ── Component ────────────────────────────────────────────── */
+/* -- Component ---------------------------------------------- */
 
 /**
  * §5.6 — Renders the appropriate input UI for the question type.
@@ -41,7 +41,7 @@ export function QuestionTypes({
 }: QuestionTypesProps) {
   const t = useTranslations("Quizzes");
 
-  /* ── single_choice ──────────────────────────────────────── */
+  /* -- single_choice ---------------------------------------- */
   if (question.type === "single_choice") {
     const selected =
       value && value.questionType === "single_choice"
@@ -67,7 +67,8 @@ export function QuestionTypes({
               "flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-background p-4 transition",
               "hover:border-primary-500/40 hover:bg-primary-500/5",
               selected === opt.id && "border-primary-500 bg-primary-500/5",
-              disabled && "cursor-default opacity-70 hover:border-border hover:bg-transparent",
+              disabled &&
+                "cursor-default opacity-70 hover:border-border hover:bg-transparent",
             )}
           >
             <RadioGroupItem
@@ -90,9 +91,7 @@ export function QuestionTypes({
                 {t("correct")}
               </Badge>
             ) : null}
-            {disabled &&
-            selected === opt.id &&
-            !opt.isCorrect ? (
+            {disabled && selected === opt.id && !opt.isCorrect ? (
               <Badge variant="destructive" size="sm">
                 <X className="size-3" />
                 {t("incorrect")}
@@ -104,7 +103,7 @@ export function QuestionTypes({
     );
   }
 
-  /* ── true_false ─────────────────────────────────────────── */
+  /* -- true_false ------------------------------------------- */
   if (question.type === "true_false") {
     const selected =
       value && value.questionType === "true_false"
@@ -144,7 +143,8 @@ export function QuestionTypes({
               "flex cursor-pointer items-center justify-center gap-3 rounded-xl border border-border bg-background p-5 transition",
               "hover:border-primary-500/40 hover:bg-primary-500/5",
               selected === id && "border-primary-500 bg-primary-500/5",
-              disabled && "cursor-default opacity-70 hover:border-border hover:bg-transparent",
+              disabled &&
+                "cursor-default opacity-70 hover:border-border hover:bg-transparent",
             )}
           >
             <RadioGroupItem
@@ -173,7 +173,7 @@ export function QuestionTypes({
     );
   }
 
-  /* ── multiple_choice ───────────────────────────────────── */
+  /* -- multiple_choice ------------------------------------- */
   if (question.type === "multiple_choice") {
     const selected =
       value && value.questionType === "multiple_choice"
@@ -203,7 +203,8 @@ export function QuestionTypes({
                 "flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-background p-4 transition",
                 "hover:border-primary-500/40 hover:bg-primary-500/5",
                 checked && "border-primary-500 bg-primary-500/5",
-                disabled && "cursor-default opacity-70 hover:border-border hover:bg-transparent",
+                disabled &&
+                  "cursor-default opacity-70 hover:border-border hover:bg-transparent",
               )}
             >
               <Checkbox
@@ -232,7 +233,7 @@ export function QuestionTypes({
                   <X className="size-3" />
                   {t("incorrect")}
                 </Badge>
-            ) : null}
+              ) : null}
             </label>
           );
         })}
@@ -240,7 +241,7 @@ export function QuestionTypes({
     );
   }
 
-  /* ── short_answer ───────────────────────────────────────── */
+  /* -- short_answer ----------------------------------------- */
   if (question.type === "short_answer") {
     const text =
       value && value.questionType === "short_answer" ? value.answerText : "";
@@ -262,10 +263,9 @@ export function QuestionTypes({
     );
   }
 
-  /* ── essay ──────────────────────────────────────────────── */
+  /* -- essay ------------------------------------------------ */
   // type === "essay"
-  const text =
-    value && value.questionType === "essay" ? value.answerText : "";
+  const text = value && value.questionType === "essay" ? value.answerText : "";
   return (
     <Textarea
       value={text}

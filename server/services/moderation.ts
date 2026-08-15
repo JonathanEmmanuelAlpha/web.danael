@@ -25,7 +25,7 @@ import type {
   ListReportsQuery,
 } from "@/server/validators/admin";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { ModerationReport };
 
@@ -64,7 +64,7 @@ export type PaginatedReports = {
 
 export type ModerationAction = "approved" | "removed" | "warning";
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 export async function createReport(
   reporterId: string,
@@ -163,7 +163,7 @@ export async function removeMessage(
   await db.delete(messages).where(eq(messages.id, messageId));
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function listReports(
   filters: ListReportsQuery,

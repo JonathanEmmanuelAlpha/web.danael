@@ -303,7 +303,7 @@ export default async function QuizDetailPage({
   );
 }
 
-/* ── Meta helper ──────────────────────────────────────────── */
+/* -- Meta helper -------------------------------------------- */
 
 function Meta({
   label,

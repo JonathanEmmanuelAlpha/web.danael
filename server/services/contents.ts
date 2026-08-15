@@ -36,7 +36,7 @@ import type {
 import type { Subject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { Content, ContentNote, ContentReport, ContentVersion };
 
@@ -104,7 +104,7 @@ export type NoteWithAuthor = ContentNote & {
   author: Pick<User, "id" | "email" | "firstName" | "lastName" | "avatarUrl">;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Create a content entry + link its file (if provided).
@@ -284,7 +284,7 @@ export async function incrementDownloads(id: string): Promise<void> {
     .where(eq(contents.id, id));
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 /**
  * Get a content by id with its subject, uploader, file info, thumbnail.
@@ -604,7 +604,7 @@ export async function searchContents(
   return { items, total, page: input.page, pageSize: input.pageSize };
 }
 
-/* ── Favorites ─────────────────────────────────────────────── */
+/* -- Favorites ----------------------------------------------- */
 
 /**
  * Toggle a favorite on/off. Returns `true` if now favorited, `false` otherwise.
@@ -746,7 +746,7 @@ export async function listFavorites(
   return { items, total, page, pageSize };
 }
 
-/* ── Notes ──────────────────────────────────────────────────── */
+/* -- Notes ---------------------------------------------------- */
 
 /**
  * Add a private note on a content.
@@ -791,7 +791,7 @@ export async function listNotes(
   return rows.map((r) => ({ ...r.note, author: r.author }));
 }
 
-/* ── Reports ───────────────────────────────────────────────── */
+/* -- Reports ------------------------------------------------- */
 
 /**
  * Report a content for moderation.
@@ -810,7 +810,7 @@ export async function reportContent(
   return created;
 }
 
-/* ── Versions ──────────────────────────────────────────────── */
+/* -- Versions ------------------------------------------------ */
 
 /**
  * List the version history of a content.
@@ -839,7 +839,7 @@ export async function listContentVersions(
   }));
 }
 
-/* ── Helpers ───────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------- */
 
 /**
  * Resolve the storage key for a content's primary file.

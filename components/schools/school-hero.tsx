@@ -49,9 +49,7 @@ export function SchoolHero({ school, className }: SchoolHeroProps) {
     return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "?";
   }, [school.name]);
 
-  const typeLabel = school.type
-    ? t(`types.${school.type}` as const)
-    : null;
+  const typeLabel = school.type ? t(`types.${school.type}` as const) : null;
 
   async function handleBecomeStudent() {
     setPendingStudent(true);
@@ -208,7 +206,10 @@ export function SchoolHero({ school, className }: SchoolHeroProps) {
           {(school.contactEmail || school.contactPhone) && (
             <div className="rounded-2xl border border-border bg-surface-2/60 p-4 backdrop-blur-md">
               <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-semibold text-foreground">
-                <MessageSquare className="size-4 text-primary-300" aria-hidden />
+                <MessageSquare
+                  className="size-4 text-primary-300"
+                  aria-hidden
+                />
                 {t("contactInfo")}
               </h3>
               <div className="flex flex-col gap-1.5 text-sm text-muted-foreground sm:flex-row sm:gap-6">
@@ -288,7 +289,7 @@ export function SchoolHero({ school, className }: SchoolHeroProps) {
   );
 }
 
-/* ── Hero stat tile ────────────────────────────────────────────── */
+/* -- Hero stat tile ---------------------------------------------- */
 
 interface HeroStatTileProps {
   icon: React.ComponentType<{ className?: string }>;

@@ -43,7 +43,7 @@ import { cn } from "@/lib/utils";
 import { submitDiagnosticAction } from "@/server/actions/learning";
 import type { DiagnosticQuestion } from "@/server/services/learning";
 
-/* ── Types ──────────────────────────────────────────────────── */
+/* -- Types ---------------------------------------------------- */
 
 type SessionState = "question" | "submitting" | "results" | "error";
 
@@ -54,7 +54,7 @@ interface AnswerDraft {
   startedAt: number;
 }
 
-/* ── Helpers ────────────────────────────────────────────────── */
+/* -- Helpers -------------------------------------------------- */
 
 const TIMER_SECONDS = 15 * 60; // 15 minutes
 
@@ -78,7 +78,7 @@ function questionTypeLabel(type: string, t: (k: string) => string): string {
   }
 }
 
-/* ── Component ──────────────────────────────────────────────── */
+/* -- Component ------------------------------------------------ */
 
 export interface DiagnosticSessionProps {
   sessionId: string;
@@ -148,9 +148,7 @@ export function DiagnosticSession({
     return a.selectedOptionIds.length > 0 || a.answerText.trim().length > 0;
   };
 
-  function updateCurrentAnswer(
-    patch: Partial<AnswerDraft>,
-  ) {
+  function updateCurrentAnswer(patch: Partial<AnswerDraft>) {
     if (!currentQuestion) return;
     setAnswers((prev) => ({
       ...prev,
@@ -216,7 +214,7 @@ export function DiagnosticSession({
     toast.success(t("diagnosticCompleted"));
   }
 
-  /* ── Loading state (questions still fetching upstream) ───── */
+  /* -- Loading state (questions still fetching upstream) ----- */
   if (questions.length === 0) {
     return (
       <div className={cn("mx-auto max-w-3xl", className)}>
@@ -232,7 +230,7 @@ export function DiagnosticSession({
     );
   }
 
-  /* ── Results screen ───────────────────────────────────────── */
+  /* -- Results screen ----------------------------------------- */
   if (state === "results" && score !== null) {
     const scoreColor =
       score >= 70
@@ -310,11 +308,7 @@ export function DiagnosticSession({
                   {t("diagnosticGeneratingPlan")}
                 </Button>
               )}
-              <Button
-                asChild
-                variant="brand-outline"
-                size="lg"
-              >
+              <Button asChild variant="brand-outline" size="lg">
                 <Link href="/learning">
                   <ArrowLeft className="size-4" />
                   {t("backToLearning")}
@@ -327,7 +321,7 @@ export function DiagnosticSession({
     );
   }
 
-  /* ── Error screen ─────────────────────────────────────────── */
+  /* -- Error screen ------------------------------------------- */
   if (state === "error") {
     return (
       <div className={cn("mx-auto max-w-2xl", className)}>
@@ -351,7 +345,7 @@ export function DiagnosticSession({
     );
   }
 
-  /* ── Question screen ──────────────────────────────────────── */
+  /* -- Question screen ---------------------------------------- */
   const isMulti = currentQuestion?.type === "multiple_choice";
   const isShortAnswer = currentQuestion?.type === "short_answer";
 
@@ -364,7 +358,9 @@ export function DiagnosticSession({
             <span className="font-medium text-foreground">
               {t("diagnosticQuestion")} {currentIdx + 1}
             </span>
-            <span>{t("diagnosticOf")} {questions.length}</span>
+            <span>
+              {t("diagnosticOf")} {questions.length}
+            </span>
           </div>
           <div
             className={cn(
@@ -422,7 +418,9 @@ export function DiagnosticSession({
           {isShortAnswer ? (
             <Input
               value={currentAnswer?.answerText ?? ""}
-              onChange={(e) => updateCurrentAnswer({ answerText: e.target.value })}
+              onChange={(e) =>
+                updateCurrentAnswer({ answerText: e.target.value })
+              }
               placeholder={t("diagnosticTypeAnswer")}
               className="w-full"
               autoFocus

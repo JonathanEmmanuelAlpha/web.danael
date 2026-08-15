@@ -2,10 +2,10 @@ import { BookOpen, Flame, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
-/* ────────────────────────────────────────────────────────────
+/* ------------------------------------------------------------
    Floating achievement cards (social proof on auth pages).
    Data extracted from original AuthLayout.tsx (DRY).
-   ──────────────────────────────────────────────────────────── */
+   ------------------------------------------------------------ */
 
 export interface AchievementCardData {
   id: string;

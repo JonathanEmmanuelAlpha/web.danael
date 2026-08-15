@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { LEVEL_VALUES } from "@/server/db/schema/enums";
 
-/* ── Tutor profile ───────────────────────────────────────────── */
+/* -- Tutor profile --------------------------------------------- */
 
 export const createTutorProfileSchema = z.object({
   bio: z.string().min(20, "Bio trop courte (20 caractères min)").max(2000),
@@ -33,7 +33,7 @@ export const removeTutorSubjectSchema = z.object({
   subjectId: z.uuid(),
 });
 
-/* ── Availabilities ─────────────────────────────────────────── */
+/* -- Availabilities ------------------------------------------- */
 
 const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -49,7 +49,7 @@ export const setAvailabilitySchema = z.object({
   slots: z.array(availabilitySlotSchema).max(50),
 });
 
-/* ── Bookings ───────────────────────────────────────────────── */
+/* -- Bookings ------------------------------------------------- */
 
 export const createBookingSchema = z.object({
   tutorProfileId: z.uuid(),
@@ -74,11 +74,15 @@ export const bookingIdSchema = z.object({
   bookingId: z.uuid(),
 });
 
-/* ── Reviews ─────────────────────────────────────────────────── */
+/* -- Reviews --------------------------------------------------- */
 
 export const createReviewSchema = z.object({
   bookingId: z.uuid(),
-  rating: z.number().int().min(1, "Note minimale : 1").max(5, "Note maximale : 5"),
+  rating: z
+    .number()
+    .int()
+    .min(1, "Note minimale : 1")
+    .max(5, "Note maximale : 5"),
   comment: z.string().max(2000).optional(),
 });
 
@@ -87,7 +91,7 @@ export const moderateReviewSchema = z.object({
   action: z.enum(["approve", "hide"]),
 });
 
-/* ── Search / list ───────────────────────────────────────────── */
+/* -- Search / list --------------------------------------------- */
 
 export const listTutorsQuerySchema = z.object({
   search: z.string().max(200).optional(),
@@ -117,7 +121,7 @@ export const listTutorReviewsQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(50).default(10),
 });
 
-/* ── Exported input types ────────────────────────────────────── */
+/* -- Exported input types -------------------------------------- */
 
 export type CreateTutorProfileInput = z.infer<typeof createTutorProfileSchema>;
 export type UpdateTutorProfileInput = z.infer<typeof updateTutorProfileSchema>;
@@ -131,5 +135,7 @@ export type CancelBookingInput = z.infer<typeof cancelBookingSchema>;
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type ModerateReviewInput = z.infer<typeof moderateReviewSchema>;
 export type ListTutorsQuery = z.infer<typeof listTutorsQuerySchema>;
-export type ListTutorBookingsQuery = z.infer<typeof listTutorBookingsQuerySchema>;
+export type ListTutorBookingsQuery = z.infer<
+  typeof listTutorBookingsQuerySchema
+>;
 export type ListTutorReviewsQuery = z.infer<typeof listTutorReviewsQuerySchema>;

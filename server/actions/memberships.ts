@@ -640,7 +640,7 @@ export async function listMyJoinRequestsAction(): Promise<
   ApiResponse<
     Array<{
       id: string;
-      type: "school";
+      type: "school" | "class";
       refId: string;
       refName: string;
       refCity: string | null;

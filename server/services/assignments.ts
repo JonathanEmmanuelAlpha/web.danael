@@ -58,7 +58,7 @@ import type { Class, Subject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 import type { File } from "@/server/db/schema/contents";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { Assignment, AssignmentItem, Submission, SubmissionFile, Grade };
 
@@ -98,7 +98,7 @@ export type SubmissionWithRelations = Submission & {
   assignment: Pick<Assignment, "id" | "title" | "points" | "dueAt">;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Create a new assignment (with optional items).
@@ -217,7 +217,7 @@ export async function publishAssignment(id: string): Promise<Assignment> {
   return updated;
 }
 
-/* ── Items ─────────────────────────────────────────────────── */
+/* -- Items --------------------------------------------------- */
 
 export async function addAssignmentItem(
   input: AssignmentItemInput & { assignmentId: string },
@@ -247,7 +247,7 @@ export async function removeAssignmentItem(id: string): Promise<void> {
   await db.delete(assignmentItems).where(eq(assignmentItems.id, id));
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 /**
  * Get a single assignment with class / subject / teacher / items.
@@ -554,7 +554,7 @@ export async function listAssignmentsForStudent(
   return enriched;
 }
 
-/* ── Submissions ───────────────────────────────────────────── */
+/* -- Submissions --------------------------------------------- */
 
 /**
  * Submit an assignment (creates the submission row + links files).
@@ -980,7 +980,7 @@ export async function returnSubmission(
   return updated;
 }
 
-/* ── Helpers ───────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------- */
 
 /**
  * Returns true if the assignment's deadline has passed.

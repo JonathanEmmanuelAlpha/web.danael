@@ -3,15 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  Check,
-  X,
-  Clock,
-  School,
-  Users,
-  Mail,
-  Loader2,
-} from "lucide-react";
+import { Check, X, Clock, School, Users, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,12 +20,17 @@ interface InvitationsListProps {
 }
 
 function statusBadge(status: InvitationItem["status"]) {
-  const map: Record<InvitationItem["status"], { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  const map: Record<
+    InvitationItem["status"],
+    {
+      label: string;
+      variant: "default" | "secondary" | "destructive" | "outline";
+    }
+  > = {
     pending: { label: "En attente", variant: "default" },
     accepted: { label: "Acceptée", variant: "secondary" },
     rejected: { label: "Refusée", variant: "outline" },
     expired: { label: "Expirée", variant: "destructive" },
-    cancelled: { label: "Annulée", variant: "outline" },
   };
   return map[status] ?? { label: status, variant: "outline" };
 }

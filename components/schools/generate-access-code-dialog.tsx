@@ -139,7 +139,7 @@ export function GenerateAccessCodeDialog({
         </DialogHeader>
 
         {generatedCode ? (
-          // ── Success state: show the generated code prominently ──
+          // -- Success state: show the generated code prominently --
           <div className="space-y-4">
             <div className="glass-card glow-primary flex flex-col items-center gap-3 rounded-2xl px-5 py-7 text-center">
               <div className="glass flex size-12 items-center justify-center rounded-xl text-primary-400 glow-primary-sm">
@@ -194,7 +194,7 @@ export function GenerateAccessCodeDialog({
             </DialogFooter>
           </div>
         ) : (
-          // ── Form state ──
+          // -- Form state --
           <form
             onSubmit={(e) => {
               e.preventDefault();

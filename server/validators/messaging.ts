@@ -12,14 +12,17 @@ import {
   AUDIENCE_VALUES,
 } from "@/server/db/schema/enums";
 
-/* ── Threads ───────────────────────────────────────────────── */
+/* -- Threads ------------------------------------------------- */
 
 export const createThreadSchema = z.object({
   type: z.enum(THREAD_TYPE_VALUES).default("direct"),
   schoolId: z.uuid().optional(),
   classId: z.uuid().optional(),
   /** Initial participant user ids (excluding the creator — the server action adds them). */
-  participantIds: z.array(z.uuid()).min(1, "At least one participant is required").max(50),
+  participantIds: z
+    .array(z.uuid())
+    .min(1, "At least one participant is required")
+    .max(50),
 });
 export type CreateThreadInput = z.infer<typeof createThreadSchema>;
 
@@ -35,7 +38,7 @@ export const removeParticipantSchema = z.object({
 });
 export type RemoveParticipantInput = z.infer<typeof removeParticipantSchema>;
 
-/* ── Messages ─────────────────────────────────────────────── */
+/* -- Messages ----------------------------------------------- */
 
 export const sendMessageSchema = z.object({
   threadId: z.uuid(),
@@ -58,7 +61,7 @@ export const listThreadsQuerySchema = z.object({
 });
 export type ListThreadsQuery = z.infer<typeof listThreadsQuerySchema>;
 
-/* ── Announcements ────────────────────────────────────────── */
+/* -- Announcements ------------------------------------------ */
 
 export const createAnnouncementSchema = z
   .object({
@@ -78,7 +81,8 @@ export const createAnnouncementSchema = z
       return true;
     },
     {
-      message: "class audience requires classId, school audience requires schoolId",
+      message:
+        "class audience requires classId, school audience requires schoolId",
       path: ["audience"],
     },
   );
@@ -91,6 +95,8 @@ export const listAnnouncementsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
-export type ListAnnouncementsQuery = z.infer<typeof listAnnouncementsQuerySchema>;
+export type ListAnnouncementsQuery = z.infer<
+  typeof listAnnouncementsQuerySchema
+>;
 
 export const messageStatusValues = MESSAGE_STATUS_VALUES;

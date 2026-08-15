@@ -10,9 +10,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { QuestionSourceBadge } from "./question-source-badge";
-import type { QuestionSourceValue, DifficultyValue } from "@/server/db/schema/enums";
+import type {
+  QuestionSourceValue,
+  DifficultyValue,
+} from "@/server/db/schema/enums";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export interface QuestionCardOption {
   id: string;
@@ -56,7 +59,10 @@ interface QuestionCardProps {
   className?: string;
 }
 
-const DIFFICULTY_VARIANT: Record<string, "success" | "warning" | "destructive" | "outline"> = {
+const DIFFICULTY_VARIANT: Record<
+  string,
+  "success" | "warning" | "destructive" | "outline"
+> = {
   easy: "success",
   medium: "warning",
   hard: "destructive",
@@ -95,7 +101,9 @@ export function QuestionCard({
 }: QuestionCardProps) {
   const t = useTranslations("Quizzes");
 
-  const difficulty = (question.difficulty ?? "medium") as DifficultyValue | string;
+  const difficulty = (question.difficulty ?? "medium") as
+    | DifficultyValue
+    | string;
   const difficultyLabel = t.has(`difficulties.${difficulty}` as never)
     ? t(`difficulties.${difficulty}` as never)
     : String(difficulty);
@@ -107,8 +115,10 @@ export function QuestionCard({
         className,
       )}
     >
-      {/* ── Header (badges + skill) ─────────────────────────────── */}
-      {header ? <div className="text-xs text-muted-foreground">{header}</div> : null}
+      {/* -- Header (badges + skill) ------------------------------- */}
+      {header ? (
+        <div className="text-xs text-muted-foreground">{header}</div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
         {typeof index === "number" ? (
@@ -133,12 +143,12 @@ export function QuestionCard({
         {extraBadges}
       </div>
 
-      {/* ── Question label ──────────────────────────────────────── */}
+      {/* -- Question label ---------------------------------------- */}
       <p className="font-display text-base font-semibold leading-snug text-foreground">
         {question.label}
       </p>
 
-      {/* ── Options / input ─────────────────────────────────────── */}
+      {/* -- Options / input --------------------------------------- */}
       <QuestionBody
         question={question}
         selectedOptionId={selectedOptionId}
@@ -148,17 +158,19 @@ export function QuestionCard({
         onToggleOption={onToggleOption}
       />
 
-      {/* ── Explanation ─────────────────────────────────────────── */}
+      {/* -- Explanation ------------------------------------------- */}
       {showExplanation && question.explanation ? (
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary-300">
             {t("explanationLabel")}
           </p>
-          <p className="mt-1 text-sm text-foreground/90">{question.explanation}</p>
+          <p className="mt-1 text-sm text-foreground/90">
+            {question.explanation}
+          </p>
         </div>
       ) : null}
 
-      {/* ── Actions ─────────────────────────────────────────────── */}
+      {/* -- Actions ----------------------------------------------- */}
       {actions ? (
         <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
           {actions}
@@ -168,7 +180,7 @@ export function QuestionCard({
   );
 }
 
-/* ── Body (the options / input area) ───────────────────────── */
+/* -- Body (the options / input area) ------------------------- */
 
 interface QuestionBodyProps {
   question: QuestionCardQuestion;
@@ -189,7 +201,7 @@ function QuestionBody({
 }: QuestionBodyProps) {
   const t = useTranslations("Quizzes");
 
-  /* ── single_choice ──────────────────────────────────────── */
+  /* -- single_choice ---------------------------------------- */
   if (question.type === "single_choice") {
     return (
       <RadioGroup
@@ -208,7 +220,8 @@ function QuestionBody({
                 "flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-background/60 p-3 transition",
                 "hover:border-primary-500/40 hover:bg-primary-500/5",
                 selected && "border-primary-500 bg-primary-500/5",
-                readOnly && "cursor-default opacity-80 hover:border-border hover:bg-transparent",
+                readOnly &&
+                  "cursor-default opacity-80 hover:border-border hover:bg-transparent",
               )}
             >
               <RadioGroupItem
@@ -244,7 +257,7 @@ function QuestionBody({
     );
   }
 
-  /* ── true_false ─────────────────────────────────────────── */
+  /* -- true_false ------------------------------------------- */
   if (question.type === "true_false") {
     return (
       <RadioGroup
@@ -263,7 +276,8 @@ function QuestionBody({
                 "flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background/60 p-3 transition",
                 "hover:border-primary-500/40 hover:bg-primary-500/5",
                 selected && "border-primary-500 bg-primary-500/5",
-                readOnly && "cursor-default opacity-80 hover:border-border hover:bg-transparent",
+                readOnly &&
+                  "cursor-default opacity-80 hover:border-border hover:bg-transparent",
               )}
             >
               <RadioGroupItem
@@ -287,7 +301,7 @@ function QuestionBody({
     );
   }
 
-  /* ── multiple_choice ─────────────────────────────────────── */
+  /* -- multiple_choice --------------------------------------- */
   if (question.type === "multiple_choice") {
     const selected = selectedOptionIds ?? [];
     return (
@@ -302,7 +316,8 @@ function QuestionBody({
                 "flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-background/60 p-3 transition",
                 "hover:border-primary-500/40 hover:bg-primary-500/5",
                 checked && "border-primary-500 bg-primary-500/5",
-                readOnly && "cursor-default opacity-80 hover:border-border hover:bg-transparent",
+                readOnly &&
+                  "cursor-default opacity-80 hover:border-border hover:bg-transparent",
               )}
             >
               <Checkbox
@@ -339,7 +354,7 @@ function QuestionBody({
     );
   }
 
-  /* ── short_answer / essay ─────────────────────────────────── */
+  /* -- short_answer / essay ----------------------------------- */
   return (
     <Textarea
       value={selectedOptionId ?? ""}

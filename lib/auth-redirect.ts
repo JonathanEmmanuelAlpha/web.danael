@@ -15,7 +15,7 @@ import { getCurrentDbUser } from "@/lib/clerk";
  */
 export async function resolvePostAuthRoute(): Promise<string> {
   const dbUser = await getCurrentDbUser();
-  if (!dbUser || !dbUser.onboardingCompleted) {
+  if (!dbUser || dbUser.onboardingStatus !== "completed") {
     return "/onboarding/role";
   }
   return "/dashboard";

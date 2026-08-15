@@ -17,7 +17,7 @@ import type { AuditLog } from "@/server/db/schema/admin";
 import type { ListAuditLogsQuery } from "@/server/validators/admin";
 import type { JsonRecord } from "@/server/db/schema/_env";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { AuditLog };
 
@@ -35,7 +35,7 @@ export type PaginatedAuditLogs = {
   pageSize: number;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Append a new audit log entry. Best-effort: errors are swallowed so the
@@ -67,7 +67,7 @@ export async function logAction(
   }
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function listAuditLogs(
   filters: ListAuditLogsQuery,

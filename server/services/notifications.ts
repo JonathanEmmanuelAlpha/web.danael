@@ -26,7 +26,7 @@ import type {
 import type { Notification } from "@/server/db/schema/messaging";
 import type { NotificationPreferences } from "@/server/db/schema/messaging";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { Notification, NotificationPreferences };
 
@@ -45,7 +45,7 @@ export type NotificationPreferencesShape = {
   quietHoursEnd: string | null;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Create a notification for `userId` and push it live to SSE subscribers.
@@ -205,7 +205,7 @@ export async function getUnreadCount(userId: string): Promise<number> {
   return rows.at(0)?.c ?? 0;
 }
 
-/* ── Preferences ─────────────────────────────────────────── */
+/* -- Preferences ------------------------------------------- */
 
 /**
  * Returns the user's notification preferences (creating a default row if none exists).
@@ -326,7 +326,7 @@ export async function updateNotificationPreferences(
   };
 }
 
-/* ── Live SSE relay (in-memory pub/sub, Phase 15 will swap for Redis) ── */
+/* -- Live SSE relay (in-memory pub/sub, Phase 15 will swap for Redis) -- */
 
 export type LiveNotificationPayload = {
   id: string;

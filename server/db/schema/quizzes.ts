@@ -33,9 +33,9 @@ import {
   questionSourceEnum,
 } from "./enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * quizzes
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const quizzes = pgTable(
   "quizzes",
@@ -77,9 +77,9 @@ export const quizzes = pgTable(
 export type Quiz = typeof quizzes.$inferSelect;
 export type NewQuiz = typeof quizzes.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * quiz_questions
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const quizQuestions = pgTable(
   "quiz_questions",
@@ -129,9 +129,9 @@ export const quizQuestions = pgTable(
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
 export type NewQuizQuestion = typeof quizQuestions.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * quiz_question_options
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const quizQuestionOptions = pgTable(
   "quiz_question_options",
@@ -157,9 +157,9 @@ export const quizQuestionOptions = pgTable(
 export type QuizQuestionOption = typeof quizQuestionOptions.$inferSelect;
 export type NewQuizQuestionOption = typeof quizQuestionOptions.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * quiz_sessions — one attempt per user
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const quizSessions = pgTable(
   "quiz_sessions",
@@ -191,9 +191,9 @@ export const quizSessions = pgTable(
 export type QuizSession = typeof quizSessions.$inferSelect;
 export type NewQuizSession = typeof quizSessions.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * quiz_answers
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const quizAnswers = pgTable(
   "quiz_answers",
@@ -230,9 +230,9 @@ export const quizAnswers = pgTable(
 export type QuizAnswer = typeof quizAnswers.$inferSelect;
 export type NewQuizAnswer = typeof quizAnswers.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * question_banks — reusable question repository
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const questionBanks = pgTable(
   "question_banks",

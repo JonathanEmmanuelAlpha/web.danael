@@ -67,7 +67,7 @@ import type {
 import type { User } from "@/server/db/schema/users";
 import type { UserRole } from "@/types";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type {
   ConversationThread,
@@ -144,7 +144,7 @@ export type AnnouncementListResult = {
   pageSize: number;
 };
 
-/* ── Messaging rules (§5.11) ──────────────────────────────── */
+/* -- Messaging rules (§5.11) -------------------------------- */
 
 /**
  * Returns true if a direct conversation between `aRole` and `bRole` is allowed.
@@ -171,7 +171,7 @@ export function isAllowedDirectPair(aRole: UserRole, bRole: UserRole): boolean {
   return allowed.has(pair);
 }
 
-/* ── Threads ──────────────────────────────────────────────── */
+/* -- Threads ------------------------------------------------ */
 
 /**
  * Find an existing direct ("direct" type) thread between two users.
@@ -516,7 +516,7 @@ export async function listUserThreads(
   return { items, total, page: query.page, pageSize: query.pageSize };
 }
 
-/* ── Participants ─────────────────────────────────────────── */
+/* -- Participants ------------------------------------------- */
 
 export async function addParticipant(
   threadId: string,
@@ -570,7 +570,7 @@ export async function removeParticipant(
   return { removed: true };
 }
 
-/* ── Messages ─────────────────────────────────────────────── */
+/* -- Messages ----------------------------------------------- */
 
 /**
  * Send a message in a thread + notify all other participants.
@@ -812,7 +812,7 @@ export async function getUnreadCount(userId: string): Promise<number> {
   return totalRow.at(0)?.c ?? 0;
 }
 
-/* ── Announcements ───────────────────────────────────────── */
+/* -- Announcements ----------------------------------------- */
 
 /**
  * Create + (optionally) publish an announcement.
@@ -1085,7 +1085,7 @@ export async function deleteAnnouncement(
   return { deleted: true };
 }
 
-/* ── Live SSE relay (delegates to notifications service for shared pub/sub) ── */
+/* -- Live SSE relay (delegates to notifications service for shared pub/sub) -- */
 
 export type LiveNotificationPayload = {
   id: string;

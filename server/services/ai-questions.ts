@@ -45,7 +45,7 @@ import type { SkillNode } from "@/server/db/schema/learning";
 import { AppError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type QuestionType =
   | "single_choice"
@@ -116,7 +116,7 @@ export interface GeneratedQuestionListItem {
 
 const AI_MODEL_NAME = "deepseek"; // identifies the model used for generation
 
-/* ── Public API ─────────────────────────────────────────────── */
+/* -- Public API ----------------------------------------------- */
 
 /**
  * Generate quiz questions for a specific skill using the AI model, then persist
@@ -237,7 +237,7 @@ export async function generateQuestionsForSkill(
   };
 }
 
-/* ── DeepSeek API call using OpenAI SDK ────────────────────── */
+/* -- DeepSeek API call using OpenAI SDK ---------------------- */
 
 /**
  * Call the DeepSeek chat completion API using the official OpenAI SDK.
@@ -286,7 +286,7 @@ async function callDeepSeekAPI(
   return parsed as GeneratedQuestion[];
 }
 
-/* ── Prompt builder with internationalization ──────────────── */
+/* -- Prompt builder with internationalization ---------------- */
 
 function buildPrompt(params: {
   skillName: string;
@@ -345,7 +345,7 @@ function buildPrompt(params: {
     .join("\n");
 }
 
-/* ── Placeholder fallback with i18n ────────────────────────── */
+/* -- Placeholder fallback with i18n -------------------------- */
 
 /**
  * Build deterministic placeholder questions when the AI API is unavailable.
@@ -447,7 +447,7 @@ function buildPlaceholderQuestions(params: {
   return out;
 }
 
-/* ── Sanitization ───────────────────────────────────────────── */
+/* -- Sanitization --------------------------------------------- */
 
 /**
  * Validate / normalize a single AI-generated question. Returns `null` if the
@@ -515,7 +515,7 @@ function sanitizeGeneratedQuestion(
   return null;
 }
 
-/* ── AI Bank quiz resolution ────────────────────────────────── */
+/* -- AI Bank quiz resolution ---------------------------------- */
 
 /**
  * Find (or create) the unpublished "AI Bank — {skillName}" practice quiz that
@@ -570,7 +570,7 @@ async function getOrCreateAIBankQuiz(
   return created.id;
 }
 
-/* ── Persistence ────────────────────────────────────────────── */
+/* -- Persistence ---------------------------------------------- */
 
 async function saveGeneratedQuestions(params: {
   quizId: string;
@@ -631,7 +631,7 @@ async function saveGeneratedQuestions(params: {
   return createdIds;
 }
 
-/* ── Listing / fetching ─────────────────────────────────────── */
+/* -- Listing / fetching --------------------------------------- */
 
 export interface ListGeneratedQuestionsFilters {
   subjectId?: string;
@@ -747,7 +747,7 @@ export async function listGeneratedQuestions(
   return { items, total, page, pageSize };
 }
 
-/* ── Verification / editing ─────────────────────────────────── */
+/* -- Verification / editing ----------------------------------- */
 
 /**
  * Mark a generated question as verified (source = "verified"). Records who
@@ -862,7 +862,7 @@ export async function deleteGeneratedQuestion(
   await db.delete(quizQuestions).where(eq(quizQuestions.id, questionId));
 }
 
-/* ── Skill listing (for the filter dropdown) ────────────────── */
+/* -- Skill listing (for the filter dropdown) ------------------ */
 
 export interface SkillOption {
   id: string;

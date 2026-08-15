@@ -20,11 +20,11 @@ import type {
   GetFlagInput,
 } from "@/server/validators/admin";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { FeatureFlag };
 
-/* ── In-memory cache (5s TTL) ──────────────────────────────── */
+/* -- In-memory cache (5s TTL) -------------------------------- */
 
 const CACHE_TTL_MS = 5_000;
 const _cache = new Map<string, { value: boolean; expiresAt: number }>();
@@ -47,11 +47,9 @@ function cacheInvalidate(key: string): void {
   _cache.delete(key);
 }
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
-export async function createFlag(
-  input: CreateFlagInput,
-): Promise<FeatureFlag> {
+export async function createFlag(input: CreateFlagInput): Promise<FeatureFlag> {
   const db = await getDb();
   const existing = await db
     .select({ id: featureFlags.id })
@@ -74,9 +72,7 @@ export async function createFlag(
   return row;
 }
 
-export async function setFlag(
-  input: SetFlagInput,
-): Promise<FeatureFlag> {
+export async function setFlag(input: SetFlagInput): Promise<FeatureFlag> {
   const db = await getDb();
   const [row] = await db
     .update(featureFlags)
@@ -90,19 +86,14 @@ export async function setFlag(
   return row;
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function listFlags(): Promise<FeatureFlag[]> {
   const db = await getDb();
-  return db
-    .select()
-    .from(featureFlags)
-    .orderBy(desc(featureFlags.updatedAt));
+  return db.select().from(featureFlags).orderBy(desc(featureFlags.updatedAt));
 }
 
-export async function getFlag(
-  input: GetFlagInput,
-): Promise<FeatureFlag> {
+export async function getFlag(input: GetFlagInput): Promise<FeatureFlag> {
   const db = await getDb();
   const rows = await db
     .select()

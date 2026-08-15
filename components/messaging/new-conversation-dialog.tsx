@@ -81,7 +81,7 @@ export interface NewConversationDialogProps {
 
 type Step = "context" | "members" | "loading";
 
-/* ── Helpers ─────────────────────────────────────────────────── */
+/* -- Helpers --------------------------------------------------- */
 
 function peerInitials(p: {
   firstName: string | null;
@@ -102,7 +102,12 @@ function peerName(p: {
 /** Map a class_member role to a Badge variant + label key. */
 function roleBadgeConfig(roleInClass: ClassMemberForMessaging["roleInClass"]): {
   variant: "warning" | "info" | "violet" | "secondary" | "default";
-  labelKey: "roleTeacher" | "roleStudent" | "roleAdmin" | "roleParent" | "roleStaff";
+  labelKey:
+    | "roleTeacher"
+    | "roleStudent"
+    | "roleAdmin"
+    | "roleParent"
+    | "roleStaff";
 } {
   switch (roleInClass) {
     case "teacher":
@@ -119,7 +124,7 @@ function roleBadgeConfig(roleInClass: ClassMemberForMessaging["roleInClass"]): {
   }
 }
 
-/* ── Sub-components ──────────────────────────────────────────── */
+/* -- Sub-components -------------------------------------------- */
 
 interface ClassCardProps {
   cls: ClassForMessaging;
@@ -213,7 +218,7 @@ function PersonRow({
   );
 }
 
-/* ── Main dialog ─────────────────────────────────────────────── */
+/* -- Main dialog ----------------------------------------------- */
 
 export function NewConversationDialog({
   trigger,
@@ -238,9 +243,9 @@ export function NewConversationDialog({
   const [schoolClasses, setSchoolClasses] = React.useState<
     ClassForMessaging[] | null
   >(null);
-  const [members, setMembers] = React.useState<ClassMemberForMessaging[] | null>(
-    null,
-  );
+  const [members, setMembers] = React.useState<
+    ClassMemberForMessaging[] | null
+  >(null);
   const [children, setChildren] = React.useState<ChildForMessaging[] | null>(
     null,
   );
@@ -398,12 +403,18 @@ export function NewConversationDialog({
   }
 
   function filterPeople<
-    T extends { firstName: string | null; lastName: string | null; email: string },
+    T extends {
+      firstName: string | null;
+      lastName: string | null;
+      email: string;
+    },
   >(list: T[]): T[] {
     if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return list.filter((p) =>
-      peerName(p).toLowerCase().includes(q) || p.email.toLowerCase().includes(q),
+    return list.filter(
+      (p) =>
+        peerName(p).toLowerCase().includes(q) ||
+        p.email.toLowerCase().includes(q),
     );
   }
 
@@ -548,7 +559,7 @@ export function NewConversationDialog({
   );
 }
 
-/* ── List views ──────────────────────────────────────────────── */
+/* -- List views ------------------------------------------------ */
 
 function LoadingView({ label }: { label: string }) {
   return (
@@ -661,7 +672,12 @@ interface MembersListProps {
   roleLabel: (key: string) => string;
 }
 
-function MembersList({ members, filtered, onPick, roleLabel }: MembersListProps) {
+function MembersList({
+  members,
+  filtered,
+  onPick,
+  roleLabel,
+}: MembersListProps) {
   const t = useTranslations("Messaging");
   if (members === null) {
     return <ListSkeleton />;
@@ -731,7 +747,8 @@ function ClassesList({
 
   // Empty state — user has no classes AND (school_admin with no school classes OR not a school_admin).
   const hasMine = myClasses.length > 0;
-  const hasSchool = isSchoolAdmin && schoolClasses !== null && schoolClasses.length > 0;
+  const hasSchool =
+    isSchoolAdmin && schoolClasses !== null && schoolClasses.length > 0;
   if (!hasMine && !hasSchool) {
     return (
       <EmptyState
@@ -797,7 +814,7 @@ function ClassesList({
   );
 }
 
-/* ── Small UI atoms ──────────────────────────────────────────── */
+/* -- Small UI atoms -------------------------------------------- */
 
 function SectionLabel({
   icon: Icon,

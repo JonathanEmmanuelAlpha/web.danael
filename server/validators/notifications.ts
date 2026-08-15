@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { NOTIFICATION_TYPE_VALUES } from "@/server/db/schema/enums";
 
-/* ── Notifications ────────────────────────────────────────── */
+/* -- Notifications ------------------------------------------ */
 
 export const createNotificationSchema = z.object({
   userId: z.uuid(),
@@ -25,9 +25,11 @@ export const listNotificationsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
-export type ListNotificationsQuery = z.infer<typeof listNotificationsQuerySchema>;
+export type ListNotificationsQuery = z.infer<
+  typeof listNotificationsQuerySchema
+>;
 
-/* ── Preferences ─────────────────────────────────────────── */
+/* -- Preferences ------------------------------------------- */
 
 export const channelEnum = z.enum(["email", "sms", "push", "in_app"]);
 export type ChannelValue = z.infer<typeof channelEnum>;
@@ -53,16 +55,18 @@ export const updateNotificationPreferencesSchema = z.object({
   /** Digest frequency. */
   frequency: frequencyEnum.default("immediate"),
   /** Categories the user wants to receive. */
-  categories: z.array(categoryEnum).default([
-    "assignments",
-    "grades",
-    "announcements",
-    "messages",
-    "reminders",
-    "social",
-    "system",
-    "billing",
-  ]),
+  categories: z
+    .array(categoryEnum)
+    .default([
+      "assignments",
+      "grades",
+      "announcements",
+      "messages",
+      "reminders",
+      "social",
+      "system",
+      "billing",
+    ]),
   /** Quiet hours window (24h "HH:mm"). null disables quiet hours. */
   quietHoursStart: z
     .string()

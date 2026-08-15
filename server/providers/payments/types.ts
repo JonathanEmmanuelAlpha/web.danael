@@ -13,7 +13,7 @@
 
 import type { PaymentProviderValue } from "@/server/db/schema/enums";
 
-/* ── Inputs / Outputs ──────────────────────────────────────── */
+/* -- Inputs / Outputs ---------------------------------------- */
 
 export interface InitiatePaymentInput {
   /** Internal payment row id (we pass it as external reference). */
@@ -71,7 +71,7 @@ export interface WebhookVerification {
   raw?: unknown;
 }
 
-/* ── Provider interface ───────────────────────────────────── */
+/* -- Provider interface ------------------------------------- */
 
 export interface PaymentProvider {
   /** Stable provider identifier (matches `PaymentProviderValue`). */
@@ -81,9 +81,7 @@ export interface PaymentProvider {
   /** Whether the provider is configured (env vars present). */
   readonly configured: boolean;
 
-  initiatePayment(
-    input: InitiatePaymentInput,
-  ): Promise<InitiatePaymentOutput>;
+  initiatePayment(input: InitiatePaymentInput): Promise<InitiatePaymentOutput>;
 
   checkStatus(transactionId: string): Promise<PaymentStatusOutput>;
 
@@ -91,7 +89,7 @@ export interface PaymentProvider {
   verifyWebhook(req: Request): Promise<WebhookVerification>;
 }
 
-/* ── Plan / entitlement feature catalog ──────────────────── */
+/* -- Plan / entitlement feature catalog -------------------- */
 
 export type PlanType = "free" | "essential" | "premium" | "institution";
 
@@ -212,7 +210,12 @@ export const PLANS: Record<PlanType, PlanDefinition> = {
   },
 };
 
-export const PLAN_TYPES: PlanType[] = ["free", "essential", "premium", "institution"];
+export const PLAN_TYPES: PlanType[] = [
+  "free",
+  "essential",
+  "premium",
+  "institution",
+];
 
 /** Grace period (days) after expiry during which access is still allowed. */
 export const GRACE_PERIOD_DAYS = 7;

@@ -29,7 +29,7 @@ import type { LinkChildInput } from "@/server/validators/parent";
 import type { User } from "@/server/db/schema/users";
 import type { ParentStudentRelation } from "@/server/db/schema/schools";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { ParentStudentRelation };
 
@@ -125,7 +125,7 @@ export type ChildOverview = {
   timeline: ChildTimelineItem[];
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Link a parent to a student by the student's email address.
@@ -204,7 +204,7 @@ export async function unlinkChild(
   return { removed: true };
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 /**
  * List all students linked to a parent, enriched with basic stats.
@@ -261,7 +261,10 @@ export async function listChildren(parentId: string): Promise<ChildSummary[]> {
   const classMap = new Map<string, { classId: string; className: string }>();
   for (const row of classRows) {
     if (!classMap.has(row.userId)) {
-      classMap.set(row.userId, { classId: row.classId, className: row.className });
+      classMap.set(row.userId, {
+        classId: row.classId,
+        className: row.className,
+      });
     }
   }
 
@@ -387,9 +390,13 @@ export async function getChildGrades(
   for (const g of mapped) {
     const sid = g.subjectId ?? "—";
     const name = g.subjectName ?? "—";
-    const entry =
-      bySubject.get(sid) ??
-      { subjectId: sid, subjectName: name, sumScore: 0, sumMax: 0, count: 0 };
+    const entry = bySubject.get(sid) ?? {
+      subjectId: sid,
+      subjectName: name,
+      sumScore: 0,
+      sumMax: 0,
+      count: 0,
+    };
     entry.sumScore += g.score;
     entry.sumMax += g.maxScore;
     entry.count += 1;
@@ -534,9 +541,7 @@ export async function getChildAssignments(
   const upcoming = mapped
     .filter((a) => a.dueAt && a.dueAt >= now && a.status === "not_started")
     .slice(0, 6);
-  const recent = mapped
-    .filter((a) => a.status !== "not_started")
-    .slice(0, 6);
+  const recent = mapped.filter((a) => a.status !== "not_started").slice(0, 6);
 
   return { upcoming, recent };
 }

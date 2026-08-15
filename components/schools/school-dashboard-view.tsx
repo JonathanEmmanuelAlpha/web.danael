@@ -73,7 +73,7 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
   );
 }
 
-/* ── Overview ───────────────────────────────────────────── */
+/* -- Overview --------------------------------------------- */
 
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";

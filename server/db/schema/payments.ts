@@ -30,9 +30,9 @@ import {
   invoiceStatusEnum,
 } from "./enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * subscriptions
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const subscriptions = pgTable(
   "subscriptions",
@@ -73,9 +73,9 @@ export const subscriptions = pgTable(
 export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * payments
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const payments = pgTable(
   "payments",
@@ -113,9 +113,9 @@ export const payments = pgTable(
 export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * invoices
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const invoices = pgTable(
   "invoices",

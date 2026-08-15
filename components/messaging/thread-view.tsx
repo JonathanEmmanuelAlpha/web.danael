@@ -78,7 +78,6 @@ export function ThreadView({
   showBackButton,
 }: ThreadViewProps) {
   const t = useTranslations("Messaging");
-  const router = useRouter();
   const [thread, setThread] = useState<ThreadWithRelations | null | undefined>(
     undefined,
   );
@@ -261,10 +260,7 @@ export function ThreadView({
       </header>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-4"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
         <div className="flex h-full flex-col gap-2">
           {messages === null ? (
             <div className="space-y-2">

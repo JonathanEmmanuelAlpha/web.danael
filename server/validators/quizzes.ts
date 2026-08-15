@@ -12,7 +12,7 @@ import {
   DIFFICULTY_VALUES,
 } from "@/server/db/schema/enums";
 
-/* ── Option shape (shared between create + update question) ── */
+/* -- Option shape (shared between create + update question) -- */
 
 export const quizOptionSchema = z.object({
   id: z.string().optional(),
@@ -22,7 +22,7 @@ export const quizOptionSchema = z.object({
 });
 export type QuizOptionInput = z.infer<typeof quizOptionSchema>;
 
-/* ── Question shape (shared between create + update) ──────── */
+/* -- Question shape (shared between create + update) -------- */
 
 export const quizQuestionSchema = z.object({
   id: z.string().optional(),
@@ -36,7 +36,7 @@ export const quizQuestionSchema = z.object({
 });
 export type QuizQuestionInput = z.infer<typeof quizQuestionSchema>;
 
-/* ── Quiz create / update ─────────────────────────────────── */
+/* -- Quiz create / update ----------------------------------- */
 
 /**
  * Create a new quiz with its questions + options in a single payload.
@@ -96,13 +96,13 @@ export const addQuizQuestionSchema = z.object({
 export const updateQuizQuestionSchema = z.object({
   id: z.uuid(),
   quizId: z.uuid().optional(),
-  type: z.enum(QUIZ_QUESTION_TYPE_VALUES).optional(),
+  type: z.enum(QUIZ_QUESTION_TYPE_VALUES).default("single_choice"),
   label: z.string().min(2).max(1000).optional(),
   points: z.number().int().min(0).max(100).optional(),
   explanation: z.string().max(2000).nullable().optional(),
   difficulty: z.enum(DIFFICULTY_VALUES).optional(),
   position: z.number().int().min(0).optional(),
-  options: z.array(quizOptionSchema).max(10).optional(),
+  options: z.array(quizOptionSchema).max(10).default([]),
 });
 
 /**
@@ -122,7 +122,7 @@ export const listQuizzesQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-/* ── Quiz session ─────────────────────────────────────────── */
+/* -- Quiz session ------------------------------------------- */
 
 /**
  * Start a new quiz session (attempt).
@@ -155,7 +155,7 @@ export const completeQuizSessionSchema = z.object({
   status: z.enum(["completed", "abandoned"]).default("completed"),
 });
 
-/* ── Question bank ─────────────────────────────────────────── */
+/* -- Question bank ------------------------------------------- */
 
 /**
  * Add a reusable question to the question bank.
@@ -189,6 +189,8 @@ export type UpdateQuizQuestionInput = z.infer<typeof updateQuizQuestionSchema>;
 export type ListQuizzesQuery = z.infer<typeof listQuizzesQuerySchema>;
 export type StartQuizSessionInput = z.infer<typeof startQuizSessionSchema>;
 export type SubmitQuizAnswerInput = z.infer<typeof submitQuizAnswerSchema>;
-export type CompleteQuizSessionInput = z.infer<typeof completeQuizSessionSchema>;
+export type CompleteQuizSessionInput = z.infer<
+  typeof completeQuizSessionSchema
+>;
 export type AddQuestionToBankInput = z.infer<typeof addQuestionToBankSchema>;
 export type ListQuestionBankQuery = z.infer<typeof listQuestionBankQuerySchema>;

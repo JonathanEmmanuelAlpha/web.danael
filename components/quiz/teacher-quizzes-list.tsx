@@ -20,7 +20,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { QuizCard } from "@/components/quiz/quiz-card";
-import { listForTeacherAction, deleteQuizAction } from "@/server/actions/quizzes";
+import {
+  listForTeacherAction,
+  deleteQuizAction,
+} from "@/server/actions/quizzes";
 import type { QuizListItem } from "@/server/services/quizzes";
 
 /**
@@ -59,9 +62,7 @@ export function TeacherQuizzesList({ teacherId }: { teacherId: string }) {
       return;
     }
     toast.success(t("quizDeleted"));
-    setItems((prev) =>
-      prev ? prev.filter((q) => q.id !== deleteId) : prev,
-    );
+    setItems((prev) => (prev ? prev.filter((q) => q.id !== deleteId) : prev));
     setDeleteId(null);
   }
 
@@ -94,7 +95,10 @@ export function TeacherQuizzesList({ teacherId }: { teacherId: string }) {
         ))}
       </ul>
 
-      <AlertDialog open={deleteId !== null} onOpenChange={(o) => !o && setDeleteId(null)}>
+      <AlertDialog
+        open={deleteId !== null}
+        onOpenChange={(o) => !o && setDeleteId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("deleteQuiz")}</AlertDialogTitle>
@@ -123,7 +127,7 @@ export function TeacherQuizzesList({ teacherId }: { teacherId: string }) {
   );
 }
 
-/* ── Header action ────────────────────────────────────────── */
+/* -- Header action ------------------------------------------ */
 
 export function CreateQuizButton() {
   const t = useTranslations("Quizzes");

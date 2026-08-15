@@ -15,7 +15,7 @@
  * <LearningStoreHydrator />, puis les composants client lisent l'état
  * depuis le store au lieu de re-fetcher à chaque navigation.
  *
- * ── Event buffer ──────────────────────────────────────────────────
+ * -- Event buffer --------------------------------------------------
  * Les événements d'apprentissage (answer_question, complete_quiz, etc.)
  * sont accumulés dans `events[]` puis envoyés au serveur en lot via
  * `recordLearningEventsAction`. Trois déclencheurs de flush :
@@ -23,7 +23,7 @@
  *   2. `visibilitychange` → onglet caché (voir useLearningEventFlusher)
  *   3. `beforeunload` → fermeture de page (sendBeacon vers /api/learning/flush)
  *
- * ── Persistence ───────────────────────────────────────────────────
+ * -- Persistence ---------------------------------------------------
  * Seuls `streak`, `lastActiveDate`, `currentPlanId`, `emotionalState`,
  * `lastCheckinWeek` sont persistés en localStorage (partialize).
  * Les autres champs sont re-hydratés depuis le serveur à chaque session.
@@ -45,9 +45,9 @@ import type {
   WarmupStatusValue,
 } from "@/server/db/schema/enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Summary types (client-side, lighter than full DB rows)
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export interface LearningPlanSummary {
   id: string;
@@ -151,9 +151,9 @@ export interface HydrationPayload {
   lastCheckinWeek?: string | null;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Store state
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 interface LearningStoreState {
   // Current plan
@@ -197,9 +197,9 @@ interface LearningStoreState {
   clear: () => void;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Flush timer (module-level, cleared/reset on each addEvent)
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 const FLUSH_DEBOUNCE_MS = 30_000;
 
@@ -220,9 +220,9 @@ function clearFlushTimer(): void {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Store
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const useLearningStore = create<LearningStoreState>()(
   persist(
@@ -242,8 +242,7 @@ export const useLearningStore = create<LearningStoreState>()(
       hydrate: (data) =>
         set((state) => ({
           currentPlan: data.currentPlan ?? state.currentPlan,
-          currentPlanId:
-            data.currentPlan?.id ?? state.currentPlanId ?? null,
+          currentPlanId: data.currentPlan?.id ?? state.currentPlanId ?? null,
           todayTasks: data.todayTasks ?? state.todayTasks,
           skillGraph: data.skillGraph ?? state.skillGraph,
           todayWarmup: data.todayWarmup ?? state.todayWarmup,
@@ -327,8 +326,7 @@ export const useLearningStore = create<LearningStoreState>()(
       setEmotionalState: (emotionalState, weekKey) =>
         set({ emotionalState, lastCheckinWeek: weekKey }),
 
-      setCurrentDiagnostic: (currentDiagnostic) =>
-        set({ currentDiagnostic }),
+      setCurrentDiagnostic: (currentDiagnostic) => set({ currentDiagnostic }),
 
       clear: () => {
         clearFlushTimer();
@@ -362,9 +360,9 @@ export const useLearningStore = create<LearningStoreState>()(
   ),
 );
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Selectors (stable references)
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const selectTodayTasks = (s: LearningStoreState) => s.todayTasks;
 export const selectCurrentPlan = (s: LearningStoreState) => s.currentPlan;
@@ -373,8 +371,7 @@ export const selectStreak = (s: LearningStoreState) => s.streak;
 export const selectWarmupStatus = (s: LearningStoreState) => s.todayWarmup;
 export const selectPendingEventsCount = (s: LearningStoreState) =>
   s.events.length;
-export const selectEmotionalState = (s: LearningStoreState) =>
-  s.emotionalState;
+export const selectEmotionalState = (s: LearningStoreState) => s.emotionalState;
 export const selectLastCheckinWeek = (s: LearningStoreState) =>
   s.lastCheckinWeek;
 export const selectCurrentDiagnostic = (s: LearningStoreState) =>

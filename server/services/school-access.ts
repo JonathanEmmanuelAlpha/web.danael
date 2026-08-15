@@ -30,7 +30,7 @@ import { users } from "@/server/db/schema/users";
 import { AppError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 
-/* ── Helpers ───────────────────────────────────────────────────── */
+/* -- Helpers ----------------------------------------------------- */
 
 /**
  * Generate a random 10-char access code (uppercase alphanumeric, no ambiguous
@@ -63,10 +63,7 @@ async function requireSchool(schoolId: string): Promise<School> {
  * Ensure the requesting user is an active admin of the given school.
  * Returns the membership row.
  */
-async function requireSchoolAdminMembership(
-  schoolId: string,
-  userId: string,
-) {
+async function requireSchoolAdminMembership(schoolId: string, userId: string) {
   const db = await getDb();
   const rows = await db
     .select()
@@ -88,7 +85,7 @@ async function requireSchoolAdminMembership(
   return rows[0];
 }
 
-/* ── Create / validate access codes ───────────────────────────── */
+/* -- Create / validate access codes ----------------------------- */
 
 /**
  * Create a new access code for a school.
@@ -186,11 +183,11 @@ export async function validateAccessCode(code: string): Promise<{
   if (codeRow.expiresAt && codeRow.expiresAt < new Date()) {
     return { valid: false, reason: "Ce code a expiré" };
   }
-  if (
-    codeRow.maxUsages !== null &&
-    codeRow.usages >= codeRow.maxUsages
-  ) {
-    return { valid: false, reason: "Ce code a atteint son nombre d'utilisations maximum" };
+  if (codeRow.maxUsages !== null && codeRow.usages >= codeRow.maxUsages) {
+    return {
+      valid: false,
+      reason: "Ce code a atteint son nombre d'utilisations maximum",
+    };
   }
 
   return {
@@ -200,7 +197,7 @@ export async function validateAccessCode(code: string): Promise<{
   };
 }
 
-/* ── Request access ───────────────────────────────────────────── */
+/* -- Request access --------------------------------------------- */
 
 /**
  * Create an access request from a school_admin to co-manage a school.
@@ -326,7 +323,7 @@ export async function requestSchoolAdminAccess(params: {
   };
 }
 
-/* ── List access requests ─────────────────────────────────────── */
+/* -- List access requests --------------------------------------- */
 
 /**
  * List access requests for a school (for the school creator to approve/reject).
@@ -366,14 +363,13 @@ export async function listAccessRequests(params: {
 
   return rows.map((r) => ({
     ...r.request,
-    adminName:
-      [r.adminName, r.adminLastName].filter(Boolean).join(" ") || "—",
+    adminName: [r.adminName, r.adminLastName].filter(Boolean).join(" ") || "—",
     adminEmail: r.adminEmail,
     adminAvatarUrl: r.adminAvatarUrl,
   }));
 }
 
-/* ── Approve / reject ─────────────────────────────────────────── */
+/* -- Approve / reject ------------------------------------------- */
 
 /**
  * Approve an access request — adds the school_admin as a member with
@@ -517,7 +513,7 @@ export async function rejectAccessRequest(params: {
   return updated;
 }
 
-/* ── Access code management (creator side) ────────────────────── */
+/* -- Access code management (creator side) ---------------------- */
 
 /**
  * List access codes for a school (for the creator to manage).
@@ -564,7 +560,7 @@ export async function deactivateAccessCode(
   return updated;
 }
 
-/* ── Cleanup helper (not exposed) ─────────────────────────────── */
+/* -- Cleanup helper (not exposed) ------------------------------- */
 
 /**
  * Mark expired codes as inactive (housekeeping). Could be called by a cron.

@@ -337,7 +337,7 @@ export function ContentDetailView({
   );
 }
 
-/* ── Helper component ──────────────────────────────────────── */
+/* -- Helper component ---------------------------------------- */
 
 import type { LucideIcon } from "lucide-react";
 import { file } from "zod";

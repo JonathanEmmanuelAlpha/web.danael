@@ -37,7 +37,7 @@ import { cn } from "@/lib/utils";
 import { updateTaskStatusAction } from "@/server/actions/learning";
 import type { PlanTaskSummary } from "@/server/services/learning";
 
-/* ── Icon mapping ───────────────────────────────────────────── */
+/* -- Icon mapping --------------------------------------------- */
 
 const TASK_TYPE_ICON: Record<string, LucideIcon> = {
   diagnostic: Target,
@@ -70,7 +70,7 @@ function TaskTypeIcon({
   });
 }
 
-/* ── Sub-components ────────────────────────────────────────── */
+/* -- Sub-components ------------------------------------------ */
 
 function TaskRow({
   task,
@@ -195,7 +195,7 @@ function TaskRow({
   );
 }
 
-/* ── Card ───────────────────────────────────────────────────── */
+/* -- Card ----------------------------------------------------- */
 
 export interface DailyTasksCardProps {
   tasks: PlanTaskSummary[];
@@ -222,7 +222,9 @@ export function DailyTasksCard({
   const noop = () => {};
 
   return (
-    <Card className={cn("relative overflow-hidden p-5 animate-fade-up", className)}>
+    <Card
+      className={cn("relative overflow-hidden p-5 animate-fade-up", className)}
+    >
       {/* Top-edge accent */}
       <div
         aria-hidden
@@ -239,7 +241,9 @@ export function DailyTasksCard({
             <h3 className="font-display text-base font-semibold text-foreground">
               {t("todayTasks")}
             </h3>
-            <p className="text-xs text-muted-foreground">{t("todayTasksHint")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("todayTasksHint")}
+            </p>
           </div>
         </div>
         <Badge variant="brand" size="sm">

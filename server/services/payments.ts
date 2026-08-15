@@ -61,7 +61,7 @@ import type {
   ListInvoicesQuery,
 } from "@/server/validators/payments";
 
-/* ── Types (re-exports) ───────────────────────────────────── */
+/* -- Types (re-exports) ------------------------------------- */
 
 export type { Payment, Subscription, Invoice };
 
@@ -104,7 +104,7 @@ export type InvoiceListResult = {
   pageSize: number;
 };
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* -- Helpers ----------------------------------------------- */
 
 /**
  * Returns the plan price + currency from the catalog.
@@ -157,7 +157,7 @@ async function assertSchoolExists(schoolId: string): Promise<void> {
   }
 }
 
-/* ── Subscriptions ────────────────────────────────────────── */
+/* -- Subscriptions ------------------------------------------ */
 
 export async function createSubscription(
   input: CreateSubscriptionInput,
@@ -354,7 +354,7 @@ export async function listSubscriptions(
   return { items, total, page: filters.page, pageSize: filters.pageSize };
 }
 
-/* ── Payments ────────────────────────────────────────────── */
+/* -- Payments ---------------------------------------------- */
 
 export async function initiatePayment(
   input: InitiatePaymentInput,
@@ -717,7 +717,7 @@ export async function confirmPaymentFromWebhook(
   return updated;
 }
 
-/* ── Invoices ─────────────────────────────────────────────── */
+/* -- Invoices ----------------------------------------------- */
 
 async function nextInvoiceNumber(): Promise<string> {
   const year = new Date().getFullYear();
@@ -803,7 +803,7 @@ export async function getInvoice(id: string): Promise<InvoiceWithRelations> {
   };
 }
 
-/* ── Grace period / expiry helpers ───────────────────────── */
+/* -- Grace period / expiry helpers ------------------------- */
 
 /**
  * Marks subscriptions whose endsAt has passed (and grace period expired) as
@@ -833,7 +833,7 @@ export async function expireDueSubscriptions(
   return rows.length;
 }
 
-/* ── Convenience: pick a "default" payment method for a user ── */
+/* -- Convenience: pick a "default" payment method for a user -- */
 export async function pickDefaultProvider(): Promise<PaymentProviderValue | null> {
   // Prefer MTN MoMo (most common in Cameroon), then Orange, then card.
   // We respect provider.configured but always allow MTN MoMo / Orange as the
@@ -841,7 +841,7 @@ export async function pickDefaultProvider(): Promise<PaymentProviderValue | null
   return "mtn_money";
 }
 
-/* ── Re-exports for callers ──────────────────────────────── */
+/* -- Re-exports for callers -------------------------------- */
 export { PLANS, GRACE_PERIOD_DAYS };
 
 void or;

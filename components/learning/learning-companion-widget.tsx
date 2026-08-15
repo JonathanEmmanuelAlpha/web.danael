@@ -49,7 +49,7 @@ import type {
   WarmupSummary,
 } from "@/server/services/learning";
 
-/* ── Icon helpers ───────────────────────────────────────────── */
+/* -- Icon helpers --------------------------------------------- */
 
 const TASK_TYPE_ICON: Record<string, LucideIcon> = {
   diagnostic: Target,
@@ -81,7 +81,7 @@ function TaskTypeIcon({
   });
 }
 
-/* ── Inline task row (compact) ──────────────────────────────── */
+/* -- Inline task row (compact) -------------------------------- */
 
 function InlineTaskRow({
   task,
@@ -161,13 +161,14 @@ function InlineTaskRow({
         {task.title}
       </span>
       <span className="shrink-0 text-[10px] text-muted-foreground">
-        {task.estimatedMinutes}{t("min")}
+        {task.estimatedMinutes}
+        {t("min")}
       </span>
     </button>
   );
 }
 
-/* ── Main widget ────────────────────────────────────────────── */
+/* -- Main widget ---------------------------------------------- */
 
 export function LearningCompanionWidget({ className }: { className?: string }) {
   const t = useTranslations("Learning");
@@ -218,9 +219,13 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
         )
       : null;
   const targetProgress = plan?.targetProgress ?? 70;
-  const weeklyPct = avgMastery !== null
-    ? Math.min(100, Math.round((avgMastery / Math.max(1, targetProgress)) * 100))
-    : 0;
+  const weeklyPct =
+    avgMastery !== null
+      ? Math.min(
+          100,
+          Math.round((avgMastery / Math.max(1, targetProgress)) * 100),
+        )
+      : 0;
 
   const handleToggle = (taskId: string, complete: boolean) => {
     if (complete) markTaskCompleted(taskId);
@@ -254,7 +259,9 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
             <h3 className="font-display text-base font-semibold text-foreground">
               {t("companion")}
             </h3>
-            <p className="text-xs text-muted-foreground">{t("companionHint")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("companionHint")}
+            </p>
           </div>
         </div>
         {streak > 0 && (
@@ -273,7 +280,7 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
           <Skeleton className="h-2 w-full rounded-full" />
         </div>
       ) : !hasActivePlan ? (
-        /* ── No active plan → CTA ─────────────────────────────── */
+        /* -- No active plan → CTA ------------------------------- */
         <div className="relative mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-4 py-6 text-center">
           <div
             aria-hidden
@@ -299,7 +306,7 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
           </div>
         </div>
       ) : (
-        /* ── Active plan → today's tasks + progress ──────────── */
+        /* -- Active plan → today's tasks + progress ------------ */
         <div className="relative mt-4 space-y-3">
           {/* Tasks */}
           <div className="space-y-2">
@@ -308,9 +315,15 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
                 {t("todayTasksHint")}
               </div>
             ) : (
-              tasks.slice(0, 3).map((task) => (
-                <InlineTaskRow key={task.id} task={task} onToggle={handleToggle} />
-              ))
+              tasks
+                .slice(0, 3)
+                .map((task) => (
+                  <InlineTaskRow
+                    key={task.id}
+                    task={task}
+                    onToggle={handleToggle}
+                  />
+                ))
             )}
           </div>
 
@@ -352,12 +365,7 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
                   {t("warmupHint")}
                 </p>
               </div>
-              <Button
-                asChild
-                variant="cyan"
-                size="sm"
-                className="shrink-0"
-              >
+              <Button asChild variant="cyan" size="sm" className="shrink-0">
                 <Link href="/learning/warmup">
                   <Play className="size-3.5" />
                   {t("warmupStart")}
@@ -367,12 +375,7 @@ export function LearningCompanionWidget({ className }: { className?: string }) {
           )}
 
           {/* View full plan CTA */}
-          <Button
-            asChild
-            variant="brand-outline"
-            size="sm"
-            className="w-full"
-          >
+          <Button asChild variant="brand-outline" size="sm" className="w-full">
             <Link href="/learning">
               {t("viewFullPlan")}
               <ArrowRight className="size-4" />

@@ -50,7 +50,7 @@ interface MembersListProps {
   emptyHint?: string;
 }
 
-/* ── Métadonnées visuelles : rôle → icône, statut → couleurs ───────── */
+/* -- Métadonnées visuelles : rôle → icône, statut → couleurs --------- */
 
 const ROLE_ICONS: Record<RoleInSchoolValue, LucideIcon> = {
   admin: ShieldCheck,

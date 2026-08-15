@@ -43,9 +43,9 @@ import type {
 } from "@/server/db/schema";
 import { MAX_STREAK_FREEZES_PER_WEEK, XP_PER_LEVEL } from "@/lib/constants";
 
-/* ── Constants ─────────────────────────────────────────────── */
+/* -- Constants ----------------------------------------------- */
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { Badge, UserBadge, UserGoal, UserActivity, UserPoint };
 
@@ -99,7 +99,7 @@ export type GoalWithProgress = UserGoal & {
   isCompleted: boolean;
 };
 
-/* ── XP / Levels ───────────────────────────────────────────── */
+/* -- XP / Levels --------------------------------------------- */
 
 /**
  * Compute the level from total XP.
@@ -194,7 +194,7 @@ export async function awardXp(
   return getUserPoints(userId);
 }
 
-/* ── Leaderboard ───────────────────────────────────────────── */
+/* -- Leaderboard --------------------------------------------- */
 
 /**
  * Returns the global leaderboard (top users by XP).
@@ -261,7 +261,7 @@ export async function getLeaderboard(
   return { entries, total };
 }
 
-/* ── Streaks ───────────────────────────────────────────────── */
+/* -- Streaks ------------------------------------------------- */
 
 /**
  * Returns the user's streak info.
@@ -482,7 +482,7 @@ export async function freezeStreak(userId: string): Promise<StreakInfo> {
   return getUserStreak(userId);
 }
 
-/* ── Weekly goals ──────────────────────────────────────────── */
+/* -- Weekly goals -------------------------------------------- */
 
 /**
  * List the user's goals with computed progress.
@@ -591,7 +591,7 @@ export async function updateGoalProgress(
   };
 }
 
-/* ── Badge catalog seeding ─────────────────────────────────── */
+/* -- Badge catalog seeding ----------------------------------- */
 
 /**
  * The catalog of badges the platform ships with.
@@ -702,7 +702,7 @@ export async function ensureBadgesSeeded(): Promise<void> {
   }
 }
 
-/* ── Badges ────────────────────────────────────────────────── */
+/* -- Badges -------------------------------------------------- */
 
 /**
  * List the badge catalog, optionally annotated with whether the given user
@@ -939,7 +939,7 @@ export async function checkBadgeCondition(
   }
 }
 
-/* ── Activity feed ─────────────────────────────────────────── */
+/* -- Activity feed ------------------------------------------- */
 
 /**
  * List the most recent activities for a user (newest first).

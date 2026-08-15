@@ -104,7 +104,11 @@ export function LineChartCard({
           {emptyMessage}
         </div>
       ) : (
-        <ShadcnChartContainer config={config} style={{ height }} className="w-full">
+        <ShadcnChartContainer
+          config={config}
+          style={{ height }}
+          className="w-full"
+        >
           <RechartsLineChart
             data={data}
             margin={{ left: 4, right: 12, top: 8, bottom: 0 }}
@@ -123,13 +127,25 @@ export function LineChartCard({
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="0%" stopColor={entry.stroke} stopOpacity={0.2} />
-                    <stop offset="100%" stopColor={entry.stroke} stopOpacity={0} />
+                    <stop
+                      offset="0%"
+                      stopColor={entry.stroke}
+                      stopOpacity={0.2}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor={entry.stroke}
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 );
               })}
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
+            <CartesianGrid
+              vertical={false}
+              stroke="rgba(255,255,255,0.05)"
+              strokeDasharray="3 3"
+            />
             <XAxis
               dataKey={xKey}
               tickLine={false}
@@ -138,7 +154,9 @@ export function LineChartCard({
               minTickGap={12}
               stroke="rgba(255,255,255,0.3)"
               fontSize={12}
-              tickFormatter={xFormatter ? (v) => xFormatter(String(v)) : undefined}
+              tickFormatter={
+                xFormatter ? (v) => xFormatter(String(v)) : undefined
+              }
             />
             <YAxis
               width={36}
@@ -149,11 +167,34 @@ export function LineChartCard({
               stroke="rgba(255,255,255,0.3)"
               fontSize={12}
               domain={domain ?? ["auto", "auto"]}
-              tickFormatter={yFormatter ? (v) => yFormatter(Number(v)) : undefined}
+              tickFormatter={
+                yFormatter ? (v) => yFormatter(Number(v)) : undefined
+              }
             />
             <ChartTooltip
-              cursor={{ stroke: "rgba(147,217,26,0.3)", strokeWidth: 1, strokeDasharray: "3 3" }}
-              content={<ChartTooltipContent indicator="line" />}
+              cursor={{
+                stroke: "rgba(147,217,26,0.3)",
+                strokeWidth: 1,
+                strokeDasharray: "3 3",
+              }}
+              content={({
+                active,
+                payload,
+                label,
+                accessibilityLayer,
+                activeIndex,
+                coordinate,
+              }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                  indicator="line"
+                  accessibilityLayer={accessibilityLayer}
+                  activeIndex={activeIndex}
+                  coordinate={coordinate}
+                />
+              )}
             />
             {series.map((s, i) => {
               const entry = s.color

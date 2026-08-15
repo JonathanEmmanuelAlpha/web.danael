@@ -25,9 +25,9 @@ import { users } from "./users";
 import { subjects } from "./schools";
 import { levelEnum, tutorBookingStatusEnum } from "./enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * tutor_profiles
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const tutorProfiles = pgTable(
   "tutor_profiles",
@@ -61,9 +61,9 @@ export const tutorProfiles = pgTable(
 export type TutorProfile = typeof tutorProfiles.$inferSelect;
 export type NewTutorProfile = typeof tutorProfiles.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * tutor_subjects
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const tutorSubjects = pgTable(
   "tutor_subjects",
@@ -92,9 +92,9 @@ export const tutorSubjects = pgTable(
 export type TutorSubject = typeof tutorSubjects.$inferSelect;
 export type NewTutorSubject = typeof tutorSubjects.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * tutor_availabilities — recurring weekly slots
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const tutorAvailabilities = pgTable(
   "tutor_availabilities",
@@ -127,9 +127,9 @@ export const tutorAvailabilities = pgTable(
 export type TutorAvailability = typeof tutorAvailabilities.$inferSelect;
 export type NewTutorAvailability = typeof tutorAvailabilities.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * tutor_bookings
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const tutorBookings = pgTable(
   "tutor_bookings",
@@ -170,9 +170,9 @@ export const tutorBookings = pgTable(
 export type TutorBooking = typeof tutorBookings.$inferSelect;
 export type NewTutorBooking = typeof tutorBookings.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * tutor_reviews
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const tutorReviews = pgTable(
   "tutor_reviews",

@@ -51,7 +51,11 @@ const editSchema = z.object({
 
 type EditValues = z.infer<typeof editSchema>;
 
-const NEEDS_OPTIONS = new Set(["single_choice", "multiple_choice", "true_false"]);
+const NEEDS_OPTIONS = new Set([
+  "single_choice",
+  "multiple_choice",
+  "true_false",
+]);
 
 /**
  * §10.4 — Edit dialog for an AI-generated question (TanStack Form + Zod).
@@ -74,9 +78,7 @@ export function QuestionEditDialog({
 }: QuestionEditDialogProps) {
   const t = useTranslations("AiQuestions");
 
-  const needsOptions = question
-    ? NEEDS_OPTIONS.has(question.type)
-    : false;
+  const needsOptions = question ? NEEDS_OPTIONS.has(question.type) : false;
 
   // Intent flag — set by the "Save & verify" button before submitting.
   const verifyAfterSaveRef = React.useRef(false);
@@ -114,7 +116,9 @@ export function QuestionEditDialog({
       }
 
       if (verifyAfterSaveRef.current) {
-        const verifyRes = await verifyQuestionAction({ questionId: question.id });
+        const verifyRes = await verifyQuestionAction({
+          questionId: question.id,
+        });
         if (!verifyRes.success) {
           toast.error(verifyRes.error?.message ?? t("verify"));
           verifyAfterSaveRef.current = false;
@@ -153,9 +157,7 @@ export function QuestionEditDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {t("edit")}
-            {question ? (
-              <QuestionSourceBadge source={question.source} />
-            ) : null}
+            {question ? <QuestionSourceBadge source={question.source} /> : null}
           </DialogTitle>
           <DialogDescription>{t("edit")}</DialogDescription>
         </DialogHeader>
@@ -193,7 +195,9 @@ export function QuestionEditDialog({
 
           {needsOptions ? (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t("optionsEditor")}</Label>
+              <Label className="text-sm font-medium">
+                {t("optionsEditor")}
+              </Label>
               <form.Field name="options">
                 {(field) => (
                   <OptionsEditor
@@ -209,9 +213,7 @@ export function QuestionEditDialog({
           ) : null}
 
           <form.Subscribe
-            selector={(state) =>
-              [state.canSubmit, state.isSubmitting] as const
-            }
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
           >
             {([canSubmit, isSubmitting]) => (
               <DialogFooter className="gap-2">
@@ -251,7 +253,7 @@ export function QuestionEditDialog({
   );
 }
 
-/* ── Options editor (sub-component) ────────────────────────── */
+/* -- Options editor (sub-component) -------------------------- */
 
 interface OptionsEditorProps {
   // The field is a TanStack Form FieldApi for an array; typed loosely here to
@@ -263,7 +265,8 @@ interface OptionsEditorProps {
 
 function OptionsEditor({ field, needsSingleCorrect }: OptionsEditorProps) {
   const t = useTranslations("AiQuestions");
-  const options: EditValues["options"] = (field.state.value ?? []) as EditValues["options"];
+  const options: EditValues["options"] = (field.state.value ??
+    []) as EditValues["options"];
 
   function update(idx: number, patch: Partial<EditValues["options"][number]>) {
     const next = options.map((o, i) => (i === idx ? { ...o, ...patch } : o));
@@ -271,16 +274,11 @@ function OptionsEditor({ field, needsSingleCorrect }: OptionsEditorProps) {
   }
 
   function add() {
-    field.handleChange([
-      ...options,
-      { label: "", isCorrect: false },
-    ] as never);
+    field.handleChange([...options, { label: "", isCorrect: false }] as never);
   }
 
   function remove(idx: number) {
-    field.handleChange(
-      options.filter((_, i) => i !== idx) as never,
-    );
+    field.handleChange(options.filter((_, i) => i !== idx) as never);
   }
 
   function toggleCorrect(idx: number) {

@@ -43,7 +43,7 @@ export type ApiFailure = {
 
 export type ApiResponse<T = unknown> = ApiSuccess<T> | ApiFailure;
 
-/* ── Builders ──────────────────────────────────────────────── */
+/* -- Builders ------------------------------------------------ */
 
 export function ok<T>(data: T, meta?: ApiMeta): ApiSuccess<T> {
   return { success: true, data, ...(meta ? { meta } : {}) };
@@ -54,10 +54,13 @@ export function fail(
   message: string,
   details?: Record<string, unknown>,
 ): ApiFailure {
-  return { success: false, error: { code, message, ...(details ? { details } : {}) } };
+  return {
+    success: false,
+    error: { code, message, ...(details ? { details } : {}) },
+  };
 }
 
-/* ── HTTP-status mapping ───────────────────────────────────── */
+/* -- HTTP-status mapping ------------------------------------- */
 
 export function statusFor(code: ErrorCode): number {
   switch (code) {
@@ -84,7 +87,7 @@ export function statusFor(code: ErrorCode): number {
   }
 }
 
-/* ── Typed application errors (throwable in server actions) ── */
+/* -- Typed application errors (throwable in server actions) -- */
 
 export class AppError extends Error {
   readonly code: ErrorCode;
@@ -112,13 +115,22 @@ export class AppError extends Error {
   static forbidden(message = "Access denied"): AppError {
     return new AppError("FORBIDDEN", message);
   }
-  static notFound(message = "Resource not found", details?: Record<string, unknown>): AppError {
+  static notFound(
+    message = "Resource not found",
+    details?: Record<string, unknown>,
+  ): AppError {
     return new AppError("NOT_FOUND", message, details);
   }
-  static validation(message = "Invalid input", details?: Record<string, unknown>): AppError {
+  static validation(
+    message = "Invalid input",
+    details?: Record<string, unknown>,
+  ): AppError {
     return new AppError("VALIDATION_ERROR", message, details);
   }
-  static conflict(message = "Conflict", details?: Record<string, unknown>): AppError {
+  static conflict(
+    message = "Conflict",
+    details?: Record<string, unknown>,
+  ): AppError {
     return new AppError("CONFLICT", message, details);
   }
   static rateLimited(message = "Too many attempts"): AppError {
@@ -127,10 +139,16 @@ export class AppError extends Error {
   static paymentRequired(message = "Payment required"): AppError {
     return new AppError("PAYMENT_REQUIRED", message);
   }
-  static provider(message = "Provider error", details?: Record<string, unknown>): AppError {
+  static provider(
+    message = "Provider error",
+    details?: Record<string, unknown>,
+  ): AppError {
     return new AppError("PROVIDER_ERROR", message, details);
   }
-  static internal(message = "Internal server error", details?: Record<string, unknown>): AppError {
+  static internal(
+    message = "Internal server error",
+    details?: Record<string, unknown>,
+  ): AppError {
     return new AppError("INTERNAL_ERROR", message, details);
   }
 }
@@ -150,11 +168,13 @@ export function toApiFailure(err: unknown): ApiFailure {
 export function apiHandler<T>(
   handler: () => Promise<ApiResponse<T>>,
 ): Promise<Response> {
-  return handler().then((res) => {
-    const status = res.success ? 200 : statusFor(res.error.code);
-    return Response.json(res, { status });
-  }).catch((err) => {
-    const failure = toApiFailure(err);
-    return Response.json(failure, { status: statusFor(failure.error.code) });
-  });
+  return handler()
+    .then((res) => {
+      const status = res.success ? 200 : statusFor(res.error.code);
+      return Response.json(res, { status });
+    })
+    .catch((err) => {
+      const failure = toApiFailure(err);
+      return Response.json(failure, { status: statusFor(failure.error.code) });
+    });
 }

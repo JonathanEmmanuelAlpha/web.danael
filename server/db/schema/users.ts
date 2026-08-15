@@ -32,9 +32,9 @@ import {
 } from "./enums";
 import { Address } from "@/types";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * users
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const users = pgTable(
   "users",
@@ -82,9 +82,9 @@ export const users = pgTable(
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * user_points — XP aggregates (one row per user)
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const userPoints = pgTable(
   "user_points",
@@ -109,9 +109,9 @@ export const userPoints = pgTable(
 export type UserPoint = typeof userPoints.$inferSelect;
 export type NewUserPoint = typeof userPoints.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * user_goals — weekly / monthly objectives
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const userGoals = pgTable(
   "user_goals",
@@ -142,9 +142,9 @@ export const userGoals = pgTable(
 export type UserGoal = typeof userGoals.$inferSelect;
 export type NewUserGoal = typeof userGoals.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * user_activities — append-only activity feed
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const userActivities = pgTable(
   "user_activities",

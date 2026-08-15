@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { ContentTypeValue } from "@/server/db/schema/enums";
 
-/* ── Per-type visual config (color + icon + i18n key) ─────── */
+/* -- Per-type visual config (color + icon + i18n key) ------- */
 
 interface TypeConfig {
   labelKey: string;
@@ -29,16 +29,24 @@ const TYPE_CONFIG: Record<ContentTypeValue, TypeConfig> = {
   resume: { labelKey: "types.resume", variant: "brand", icon: BookOpen },
   fiche: { labelKey: "types.fiche", variant: "warning", icon: StickyNote },
   video: { labelKey: "types.video", variant: "info", icon: Video },
-  exercice: { labelKey: "types.exercice", variant: "secondary", icon: PencilLine },
+  exercice: {
+    labelKey: "types.exercice",
+    variant: "secondary",
+    icon: PencilLine,
+  },
   devoir_modele: {
     labelKey: "types.devoir_modele",
     variant: "brand",
     icon: GraduationCap,
   },
-  sujet_blanc: { labelKey: "types.sujet_blanc", variant: "info", icon: FileCheck },
+  sujet_blanc: {
+    labelKey: "types.sujet_blanc",
+    variant: "info",
+    icon: FileCheck,
+  },
 };
 
-/* ── Component ─────────────────────────────────────────────── */
+/* -- Component ----------------------------------------------- */
 
 export interface ContentTypeBadgeProps {
   type: ContentTypeValue;
@@ -65,6 +73,6 @@ export function ContentTypeBadge({
   );
 }
 
-/* ── Export the config for use elsewhere ──────────────────── */
+/* -- Export the config for use elsewhere -------------------- */
 
 export const CONTENT_TYPE_CONFIG = TYPE_CONFIG;

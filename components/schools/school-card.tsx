@@ -19,12 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  requestToJoinSchoolAction,
-} from "@/server/actions/memberships";
-import {
-  startConversationAction,
-} from "@/server/actions/messaging";
+import { requestToJoinSchoolAction } from "@/server/actions/memberships";
+import { startConversationAction } from "@/server/actions/messaging";
 import type { SchoolCardData } from "@/server/services/schools";
 
 interface SchoolCardProps {
@@ -60,9 +56,7 @@ export function SchoolCard({
     return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "?";
   }, [school.name]);
 
-  const typeLabel = school.type
-    ? t(`types.${school.type}` as const)
-    : null;
+  const typeLabel = school.type ? t(`types.${school.type}` as const) : null;
 
   async function handleBecomeStudent() {
     setPendingStudent(true);
@@ -125,7 +119,7 @@ export function SchoolCard({
         className,
       )}
     >
-      {/* ── Top: logo + name + badges ─────────────────────────── */}
+      {/* -- Top: logo + name + badges --------------------------- */}
       <div className="flex items-start gap-4">
         <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary-500/10 text-primary-300 ring-1 ring-primary-500/30">
           {school.logoUrl ? (
@@ -180,7 +174,7 @@ export function SchoolCard({
         </div>
       </div>
 
-      {/* ── Stats grid ────────────────────────────────────────── */}
+      {/* -- Stats grid ------------------------------------------ */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile
           icon={Users}
@@ -208,7 +202,7 @@ export function SchoolCard({
         />
       </div>
 
-      {/* ── Actions ───────────────────────────────────────────── */}
+      {/* -- Actions --------------------------------------------- */}
       <div className="mt-auto flex flex-wrap gap-2 pt-2">
         <Button
           type="button"
@@ -273,7 +267,7 @@ export function SchoolCard({
   );
 }
 
-/* ── Stat tile ─────────────────────────────────────────────────── */
+/* -- Stat tile --------------------------------------------------- */
 
 interface StatTileProps {
   icon: React.ComponentType<{ className?: string }>;

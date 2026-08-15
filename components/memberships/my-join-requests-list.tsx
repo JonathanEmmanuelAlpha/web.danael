@@ -21,7 +21,10 @@ interface MyJoinRequestsListProps {
 function statusBadge(status: JoinRequestItem["status"]) {
   const map: Record<
     JoinRequestItem["status"],
-    { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+    {
+      label: string;
+      variant: "default" | "secondary" | "destructive" | "outline";
+    }
   > = {
     pending: { label: "En attente", variant: "default" },
     approved: { label: "Approuvée", variant: "secondary" },
@@ -104,11 +107,6 @@ export function MyJoinRequestsList({ requests }: MyJoinRequestsListProps) {
                 {req.message && (
                   <p className="mt-1 text-xs italic text-muted-foreground">
                     « {req.message} »
-                  </p>
-                )}
-                {req.adminNote && req.status === "rejected" && (
-                  <p className="mt-1 text-xs text-destructive">
-                    Note de l'administrateur : {req.adminNote}
                   </p>
                 )}
                 <p className="text-[11px] text-muted-foreground">

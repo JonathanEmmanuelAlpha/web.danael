@@ -15,7 +15,7 @@ import {
 } from "@/server/db/schema/enums";
 import type { PlanType } from "@/server/providers/payments/types";
 
-/* ── Subscriptions ──────────────────────────────────────────── */
+/* -- Subscriptions -------------------------------------------- */
 
 export const planTypeSchema = z.enum(
   PLAN_TYPE_VALUES as unknown as [PlanType, ...PlanType[]],
@@ -55,7 +55,7 @@ export const cancelSubscriptionSchema = z.object({
   id: z.uuid(),
 });
 
-/* ── Payments ──────────────────────────────────────────────── */
+/* -- Payments ------------------------------------------------ */
 
 export const initiatePaymentSchema = z.object({
   subscriptionId: z.uuid(),
@@ -95,7 +95,7 @@ export const listSubscriptionsQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-/* ── Invoices ─────────────────────────────────────────────── */
+/* -- Invoices ----------------------------------------------- */
 
 export const listInvoicesQuerySchema = z.object({
   schoolId: z.uuid().optional(),
@@ -109,14 +109,14 @@ export const getInvoiceSchema = z.object({
   id: z.uuid(),
 });
 
-/* ── Entitlements ─────────────────────────────────────────── */
+/* -- Entitlements ------------------------------------------- */
 
 export const canAccessFeatureSchema = z.object({
   feature: z.string().min(1).max(80),
   userId: z.uuid().optional(),
 });
 
-/* ── Types ────────────────────────────────────────────────── */
+/* -- Types -------------------------------------------------- */
 
 export type CreateSubscriptionInput = z.infer<typeof createSubscriptionSchema>;
 export type UpdateSubscriptionInput = z.infer<typeof updateSubscriptionSchema>;
@@ -124,7 +124,9 @@ export type CancelSubscriptionInput = z.infer<typeof cancelSubscriptionSchema>;
 export type InitiatePaymentInput = z.infer<typeof initiatePaymentSchema>;
 export type ConfirmPaymentInput = z.infer<typeof confirmPaymentSchema>;
 export type ListPaymentsQuery = z.infer<typeof listPaymentsQuerySchema>;
-export type ListSubscriptionsQuery = z.infer<typeof listSubscriptionsQuerySchema>;
+export type ListSubscriptionsQuery = z.infer<
+  typeof listSubscriptionsQuerySchema
+>;
 export type ListInvoicesQuery = z.infer<typeof listInvoicesQuerySchema>;
 export type GetInvoiceInput = z.infer<typeof getInvoiceSchema>;
 export type CanAccessFeatureInput = z.infer<typeof canAccessFeatureSchema>;

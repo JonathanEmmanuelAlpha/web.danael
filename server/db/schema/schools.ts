@@ -33,9 +33,9 @@ import {
   invitationTargetEnum,
 } from "./enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * schools
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const schools = pgTable(
   "schools",
@@ -77,9 +77,9 @@ export const schools = pgTable(
 export type School = typeof schools.$inferSelect;
 export type NewSchool = typeof schools.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * school_members
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const schoolMembers = pgTable(
   "school_members",
@@ -112,9 +112,9 @@ export const schoolMembers = pgTable(
 export type SchoolMember = typeof schoolMembers.$inferSelect;
 export type NewSchoolMember = typeof schoolMembers.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * classes
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const classes = pgTable(
   "classes",
@@ -151,9 +151,9 @@ export const classes = pgTable(
 export type Class = typeof classes.$inferSelect;
 export type NewClass = typeof classes.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * class_members
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const classMembers = pgTable(
   "class_members",
@@ -182,9 +182,9 @@ export const classMembers = pgTable(
 export type ClassMember = typeof classMembers.$inferSelect;
 export type NewClassMember = typeof classMembers.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * subjects — global catalog
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const subjects = pgTable(
   "subjects",
@@ -210,9 +210,9 @@ export const subjects = pgTable(
 export type Subject = typeof subjects.$inferSelect;
 export type NewSubject = typeof subjects.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * class_subjects — subject taught in a class with coefficient
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const classSubjects = pgTable(
   "class_subjects",
@@ -248,9 +248,9 @@ export const classSubjects = pgTable(
 export type ClassSubject = typeof classSubjects.$inferSelect;
 export type NewClassSubject = typeof classSubjects.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * parent_student_relations
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const parentStudentRelations = pgTable(
   "parent_student_relations",
@@ -283,13 +283,13 @@ export type ParentStudentRelation = typeof parentStudentRelations.$inferSelect;
 export type NewParentStudentRelation =
   typeof parentStudentRelations.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * invitations — In-app invitations sent by school admin / teacher
  *
  * Replaces the email-only flow. The invitation is created in DB
  * (status=pending), an in-app notification is created, AND an email
  * is sent (best-effort). The recipient can accept/reject from the app.
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const invitations = pgTable(
   "invitations",
@@ -324,7 +324,9 @@ export const invitations = pgTable(
   },
   (t) => ({
     inviteeIdx: pgIndex("invitations_invitee_user_id_idx").on(t.inviteeUserId),
-    inviteeEmailIdx: pgIndex("invitations_invitee_email_idx").on(t.inviteeEmail),
+    inviteeEmailIdx: pgIndex("invitations_invitee_email_idx").on(
+      t.inviteeEmail,
+    ),
     targetIdx: pgIndex("invitations_target_idx").on(t.targetType, t.targetId),
     statusIdx: pgIndex("invitations_status_idx").on(t.status),
   }),
@@ -333,12 +335,12 @@ export const invitations = pgTable(
 export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * school_join_requests — Requests from users to join a school
  *
  * Initiated by students/teachers who want to join a school by code
  * or by browsing. School admin can approve/reject.
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const schoolJoinRequests = pgTable(
   "school_join_requests",
@@ -377,11 +379,11 @@ export const schoolJoinRequests = pgTable(
 export type SchoolJoinRequest = typeof schoolJoinRequests.$inferSelect;
 export type NewSchoolJoinRequest = typeof schoolJoinRequests.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * class_join_requests — Requests from users to join a class
  *
  * Same pattern as school_join_requests but for a class.
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const classJoinRequests = pgTable(
   "class_join_requests",
@@ -417,10 +419,10 @@ export const classJoinRequests = pgTable(
 export type ClassJoinRequest = typeof classJoinRequests.$inferSelect;
 export type NewClassJoinRequest = typeof classJoinRequests.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * school_access_codes — Access codes for school admin to invite
  *                       other school_admins to co-manage the school
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const schoolAccessCodes = pgTable(
   "school_access_codes",
@@ -459,10 +461,10 @@ export const schoolAccessCodes = pgTable(
 export type SchoolAccessCode = typeof schoolAccessCodes.$inferSelect;
 export type NewSchoolAccessCode = typeof schoolAccessCodes.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * school_admin_access — Access requests from school_admins to
  *                       join the management of an existing school
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const schoolAdminAccess = pgTable(
   "school_admin_access",
@@ -490,7 +492,9 @@ export const schoolAdminAccess = pgTable(
   },
   (t) => ({
     schoolIdx: pgIndex("school_admin_access_school_id_idx").on(t.schoolId),
-    adminIdx: pgIndex("school_admin_access_school_admin_id_idx").on(t.schoolAdminId),
+    adminIdx: pgIndex("school_admin_access_school_admin_id_idx").on(
+      t.schoolAdminId,
+    ),
     statusIdx: pgIndex("school_admin_access_status_idx").on(t.status),
     schoolAdminUniq: pgUniqueIndex("school_admin_access_school_admin_uniq").on(
       t.schoolId,

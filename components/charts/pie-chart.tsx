@@ -96,7 +96,11 @@ export function PieChartCard({
           {emptyMessage}
         </div>
       ) : (
-        <ShadcnChartContainer config={config} style={{ height }} className="mx-auto w-full">
+        <ShadcnChartContainer
+          config={config}
+          style={{ height }}
+          className="mx-auto w-full"
+        >
           <RechartsPieChart>
             <defs>
               {/* Subtle drop-shadow for slice glow (only on the pie). */}
@@ -108,7 +112,27 @@ export function PieChartCard({
                 </feMerge>
               </filter>
             </defs>
-            <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
+            <ChartTooltip
+              content={({
+                active,
+                payload,
+                label,
+                accessibilityLayer,
+                activeIndex,
+                coordinate,
+              }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                  accessibilityLayer={accessibilityLayer}
+                  activeIndex={activeIndex}
+                  coordinate={coordinate}
+                  nameKey="label"
+                  hideLabel
+                />
+              )}
+            />
             <Pie
               data={data.map((d) => ({ ...d, name: d.label }))}
               dataKey="value"
@@ -120,7 +144,8 @@ export function PieChartCard({
               stroke="rgba(3,9,19,0.6)"
             >
               {data.map((s, i) => {
-                const color = s.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length];
+                const color =
+                  s.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length];
                 return <Cell key={s.key} fill={color} />;
               })}
               {donut && centerValue != null && (

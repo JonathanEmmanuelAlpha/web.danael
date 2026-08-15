@@ -8,7 +8,7 @@
 
 import type { UserRole } from "@/types";
 
-/* ── Permissions (fine-grained actions) ────────────────────── */
+/* -- Permissions (fine-grained actions) ---------------------- */
 
 export const PERMISSIONS = [
   // Content
@@ -82,12 +82,9 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
-/* ── Role → permissions mapping (§4.2) ─────────────────────── */
+/* -- Role → permissions mapping (§4.2) ----------------------- */
 
-const ALL_CONTENT_VIEW = [
-  "content:view:public",
-  "content:download",
-] as const;
+const ALL_CONTENT_VIEW = ["content:view:public", "content:download"] as const;
 
 const ROLE_PERMISSIONS: Record<UserRole, ReadonlySet<Permission>> = {
   student: new Set<Permission>([
@@ -192,7 +189,7 @@ const ROLE_PERMISSIONS: Record<UserRole, ReadonlySet<Permission>> = {
   ]),
 };
 
-/* ── Public API ────────────────────────────────────────────── */
+/* -- Public API ---------------------------------------------- */
 
 /**
  * Returns true if the given role has the requested permission.
@@ -204,7 +201,10 @@ export function hasPermission(role: UserRole, permission: Permission): boolean {
 /**
  * Returns true if the role has ALL of the requested permissions.
  */
-export function hasAllPermissions(role: UserRole, permissions: Permission[]): boolean {
+export function hasAllPermissions(
+  role: UserRole,
+  permissions: Permission[],
+): boolean {
   const granted = ROLE_PERMISSIONS[role];
   if (!granted) return false;
   return permissions.every((p) => granted.has(p));
@@ -213,7 +213,10 @@ export function hasAllPermissions(role: UserRole, permissions: Permission[]): bo
 /**
  * Returns true if the role has ANY of the requested permissions.
  */
-export function hasAnyPermission(role: UserRole, permissions: Permission[]): boolean {
+export function hasAnyPermission(
+  role: UserRole,
+  permissions: Permission[],
+): boolean {
   const granted = ROLE_PERMISSIONS[role];
   if (!granted) return false;
   return permissions.some((p) => granted.has(p));

@@ -44,7 +44,7 @@ import {
 } from "@/server/actions/learning";
 import type { SkillNodeWithState } from "@/server/services/learning";
 
-/* ── Mastery helpers ────────────────────────────────────────── */
+/* -- Mastery helpers ------------------------------------------ */
 
 type MasteryLevel = "low" | "medium" | "high";
 
@@ -97,7 +97,7 @@ function formatLastPracticed(
   return `${t("skillLastPracticed")} · ${diffDays}j`;
 }
 
-/* ── Detail panel ───────────────────────────────────────────── */
+/* -- Detail panel --------------------------------------------- */
 
 interface SkillDetailState {
   loading: boolean;
@@ -274,7 +274,9 @@ function SkillDetailPanel({ skill }: { skill: SkillNodeWithState }) {
             <Skeleton className="h-8 w-full rounded-md" />
           </div>
         ) : state.peerSignals.length === 0 ? (
-          <p className="text-xs text-muted-foreground">{t("peerSignalNoData")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("peerSignalNoData")}
+          </p>
         ) : (
           <ul className="space-y-1.5">
             {state.peerSignals.slice(0, 3).map((s) => (
@@ -296,8 +298,8 @@ function SkillDetailPanel({ skill }: { skill: SkillNodeWithState }) {
                     {s.helpfulCount}
                   </span>
                   <span className="flex items-center gap-0.5 text-primary-400">
-                    <TrendingUp className="size-3" />
-                    +{s.avgImprovement.toFixed(1)}
+                    <TrendingUp className="size-3" />+
+                    {s.avgImprovement.toFixed(1)}
                   </span>
                 </div>
               </li>
@@ -307,7 +309,8 @@ function SkillDetailPanel({ skill }: { skill: SkillNodeWithState }) {
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        {masteryText(level, t)} · {formatLastPracticed(skill.lastPracticedAt, t)}
+        {masteryText(level, t)} ·{" "}
+        {formatLastPracticed(skill.lastPracticedAt, t)}
       </p>
     </div>
   );
@@ -346,7 +349,7 @@ function StatBlock({
   );
 }
 
-/* ── Skill node row ─────────────────────────────────────────── */
+/* -- Skill node row ------------------------------------------- */
 
 interface SkillNodeRowProps {
   node: SkillNodeWithState;
@@ -434,7 +437,10 @@ function SkillNodeRow({
             </div>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
               <div
-                className={cn("h-full rounded-full transition-all", masteryColor(level))}
+                className={cn(
+                  "h-full rounded-full transition-all",
+                  masteryColor(level),
+                )}
                 style={{ width: `${node.mastery}%` }}
               />
             </div>
@@ -469,7 +475,7 @@ function SkillNodeRow({
   );
 }
 
-/* ── Main component ─────────────────────────────────────────── */
+/* -- Main component ------------------------------------------- */
 
 export interface SkillGraphViewProps {
   skills: SkillNodeWithState[];
@@ -506,7 +512,9 @@ export function SkillGraphView({
   };
 
   return (
-    <Card className={cn("relative overflow-hidden p-5 animate-fade-up", className)}>
+    <Card
+      className={cn("relative overflow-hidden p-5 animate-fade-up", className)}
+    >
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary-500/40 via-accent-cyan-400/20 to-transparent"
@@ -520,7 +528,9 @@ export function SkillGraphView({
             <h3 className="font-display text-base font-semibold text-foreground">
               {t("skillGraph")}
             </h3>
-            <p className="text-xs text-muted-foreground">{t("skillGraphHint")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("skillGraphHint")}
+            </p>
           </div>
         </div>
       </div>

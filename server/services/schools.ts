@@ -26,7 +26,7 @@ import type {
 import type { School, SchoolMember } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { School, SchoolMember };
 
@@ -94,7 +94,7 @@ export type InviteByEmailInput = {
   roleInSchool: "admin" | "teacher" | "student" | "parent" | "staff";
 };
 
-/* ── Slug helper ───────────────────────────────────────────── */
+/* -- Slug helper --------------------------------------------- */
 
 async function ensureUniqueSlug(base: string): Promise<string> {
   const db = await getDb();
@@ -113,7 +113,7 @@ async function ensureUniqueSlug(base: string): Promise<string> {
   }
 }
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Create a new school and immediately add the creator as `school_admin`.
@@ -218,7 +218,7 @@ export async function verifySchool(id: string): Promise<School> {
   return updated;
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function getSchoolById(id: string): Promise<SchoolWithCounts> {
   const db = await getDb();
@@ -335,7 +335,7 @@ async function countMembersByRole(
   return Number(rows.at(0)?.c ?? 0);
 }
 
-/* ── Membership ────────────────────────────────────────────── */
+/* -- Membership ---------------------------------------------- */
 
 /**
  * Invite a user by email. If the email matches a known user, the membership
@@ -528,7 +528,7 @@ export async function countClassMembersByRole(
 
 // `sql` is used by `listSchoolsFTS` (PostgreSQL tsvector full-text search).
 
-/* ── Public listing (FTS + card view) ───────────────────────── */
+/* -- Public listing (FTS + card view) ------------------------- */
 
 /**
  * Convert a raw schools row into the public `SchoolCardData` shape, enriched
@@ -655,7 +655,7 @@ export async function listSchoolsFTS(
 
   const conditions: SQL<unknown>[] = [];
 
-  // ── Search: try FTS first, fall back to ILIKE ─────────────
+  // -- Search: try FTS first, fall back to ILIKE -------------
   if (query.search && query.search.trim().length > 0) {
     const needle = query.search.trim();
     try {
@@ -720,7 +720,7 @@ export async function listSchoolsFTS(
   };
 }
 
-/* ── School detail ─────────────────────────────────────────── */
+/* -- School detail ------------------------------------------- */
 
 /**
  * Get a single school as `SchoolCardData`, plus the first page of its classes.
@@ -773,7 +773,7 @@ export async function getSchoolCardById(
   return toSchoolCardData(school, revealJoinCode);
 }
 
-/* ── School classes (paginated) ────────────────────────────── */
+/* -- School classes (paginated) ------------------------------ */
 
 export interface ListSchoolClassesQuery {
   schoolId: string;

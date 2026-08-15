@@ -97,7 +97,11 @@ export function RadarChartCard({
           {emptyMessage}
         </div>
       ) : (
-        <ShadcnChartContainer config={config} style={{ height }} className="mx-auto w-full">
+        <ShadcnChartContainer
+          config={config}
+          style={{ height }}
+          className="mx-auto w-full"
+        >
           <RechartsRadarChart data={data} outerRadius="80%">
             <PolarGrid stroke="rgba(255,255,255,0.08)" />
             <PolarAngleAxis
@@ -109,7 +113,26 @@ export function RadarChartCard({
               stroke="rgba(255,255,255,0.1)"
               axisLine={false}
             />
-            <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+            <ChartTooltip
+              content={({
+                active,
+                payload,
+                label,
+                accessibilityLayer,
+                activeIndex,
+                coordinate,
+              }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                  indicator="dot"
+                  accessibilityLayer={accessibilityLayer}
+                  activeIndex={activeIndex}
+                  coordinate={coordinate}
+                />
+              )}
+            />
             {series.map((s, i) => {
               const entry = s.color
                 ? { stroke: s.color, glow: s.color }

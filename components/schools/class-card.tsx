@@ -165,7 +165,7 @@ export function ClassCard({ cls, className }: ClassCardProps) {
   );
 }
 
-/* ── Compact stat ──────────────────────────────────────────────── */
+/* -- Compact stat ------------------------------------------------ */
 
 interface CompactStatProps {
   icon: React.ComponentType<{ className?: string }>;

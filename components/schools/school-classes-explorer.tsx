@@ -97,10 +97,10 @@ export function SchoolClassesExplorer({
     return data?.pages.flatMap((p) => p.items) ?? [];
   }, [data]);
 
-  // ── Responsive column count ─────────────────────────────────────
+  // -- Responsive column count -------------------------------------
   const columns = useColumns();
 
-  // ── Row-based virtualization ────────────────────────────────────
+  // -- Row-based virtualization ------------------------------------
   const parentRef = React.useRef<HTMLDivElement | null>(null);
   const rowCount = Math.ceil(allClasses.length / columns);
   const rowVirtualizer = useVirtualizer({
@@ -110,7 +110,7 @@ export function SchoolClassesExplorer({
     overscan: 2,
   });
 
-  // ── Infinite scroll sentinel ────────────────────────────────────
+  // -- Infinite scroll sentinel ------------------------------------
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     const node = sentinelRef.current;
@@ -146,7 +146,7 @@ export function SchoolClassesExplorer({
 
   return (
     <div className="space-y-6">
-      {/* ── Search bar ────────────────────────────────────────── */}
+      {/* -- Search bar ------------------------------------------ */}
       <div className="glass sticky top-4 z-10 rounded-2xl p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
@@ -187,7 +187,7 @@ export function SchoolClassesExplorer({
         )}
       </div>
 
-      {/* ── List ───────────────────────────────────────────────── */}
+      {/* -- List ------------------------------------------------- */}
       {isEmpty ? (
         <EmptyState
           icon={BookOpen}
@@ -277,7 +277,7 @@ export function SchoolClassesExplorer({
   );
 }
 
-/* ── Skeleton ──────────────────────────────────────────────────── */
+/* -- Skeleton ---------------------------------------------------- */
 
 function ClassCardSkeleton() {
   return (
@@ -317,7 +317,7 @@ function ClassCardSkeleton() {
   );
 }
 
-/* ── Helpers ────────────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------------ */
 
 function useDebouncedValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = React.useState(value);

@@ -32,7 +32,7 @@ import type {
 import type { Subject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const generateInviteCode = customAlphabet(alphabet, 8);
@@ -63,7 +63,7 @@ export type ClassSubjectWithRelations = ClassSubject & {
   > | null;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 /**
  * Create a new class within a school. Auto-generates an 8-char invite code.
@@ -186,7 +186,7 @@ export async function joinClassByCode(
   return cls;
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function getClassById(
   id: string,
@@ -233,9 +233,7 @@ export async function getClassById(
   };
 }
 
-export async function listClasses(
-  filters: ListClassesQuery,
-): Promise<{
+export async function listClasses(filters: ListClassesQuery): Promise<{
   items: ClassWithRelations[];
   total: number;
   page: number;
@@ -414,7 +412,7 @@ export async function removeMember(
     );
 }
 
-/* ── Helpers (re-exported for school pages) ─────────────────── */
+/* -- Helpers (re-exported for school pages) ------------------- */
 
 /**
  * Returns the schoolId for a given class (used for context checks).

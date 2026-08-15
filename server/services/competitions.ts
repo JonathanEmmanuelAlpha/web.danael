@@ -44,7 +44,7 @@ import type {
 } from "@/server/db/schema/competitions";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { Competition, CompetitionParticipant };
 
@@ -87,7 +87,7 @@ export type RankedParticipant = ParticipantWithUser & {
   rank: number;
 };
 
-/* ── Mutations: competitions ────────────────────────────────── */
+/* -- Mutations: competitions ---------------------------------- */
 
 /**
  * Create a new competition. `creatorId` is stored as the schoolId-less
@@ -347,7 +347,7 @@ export async function publishCompetition(id: string): Promise<Competition> {
   return updated;
 }
 
-/* ── Participants ──────────────────────────────────────────── */
+/* -- Participants -------------------------------------------- */
 
 /**
  * Join a competition. Idempotent — if already joined, returns the existing

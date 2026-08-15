@@ -2,7 +2,7 @@
  * Shared application types (§4, §10).
  */
 
-/* ── Roles (§4.1) ─────────────────────────────────────────── */
+/* -- Roles (§4.1) ------------------------------------------- */
 export type UserRole =
   | "student"
   | "teacher"
@@ -24,15 +24,15 @@ export const USER_ROLES: UserRole[] = [
   "support",
 ];
 
-/* ── Levels (§10.2) ───────────────────────────────────────── */
+/* -- Levels (§10.2) ----------------------------------------- */
 export type Level = "6e" | "5e" | "4e" | "3e" | "2nde" | "1ere" | "Tle";
 export const LEVELS: Level[] = ["6e", "5e", "4e", "3e", "2nde", "1ere", "Tle"];
 
-/* ── Series (§10.2) ───────────────────────────────────────── */
+/* -- Series (§10.2) ----------------------------------------- */
 export type Series = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "TI";
 export const SERIES: Series[] = ["A", "B", "C", "D", "E", "F", "G", "TI"];
 
-/* ── Content types (§10.2) ────────────────────────────────── */
+/* -- Content types (§10.2) ---------------------------------- */
 export type ContentType =
   | "epreuve"
   | "corrige"
@@ -43,7 +43,7 @@ export type ContentType =
   | "devoir_modele"
   | "sujet_blanc";
 
-/* ── Content visibility (§10.2) ────────────────────────────── */
+/* -- Content visibility (§10.2) ------------------------------ */
 export type ContentVisibility =
   | "public"
   | "school_private"
@@ -52,7 +52,7 @@ export type ContentVisibility =
   | "draft"
   | "archived";
 
-/* ── Subscription status (§10.2) ───────────────────────────── */
+/* -- Subscription status (§10.2) ----------------------------- */
 export type SubscriptionStatus =
   | "free"
   | "active"
@@ -60,7 +60,7 @@ export type SubscriptionStatus =
   | "expired"
   | "cancelled";
 
-/* ── Assignment status (§10.2) ─────────────────────────────── */
+/* -- Assignment status (§10.2) ------------------------------- */
 export type AssignmentStatus =
   | "draft"
   | "scheduled"
@@ -68,7 +68,7 @@ export type AssignmentStatus =
   | "closed"
   | "archived";
 
-/* ── Submission status (§10.2) ─────────────────────────────── */
+/* -- Submission status (§10.2) ------------------------------- */
 export type SubmissionStatus =
   | "not_started"
   | "submitted"
@@ -76,21 +76,21 @@ export type SubmissionStatus =
   | "graded"
   | "returned";
 
-/* ── Attendance status (§10.2) ─────────────────────────────── */
+/* -- Attendance status (§10.2) ------------------------------- */
 export type AttendanceStatus = "present" | "absent" | "late" | "excused";
 
-/* ── Competition scope (§10.2) ─────────────────────────────── */
+/* -- Competition scope (§10.2) ------------------------------- */
 export type CompetitionScope = "class" | "school" | "regional" | "national";
 
-/* ── Clerk error shape (used by auth pages) ────────────────── */
+/* -- Clerk error shape (used by auth pages) ------------------ */
 export interface ClerkError {
   errors?: Array<{ code?: string; longMessage?: string; message?: string }>;
 }
 
-/* ── OAuth strategies ─────────────────────────────────────── */
+/* -- OAuth strategies --------------------------------------- */
 export type OAuthStrategy = "oauth_google" | "oauth_apple" | "oauth_facebook";
 
-/* ── Address ─────────────────────────────────────── */
+/* -- Address --------------------------------------- */
 export type Address = {
   country: string;
   region: string;

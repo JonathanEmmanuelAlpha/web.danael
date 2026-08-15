@@ -48,12 +48,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  SelectField,
-  SubmitButton,
-} from "@/components/forms/tanstack-fields";
+import { SelectField, SubmitButton } from "@/components/forms/tanstack-fields";
 
-import { getUserByIdAction, updateUserRoleAction, deactivateUserAction } from "@/server/actions/admin";
+import {
+  getUserByIdAction,
+  updateUserRoleAction,
+  deactivateUserAction,
+} from "@/server/actions/admin";
 import type { AdminUserDetail } from "@/server/services/admin";
 import { USER_ROLES, type UserRole } from "@/types";
 import { roleBadgeVariant } from "@/lib/role-utils";
@@ -101,7 +102,10 @@ export function UserDetailSheet({
       });
       if (res.success) {
         toast.success(t("roleChanged"));
-        setDetail({ ...detail, role: res.data.role as AdminUserDetail["role"] });
+        setDetail({
+          ...detail,
+          role: res.data.role as AdminUserDetail["role"],
+        });
       } else {
         toast.error(res.error?.message ?? t("changeRoleFailed"));
         roleForm.reset({ role: detail.role });
@@ -184,7 +188,9 @@ export function UserDetailSheet({
             {/* Identity */}
             <div className="flex items-center gap-3">
               <Avatar className="size-12">
-                {detail.avatarUrl && <AvatarImage src={detail.avatarUrl} alt={fullName} />}
+                {detail.avatarUrl && (
+                  <AvatarImage src={detail.avatarUrl} alt={fullName} />
+                )}
                 <AvatarFallback>{initials || "?"}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
@@ -258,12 +264,22 @@ export function UserDetailSheet({
                   <span className="font-medium">
                     {t(`plans.${detail.subscription.planType}` as never)}
                   </span>
-                  <Badge variant={detail.subscription.status === "active" ? "success" : "secondary"}>
-                    {t(`subscriptionStatus.${detail.subscription.status}` as never)}
+                  <Badge
+                    variant={
+                      detail.subscription.status === "active"
+                        ? "success"
+                        : "secondary"
+                    }
+                  >
+                    {t(
+                      `subscriptionStatus.${detail.subscription.status}` as never,
+                    )}
                   </Badge>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">{t("noSubscription")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("noSubscription")}
+                </p>
               )}
             </div>
 
@@ -273,7 +289,9 @@ export function UserDetailSheet({
                 <SchoolIcon className="size-3.5" /> {t("schools")}
               </div>
               {detail.schools.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("noSchools")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("noSchools")}
+                </p>
               ) : (
                 <ul className="space-y-2">
                   {detail.schools.map((s) => (
@@ -287,7 +305,9 @@ export function UserDetailSheet({
                           {t(`roleInSchool.${s.roleInSchool}` as never)}
                         </Badge>
                         <Badge
-                          variant={s.status === "active" ? "success" : "secondary"}
+                          variant={
+                            s.status === "active" ? "success" : "secondary"
+                          }
                           size="sm"
                         >
                           {t(`memberStatus.${s.status}` as never)}
@@ -303,13 +323,24 @@ export function UserDetailSheet({
             <div className="rounded-xl border border-border bg-muted/20 p-4 text-xs">
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">{t("onboarding")}</span>
-                <Badge variant={detail.onboardingCompleted ? "success" : "warning"} size="sm">
-                  {detail.onboardingCompleted ? t("completed") : t("pending")}
+                <Badge
+                  variant={
+                    detail.onboardingStatus === "completed"
+                      ? "success"
+                      : "warning"
+                  }
+                  size="sm"
+                >
+                  {detail.onboardingStatus === "completed"
+                    ? t("completed")
+                    : t("pending")}
                 </Badge>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">{t("streak")}</span>
-                <span className="font-medium">{detail.currentStreak} {t("days")}</span>
+                <span className="font-medium">
+                  {detail.currentStreak} {t("days")}
+                </span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">{t("joinedAt")}</span>
@@ -319,7 +350,9 @@ export function UserDetailSheet({
               </div>
               {detail.lastActiveAt && (
                 <div className="flex justify-between py-1">
-                  <span className="text-muted-foreground">{t("lastActive")}</span>
+                  <span className="text-muted-foreground">
+                    {t("lastActive")}
+                  </span>
                   <span className="font-medium">
                     {new Date(detail.lastActiveAt).toLocaleDateString("fr-FR")}
                   </span>
@@ -334,8 +367,14 @@ export function UserDetailSheet({
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" disabled={deactivating}>
-                    {deactivating && <Loader2 className="size-4 animate-spin" />}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={deactivating}
+                  >
+                    {deactivating && (
+                      <Loader2 className="size-4 animate-spin" />
+                    )}
                     {t("deactivate")}
                   </Button>
                 </AlertDialogTrigger>

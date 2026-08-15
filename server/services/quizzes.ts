@@ -48,6 +48,7 @@ import type {
   StartQuizSessionInput,
   SubmitQuizAnswerInput,
   UpdateQuizInput,
+  UpdateQuizQuestionInput,
 } from "@/server/validators/quizzes";
 import type {
   NewQuestionBank,
@@ -66,7 +67,7 @@ import type {
 import type { Subject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type {
   Quiz,
@@ -120,7 +121,7 @@ export type QuizSessionResults = {
   passed: boolean;
 };
 
-/* ── Mutations: quizzes ───────────────────────────────────── */
+/* -- Mutations: quizzes ------------------------------------- */
 
 /**
  * Create a new quiz with its questions + options in a single transaction.
@@ -283,7 +284,7 @@ export async function publishQuiz(id: string, publish: boolean): Promise<Quiz> {
   return updated;
 }
 
-/* ── Mutations: questions + options ───────────────────────── */
+/* -- Mutations: questions + options ------------------------- */
 
 /**
  * Add a question (with its options) to an existing quiz.
@@ -303,7 +304,7 @@ export async function addQuestion(
  */
 export async function updateQuestion(
   questionId: string,
-  input: Partial<Omit<AddQuizQuestionInput, "quizId">>,
+  input: Partial<Omit<UpdateQuizQuestionInput, "quizId">>,
 ): Promise<QuizQuestionWithOptions> {
   const db = await getDb();
 
@@ -407,7 +408,7 @@ export async function removeQuestion(questionId: string): Promise<void> {
   await db.delete(quizQuestions).where(eq(quizQuestions.id, questionId));
 }
 
-/* ── Mutations: quiz session ───────────────────────────────── */
+/* -- Mutations: quiz session --------------------------------- */
 
 /**
  * Start a new quiz session. If an in_progress session already exists for the
@@ -657,7 +658,7 @@ export async function completeSession(
   return updated;
 }
 
-/* ── Queries: quizzes ─────────────────────────────────────── */
+/* -- Queries: quizzes --------------------------------------- */
 
 export async function getQuizById(id: string): Promise<QuizWithDetails> {
   const db = await getDb();
@@ -863,7 +864,7 @@ export async function listQuizzesForTeacher(
   });
 }
 
-/* ── Queries: session ─────────────────────────────────────── */
+/* -- Queries: session --------------------------------------- */
 
 export async function getSession(
   sessionId: string,
@@ -1047,7 +1048,7 @@ export async function listSessionsForUser(
   return rows.map((r) => ({ ...r.session, quiz: r.quiz, user: r.user }));
 }
 
-/* ── Question bank ────────────────────────────────────────── */
+/* -- Question bank ------------------------------------------ */
 
 export async function addQuestionToBank(
   input: AddQuestionToBankInput,
@@ -1112,7 +1113,7 @@ export async function listQuestionBank(
   return { items, total, page: filters.page, pageSize: filters.pageSize };
 }
 
-/* ── Helpers ──────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------ */
 
 /**
  * Insert a question + its options into a quiz.

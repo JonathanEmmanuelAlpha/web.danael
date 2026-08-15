@@ -61,7 +61,7 @@ import type {
 import type { User } from "@/server/db/schema/users";
 import type { Subject } from "@/server/db/schema/schools";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type {
   TutorProfile,
@@ -135,14 +135,14 @@ export type TutorEarnings = {
   monthly: Array<{ month: string; revenue: number; sessions: number }>;
 };
 
-/* ── Helpers ──────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------ */
 
 function toRating(value: unknown): number {
   const n = typeof value === "string" ? parseFloat(value) : Number(value);
   return Number.isFinite(n) ? n : 0;
 }
 
-/* ── Tutor profile mutations ──────────────────────────────── */
+/* -- Tutor profile mutations -------------------------------- */
 
 export async function createTutorProfile(
   userId: string,
@@ -205,7 +205,7 @@ export async function verifyTutor(profileId: string): Promise<TutorProfile> {
   return updated;
 }
 
-/* ── Tutor profile queries ────────────────────────────────── */
+/* -- Tutor profile queries ---------------------------------- */
 
 export async function getTutorProfile(
   userId: string,
@@ -427,7 +427,7 @@ export async function listTutors(filters: ListTutorsQuery): Promise<{
   return { items, total, page: filters.page, pageSize: filters.pageSize };
 }
 
-/* ── Tutor subjects ───────────────────────────────────────── */
+/* -- Tutor subjects ----------------------------------------- */
 
 export async function addTutorSubject(
   input: AddTutorSubjectInput,
@@ -473,7 +473,7 @@ export async function removeTutorSubject(
   return { removed: true };
 }
 
-/* ── Availabilities ───────────────────────────────────────── */
+/* -- Availabilities ----------------------------------------- */
 
 export async function setAvailability(
   input: SetAvailabilityInput,
@@ -530,7 +530,7 @@ export async function checkAvailability(
   );
 }
 
-/* ── Bookings ─────────────────────────────────────────────── */
+/* -- Bookings ----------------------------------------------- */
 
 export async function createBooking(
   input: CreateBookingInput,
@@ -806,7 +806,7 @@ export async function rescheduleBooking(
   return updated;
 }
 
-/* ── Reviews ──────────────────────────────────────────────── */
+/* -- Reviews ------------------------------------------------ */
 
 export async function createReview(
   input: CreateReviewInput,
@@ -950,7 +950,7 @@ async function recalculateTutorRating(profileId: string): Promise<void> {
     .where(eq(tutorProfiles.id, profileId));
 }
 
-/* ── Tutor earnings ───────────────────────────────────────── */
+/* -- Tutor earnings ----------------------------------------- */
 
 export async function getTutorEarnings(
   profileId: string,

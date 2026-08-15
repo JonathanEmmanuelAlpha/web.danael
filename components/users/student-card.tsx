@@ -44,7 +44,11 @@ function initials(first?: string | null, last?: string | null): string {
  * school admins are encouraged to invite the most active learners.
  * When `avgScore > 80` an amber "Top performer" badge glows on the card.
  */
-export function StudentCard({ student, schoolId, className }: StudentCardProps) {
+export function StudentCard({
+  student,
+  schoolId,
+  className,
+}: StudentCardProps) {
   const t = useTranslations("Users");
   const router = useRouter();
   const [inviting, setInviting] = React.useState(false);
@@ -53,8 +57,7 @@ export function StudentCard({ student, schoolId, className }: StudentCardProps) 
   const name =
     [student.firstName, student.lastName].filter(Boolean).join(" ") || "Élève";
 
-  const isTopPerformer =
-    student.avgScore !== null && student.avgScore > 80;
+  const isTopPerformer = student.avgScore !== null && student.avgScore > 80;
 
   async function handleInvite() {
     setInviting(true);
@@ -166,9 +169,7 @@ export function StudentCard({ student, schoolId, className }: StudentCardProps) 
         <Stat
           icon={<TrendingUp className="size-3.5" />}
           label={t("avgScore")}
-          value={
-            student.avgScore !== null ? `${student.avgScore}%` : "—"
-          }
+          value={student.avgScore !== null ? `${student.avgScore}%` : "—"}
           tone="cyan"
         />
       </div>
@@ -210,7 +211,7 @@ export function StudentCard({ student, schoolId, className }: StudentCardProps) 
   );
 }
 
-/* ── Internal stat tile ─────────────────────────────────────── */
+/* -- Internal stat tile --------------------------------------- */
 
 function Stat({
   icon,
@@ -235,7 +236,12 @@ function Stat({
             : "text-accent-coral-300";
   return (
     <div className="glass flex flex-col items-center gap-1 rounded-lg p-2.5 text-center">
-      <div className={cn("flex items-center gap-1 text-[10px] uppercase tracking-wide", toneClass)}>
+      <div
+        className={cn(
+          "flex items-center gap-1 text-[10px] uppercase tracking-wide",
+          toneClass,
+        )}
+      >
         {icon}
         <span>{label}</span>
       </div>

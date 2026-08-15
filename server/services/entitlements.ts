@@ -46,7 +46,7 @@ export interface EntitlementResult {
   schoolSubscriptionId?: string;
 }
 
-/* ── Plan catalog accessors ──────────────────────────────── */
+/* -- Plan catalog accessors -------------------------------- */
 
 export function getPlanFeatures(planType: PlanType): PlanDefinition {
   const plan = PLANS[planType];
@@ -58,7 +58,7 @@ export function getAllPlans(): PlanDefinition[] {
   return Object.values(PLANS);
 }
 
-/* ── Subscription lookup helpers ──────────────────────────── */
+/* -- Subscription lookup helpers ---------------------------- */
 
 async function getActiveSubscriptionForUser(
   userId: string,
@@ -179,7 +179,7 @@ async function getActiveFamilySubscription(
   return { sub: null };
 }
 
-/* ── Main API ────────────────────────────────────────────── */
+/* -- Main API ---------------------------------------------- */
 
 export async function getUserEntitlements(
   userId: string,

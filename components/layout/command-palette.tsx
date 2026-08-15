@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CommandModal } from "@/components/ui/command";
+import { CommandDialog } from "@/components/ui/command";
 import { getNavForRole } from "./nav-config";
 import type { UserRole } from "@/types";
 import type { LucideIcon } from "lucide-react";
@@ -23,14 +23,22 @@ interface CmdItem {
 /**
  * Global command palette (§6.2). Triggered with ⌘K / Ctrl+K.
  */
-export function CommandPalette({ open, onOpenChange, role }: CommandPaletteProps) {
+export function CommandPalette({
+  open,
+  onOpenChange,
+  role,
+}: CommandPaletteProps) {
   const router = useRouter();
   const t = useTranslations("Navigation");
 
   const items = useMemo<CmdItem[]>(() => {
     const sections = getNavForRole(role);
     return sections.flatMap((s) =>
-      s.items.map((i) => ({ label: t(i.labelKey), href: i.href, icon: i.icon })),
+      s.items.map((i) => ({
+        label: t(i.labelKey),
+        href: i.href,
+        icon: i.icon,
+      })),
     );
   }, [role, t]);
 
@@ -40,7 +48,7 @@ export function CommandPalette({ open, onOpenChange, role }: CommandPaletteProps
   }
 
   return (
-    <CommandModal open={open} onOpenChange={onOpenChange}>
+    <CommandDialog open={open} onOpenChange={onOpenChange}>
       {items.map((item) => (
         <button
           key={item.href}
@@ -51,6 +59,6 @@ export function CommandPalette({ open, onOpenChange, role }: CommandPaletteProps
           <span>{item.label}</span>
         </button>
       ))}
-    </CommandModal>
+    </CommandDialog>
   );
 }

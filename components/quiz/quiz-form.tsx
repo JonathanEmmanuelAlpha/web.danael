@@ -18,10 +18,7 @@ import {
   SubmitButton,
   FormErrorBanner,
 } from "@/components/forms/tanstack-fields";
-import {
-  QUIZ_TYPE_VALUES,
-  DIFFICULTY_VALUES,
-} from "@/server/db/schema/enums";
+import { QUIZ_TYPE_VALUES, DIFFICULTY_VALUES } from "@/server/db/schema/enums";
 import type { Subject } from "@/server/db/schema/schools";
 import type { CreateQuizInput } from "@/server/validators/quizzes";
 import type { QuizQuestionInput } from "@/server/validators/quizzes";
@@ -86,9 +83,7 @@ export function QuizForm({
 
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuizQuestionInput[]>(
-    initialQuestions.length > 0
-      ? initialQuestions
-      : [makeEmptyQuestion(0)],
+    initialQuestions.length > 0 ? initialQuestions : [makeEmptyQuestion(0)],
   );
 
   function addQuestion() {
@@ -145,7 +140,9 @@ export function QuizForm({
             return;
           }
           if (!q.options.some((o) => o.isCorrect)) {
-            setError(`${t("question")} ${i + 1}: ${t("correctOptionRequired")}`);
+            setError(
+              `${t("question")} ${i + 1}: ${t("correctOptionRequired")}`,
+            );
             return;
           }
           for (const opt of q.options) {
@@ -161,8 +158,14 @@ export function QuizForm({
         title: value.title.trim(),
         description: value.description?.trim() || undefined,
         subjectId: value.subjectId === "none" ? undefined : value.subjectId,
-        level: value.level === "none" ? undefined : (value.level as CreateQuizInput["level"]),
-        series: value.series === "none" ? undefined : (value.series as CreateQuizInput["series"]),
+        level:
+          value.level === "none"
+            ? undefined
+            : (value.level as CreateQuizInput["level"]),
+        series:
+          value.series === "none"
+            ? undefined
+            : (value.series as CreateQuizInput["series"]),
         type: value.type,
         timeLimitMinutes:
           value.timeLimit !== undefined
@@ -192,7 +195,9 @@ export function QuizForm({
     <div className="space-y-6">
       <PageHeader
         title={mode === "create" ? t("create") : t("edit")}
-        description={mode === "create" ? t("createDescription") : t("editDescription")}
+        description={
+          mode === "create" ? t("createDescription") : t("editDescription")
+        }
       />
 
       <form
@@ -388,7 +393,7 @@ export function QuizForm({
   );
 }
 
-/* ── Helpers ──────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------ */
 
 const LEVELS = ["6e", "5e", "4e", "3e", "2nde", "1ere", "Tle"] as const;
 const SERIES = ["A", "B", "C", "D", "E", "F", "G", "TI"] as const;

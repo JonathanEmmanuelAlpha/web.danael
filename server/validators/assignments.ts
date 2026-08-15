@@ -12,7 +12,7 @@ import {
   ASSIGNMENT_ITEM_TYPE_VALUES,
 } from "@/server/db/schema/enums";
 
-/* ── Assignment items ──────────────────────────────────────── */
+/* -- Assignment items ---------------------------------------- */
 
 /**
  * A single resource attached to an assignment (file/url/text/quiz).
@@ -26,18 +26,18 @@ export const assignmentItemSchema = z
     text: z.string().max(8000).optional(),
     position: z.number().int().min(0).default(0),
   })
-  .refine(
-    (v) => v.type !== "url" || (!!v.url && v.url.length > 0),
-    { message: "URL required for url items", path: ["url"] },
-  )
-  .refine(
-    (v) => v.type !== "text" || (!!v.text && v.text.length > 0),
-    { message: "Text required for text items", path: ["text"] },
-  );
+  .refine((v) => v.type !== "url" || (!!v.url && v.url.length > 0), {
+    message: "URL required for url items",
+    path: ["url"],
+  })
+  .refine((v) => v.type !== "text" || (!!v.text && v.text.length > 0), {
+    message: "Text required for text items",
+    path: ["text"],
+  });
 
 export type AssignmentItemInput = z.infer<typeof assignmentItemSchema>;
 
-/* ── Assignment ────────────────────────────────────────────── */
+/* -- Assignment ---------------------------------------------- */
 
 /**
  * Create an assignment (with optional items).
@@ -83,7 +83,7 @@ export const listAssignmentsQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
 });
 
-/* ── Submissions ──────────────────────────────────────────── */
+/* -- Submissions -------------------------------------------- */
 
 /**
  * Submit an assignment (student side) — attaches files & optional text answer.
@@ -106,7 +106,7 @@ export const resubmitAssignmentSchema = z.object({
   fileIds: z.array(z.uuid()).max(10).default([]),
 });
 
-/* ── Grading ───────────────────────────────────────────────── */
+/* -- Grading ------------------------------------------------- */
 
 /**
  * Grade a submission (teacher side).
@@ -120,7 +120,7 @@ export const gradeSubmissionSchema = z.object({
   status: z.enum(["graded", "returned"]).default("graded"),
 });
 
-/* ── Standalone item add ──────────────────────────────────── */
+/* -- Standalone item add ------------------------------------ */
 
 /**
  * Add an ordered resource item to an assignment (kept for parity with the

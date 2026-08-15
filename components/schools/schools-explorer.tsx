@@ -118,11 +118,11 @@ export function SchoolsExplorer({ initialPage }: SchoolsExplorerProps) {
     return data?.pages.flatMap((p) => p.items) ?? [];
   }, [data]);
 
-  // ── Responsive column count ─────────────────────────────────────
+  // -- Responsive column count -------------------------------------
   // 1 on mobile / 2 on sm (≥640px) / 3 on xl (≥1280px).
   const columns = useColumns();
 
-  // ── Row-based virtualization ────────────────────────────────────
+  // -- Row-based virtualization ------------------------------------
   // Each virtual "row" represents a horizontal grid row of `columns` cards.
   const parentRef = React.useRef<HTMLDivElement | null>(null);
   const rowCount = Math.ceil(allSchools.length / columns);
@@ -133,7 +133,7 @@ export function SchoolsExplorer({ initialPage }: SchoolsExplorerProps) {
     overscan: 2,
   });
 
-  // ── Infinite scroll sentinel (IntersectionObserver) ─────────────
+  // -- Infinite scroll sentinel (IntersectionObserver) -------------
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     const node = sentinelRef.current;
@@ -173,7 +173,7 @@ export function SchoolsExplorer({ initialPage }: SchoolsExplorerProps) {
 
   return (
     <div className="space-y-6">
-      {/* ── Search + filter bar ────────────────────────────────── */}
+      {/* -- Search + filter bar ---------------------------------- */}
       <div className="glass sticky top-4 z-10 rounded-2xl p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative flex-1">
@@ -260,7 +260,7 @@ export function SchoolsExplorer({ initialPage }: SchoolsExplorerProps) {
         )}
       </div>
 
-      {/* ── List ───────────────────────────────────────────────── */}
+      {/* -- List ------------------------------------------------- */}
       {isEmpty ? (
         <EmptyState
           icon={Building2}
@@ -351,7 +351,7 @@ export function SchoolsExplorer({ initialPage }: SchoolsExplorerProps) {
   );
 }
 
-/* ── Helpers ────────────────────────────────────────────────────── */
+/* -- Helpers ------------------------------------------------------ */
 
 /**
  * Returns a debounced copy of `value` that only updates after `delay` ms

@@ -110,15 +110,26 @@ export function MasteryChart({
       );
     }
     return (
-      <ShadcnChartContainer config={config} style={{ height }} className="w-full">
-        <RechartsAreaChart data={chartData} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
+      <ShadcnChartContainer
+        config={config}
+        style={{ height }}
+        className="w-full"
+      >
+        <RechartsAreaChart
+          data={chartData}
+          margin={{ left: 0, right: 8, top: 8, bottom: 0 }}
+        >
           <defs>
             <linearGradient id="masteryArea" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={STROKE} stopOpacity={0.4} />
               <stop offset="95%" stopColor={STROKE} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
+          <CartesianGrid
+            vertical={false}
+            stroke="rgba(255,255,255,0.05)"
+            strokeDasharray="3 3"
+          />
           <XAxis
             dataKey="date"
             tickLine={false}
@@ -139,8 +150,29 @@ export function MasteryChart({
             fontSize={11}
           />
           <ChartTooltip
-            cursor={{ stroke: "rgba(147,217,26,0.3)", strokeWidth: 1, strokeDasharray: "3 3" }}
-            content={<ChartTooltipContent indicator="dot" />}
+            cursor={{
+              stroke: "rgba(147,217,26,0.3)",
+              strokeWidth: 1,
+              strokeDasharray: "3 3",
+            }}
+            content={({
+              active,
+              payload,
+              label,
+              accessibilityLayer,
+              activeIndex,
+              coordinate,
+            }) => (
+              <ChartTooltipContent
+                active={active}
+                payload={payload}
+                label={label}
+                indicator="dot"
+                accessibilityLayer={accessibilityLayer}
+                activeIndex={activeIndex}
+                coordinate={coordinate}
+              />
+            )}
           />
           <Area
             dataKey="mastery"
@@ -174,15 +206,26 @@ export function MasteryChart({
       className={className}
     >
       {hasData ? (
-        <ShadcnChartContainer config={config} style={{ height }} className="w-full">
-          <RechartsAreaChart data={chartData} margin={{ left: 4, right: 12, top: 8, bottom: 0 }}>
+        <ShadcnChartContainer
+          config={config}
+          style={{ height }}
+          className="w-full"
+        >
+          <RechartsAreaChart
+            data={chartData}
+            margin={{ left: 4, right: 12, top: 8, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="masteryAreaCard" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={STROKE} stopOpacity={0.4} />
                 <stop offset="95%" stopColor={STROKE} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
+            <CartesianGrid
+              vertical={false}
+              stroke="rgba(255,255,255,0.05)"
+              strokeDasharray="3 3"
+            />
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -203,8 +246,29 @@ export function MasteryChart({
               fontSize={12}
             />
             <ChartTooltip
-              cursor={{ stroke: "rgba(147,217,26,0.3)", strokeWidth: 1, strokeDasharray: "3 3" }}
-              content={<ChartTooltipContent indicator="dot" />}
+              cursor={{
+                stroke: "rgba(147,217,26,0.3)",
+                strokeWidth: 1,
+                strokeDasharray: "3 3",
+              }}
+              content={({
+                active,
+                payload,
+                label,
+                accessibilityLayer,
+                activeIndex,
+                coordinate,
+              }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                  indicator="dot"
+                  accessibilityLayer={accessibilityLayer}
+                  activeIndex={activeIndex}
+                  coordinate={coordinate}
+                />
+              )}
             />
             <Area
               dataKey="mastery"

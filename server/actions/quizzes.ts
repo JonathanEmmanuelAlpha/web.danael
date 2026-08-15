@@ -63,7 +63,10 @@ function isTeacherRole(role: string | undefined): role is TeacherRole {
   return !!role && (TEACHER_ROLES as readonly string[]).includes(role);
 }
 
-async function requireTeacher(): Promise<{ userId: string; role: TeacherRole }> {
+async function requireTeacher(): Promise<{
+  userId: string;
+  role: TeacherRole;
+}> {
   const session = await requireSession();
   const dbUser = await getCurrentDbUser();
   if (!dbUser) throw AppError.notFound("User profile not found");
@@ -117,7 +120,10 @@ export async function createQuizAction(
     return { success: true, data: quiz };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("createQuizAction failed", { error: String(err) });
     return {
@@ -138,14 +144,20 @@ export async function updateQuizAction(
       throw AppError.validation("Invalid input", parsed.error.flatten());
     }
 
-    const updated = await quizzesService.updateQuiz(parsed.data.id, parsed.data);
+    const updated = await quizzesService.updateQuiz(
+      parsed.data.id,
+      parsed.data,
+    );
     logger.info("Quiz updated", { quizId: updated.id, byUserId: userId });
     revalidatePath(`/quizzes/${updated.id}`);
     revalidatePath("/quizzes");
     return { success: true, data: updated };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("updateQuizAction failed", { error: String(err) });
     return {
@@ -166,7 +178,10 @@ export async function deleteQuizAction(
     return { success: true, data: { deleted: true } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("deleteQuizAction failed", { error: String(err) });
     return {
@@ -194,7 +209,10 @@ export async function publishQuizAction(
     return { success: true, data: refreshed };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("publishQuizAction failed", { error: String(err) });
     return {
@@ -227,7 +245,10 @@ export async function addQuestionAction(
     return { success: true, data: question };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("addQuestionAction failed", { error: String(err) });
     return {
@@ -242,7 +263,10 @@ export async function updateQuestionAction(
   input: Omit<UpdateQuizQuestionInput, "id">,
 ): Promise<ApiResponse<QuizQuestionWithOptions>> {
   try {
-    const parsed = updateQuizQuestionSchema.safeParse({ ...input, id: questionId });
+    const parsed = updateQuizQuestionSchema.safeParse({
+      ...input,
+      id: questionId,
+    });
     if (!parsed.success) {
       throw AppError.validation("Invalid input", parsed.error.flatten());
     }
@@ -265,7 +289,10 @@ export async function updateQuestionAction(
     return { success: true, data: question };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("updateQuestionAction failed", { error: String(err) });
     return {
@@ -293,7 +320,10 @@ export async function removeQuestionAction(
     return { success: true, data: { removed: true } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("removeQuestionAction failed", { error: String(err) });
     return {
@@ -334,19 +364,31 @@ export async function startSessionAction(
     return { success: true, data: quizSession };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("startSessionAction failed", { error: String(err) });
     return {
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Could not start quiz session" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Could not start quiz session",
+      },
     };
   }
 }
 
 export async function submitAnswerAction(
   input: SubmitQuizAnswerInput,
-): Promise<ApiResponse<{ answerId: string; isCorrect: boolean | null; pointsAwarded: number }>> {
+): Promise<
+  ApiResponse<{
+    answerId: string;
+    isCorrect: boolean | null;
+    pointsAwarded: number;
+  }>
+> {
   try {
     await requireSession();
     const dbUser = await getCurrentDbUser();
@@ -358,10 +400,14 @@ export async function submitAnswerAction(
     }
 
     // Verify the session belongs to the current user.
-    const existingSession = await quizzesService.getSession(parsed.data.sessionId);
+    const existingSession = await quizzesService.getSession(
+      parsed.data.sessionId,
+    );
     if (!existingSession) throw AppError.notFound("Quiz session not found");
     if (existingSession.user.id !== dbUser.id) {
-      throw AppError.forbidden("You can only submit answers to your own sessions");
+      throw AppError.forbidden(
+        "You can only submit answers to your own sessions",
+      );
     }
 
     const answer = await quizzesService.submitAnswer(parsed.data);
@@ -382,7 +428,10 @@ export async function submitAnswerAction(
     };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("submitAnswerAction failed", { error: String(err) });
     return {
@@ -424,11 +473,15 @@ export async function completeSessionAction(
     revalidatePath(`/quizzes/${completed.quizId}`);
     revalidatePath("/quizzes");
     const refreshed = await quizzesService.getSession(completed.id);
-    if (!refreshed) throw AppError.internal("Session completed but could not be reloaded");
+    if (!refreshed)
+      throw AppError.internal("Session completed but could not be reloaded");
     return { success: true, data: refreshed };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("completeSessionAction failed", { error: String(err) });
     return {
@@ -461,7 +514,10 @@ export async function getQuizAction(
     return { success: true, data: quiz };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("getQuizAction failed", { error: String(err) });
     return {
@@ -473,7 +529,14 @@ export async function getQuizAction(
 
 export async function listQuizzesAction(
   filters: ListQuizzesQuery,
-): Promise<ApiResponse<{ items: QuizListItem[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: QuizListItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     await requireSession();
     const parsed = listQuizzesQuerySchema.safeParse(filters);
@@ -484,7 +547,10 @@ export async function listQuizzesAction(
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listQuizzesAction failed", { error: String(err) });
     return {
@@ -496,7 +562,14 @@ export async function listQuizzesAction(
 
 export async function listForStudentAction(
   filters: ListQuizzesQuery,
-): Promise<ApiResponse<{ items: QuizListItem[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: QuizListItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const session = await requireSession();
     const dbUser = await getCurrentDbUser();
@@ -506,12 +579,18 @@ export async function listForStudentAction(
     if (!parsed.success) {
       throw AppError.validation("Invalid filters", parsed.error.flatten());
     }
-    const result = await quizzesService.listQuizzesForStudent(dbUser.id, parsed.data);
+    const result = await quizzesService.listQuizzesForStudent(
+      dbUser.id,
+      parsed.data,
+    );
     void session;
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listForStudentAction failed", { error: String(err) });
     return {
@@ -523,18 +602,31 @@ export async function listForStudentAction(
 
 export async function listForTeacherAction(
   filters: ListQuizzesQuery,
-): Promise<ApiResponse<{ items: QuizListItem[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: QuizListItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const { userId } = await requireTeacher();
     const parsed = listQuizzesQuerySchema.safeParse(filters);
     if (!parsed.success) {
       throw AppError.validation("Invalid filters", parsed.error.flatten());
     }
-    const result = await quizzesService.listQuizzesForTeacher(userId, parsed.data);
+    const result = await quizzesService.listQuizzesForTeacher(
+      userId,
+      parsed.data,
+    );
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listForTeacherAction failed", { error: String(err) });
     return {
@@ -564,7 +656,10 @@ export async function getSessionAction(
     return { success: true, data: session };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("getSessionAction failed", { error: String(err) });
     return {
@@ -601,12 +696,18 @@ export async function getSessionResultsAction(
     return { success: true, data: results };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("getSessionResultsAction failed", { error: String(err) });
     return {
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Could not load session results" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Could not load session results",
+      },
     };
   }
 }
@@ -620,7 +721,10 @@ export async function listSessionsForQuizAction(
     return { success: true, data: sessions };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listSessionsForQuizAction failed", { error: String(err) });
     return {
@@ -634,7 +738,14 @@ export async function listSessionsForQuizAction(
 
 export async function listQuestionBankAction(
   filters: ListQuestionBankQuery,
-): Promise<ApiResponse<{ items: QuestionBank[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: QuestionBank[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     await requireTeacher();
     const parsed = listQuestionBankQuerySchema.safeParse(filters);
@@ -645,12 +756,18 @@ export async function listQuestionBankAction(
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listQuestionBankAction failed", { error: String(err) });
     return {
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Could not list question bank" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Could not list question bank",
+      },
     };
   }
 }
@@ -672,12 +789,18 @@ export async function addQuestionToBankAction(
     return { success: true, data: item };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("addQuestionToBankAction failed", { error: String(err) });
     return {
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Could not add question to bank" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Could not add question to bank",
+      },
     };
   }
 }

@@ -53,7 +53,8 @@ function formatRelative(date: Date): string {
   const day = 24 * 60 * 60 * 1000;
   if (diff < 60_000) return "à l'instant";
   if (diff < 60 * 60 * 1000) return `il y a ${Math.floor(diff / 60_000)} min`;
-  if (diff < day) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (diff < day)
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   if (diff < 2 * day) return "hier";
   if (diff < 7 * day) return `il y a ${Math.floor(diff / day)} j`;
   return d.toLocaleDateString();
@@ -101,7 +102,9 @@ export function NotificationItem({
           <h3
             className={cn(
               "text-sm",
-              isUnread ? "font-semibold text-foreground" : "font-medium text-foreground",
+              isUnread
+                ? "font-semibold text-foreground"
+                : "font-medium text-foreground",
             )}
           >
             {notification.title}
@@ -161,7 +164,7 @@ export function NotificationItem({
   return content;
 }
 
-/* ── Unused icons kept for tree-shake-friendly re-export ── */
+/* -- Unused icons kept for tree-shake-friendly re-export -- */
 void Trophy;
 void Award;
 void CreditCard;

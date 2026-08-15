@@ -31,8 +31,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { QuestionTypes } from "./question-types";
 import { useQuizSessionStore, formatTime } from "@/stores/quiz-session-store";
-import { submitAnswerAction, completeSessionAction } from "@/server/actions/quizzes";
-import type { QuizWithDetails, QuizSessionWithRelations } from "@/server/services/quizzes";
+import {
+  submitAnswerAction,
+  completeSessionAction,
+} from "@/server/actions/quizzes";
+import type {
+  QuizWithDetails,
+  QuizSessionWithRelations,
+} from "@/server/services/quizzes";
 import type { QuizAnswerDraft } from "@/stores/quiz-session-store";
 
 interface QuizSessionViewProps {
@@ -67,7 +73,6 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
   const previous = store.previous;
   const setAnswer = store.setAnswer;
   const setStoreFinishing = store.setFinishing;
-  const isFinishing = store.isFinishing;
 
   const [pendingSave, setPendingSave] = useState(false);
   const [savedQuestions, setSavedQuestions] = useState<Set<string>>(new Set());
@@ -111,7 +116,10 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
 
   const currentQuestion = quiz.questions[currentIndex];
   const answeredCount = Object.keys(answers).length;
-  const progress = quiz.questions.length > 0 ? (answeredCount / quiz.questions.length) * 100 : 0;
+  const progress =
+    quiz.questions.length > 0
+      ? (answeredCount / quiz.questions.length) * 100
+      : 0;
 
   // Save the answer for the current question.
   async function handleSaveAnswer(answer: QuizAnswerDraft | undefined) {
@@ -121,11 +129,13 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
       sessionId: session.id,
       questionId: currentQuestion.id,
       answerText:
-        answer.questionType === "short_answer" || answer.questionType === "essay"
+        answer.questionType === "short_answer" ||
+        answer.questionType === "essay"
           ? answer.answerText
           : undefined,
       selectedOptionId:
-        answer.questionType === "single_choice" || answer.questionType === "true_false"
+        answer.questionType === "single_choice" ||
+        answer.questionType === "true_false"
           ? answer.selectedOptionId
           : undefined,
       selectedOptionIds:
@@ -170,12 +180,14 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
   }
 
   async function handleFinish(auto = false) {
-    setFinishing(true);
+    setLocalFinishing(true);
+    setStoreFinishing(true);
     const result = await completeSessionAction({
       id: session.id,
       status: "completed",
     });
-    setFinishing(false);
+    setLocalFinishing(false);
+    setStoreFinishing(false);
     if (!result.success) {
       toast.error(result.error?.message ?? t("error"));
       return;
@@ -312,22 +324,25 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
             ) : (
               <Save className="size-4" />
             )}
-            {savedQuestions.has(currentQuestion.id) ? t("answerSaved") : t("submitAnswer")}
+            {savedQuestions.has(currentQuestion.id)
+              ? t("answerSaved")
+              : t("submitAnswer")}
           </Button>
 
           {!isLast ? (
-            <Button type="button" variant="brand" onClick={handleNext} disabled={pendingSave}>
+            <Button
+              type="button"
+              variant="brand"
+              onClick={handleNext}
+              disabled={pendingSave}
+            >
               {t("next")}
               <ArrowRight className="size-4" />
             </Button>
           ) : (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="brand"
-                  disabled={finishing}
-                >
+                <Button type="button" variant="brand" disabled={finishing}>
                   {finishing ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
@@ -377,7 +392,7 @@ export function QuizSessionView({ quiz, session }: QuizSessionViewProps) {
   );
 }
 
-/* ── Question nav pills ───────────────────────────────────── */
+/* -- Question nav pills ------------------------------------- */
 
 function QuestionNav({
   total,

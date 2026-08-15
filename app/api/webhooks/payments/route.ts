@@ -16,7 +16,10 @@
 import { getDb } from "@/server/db";
 import { auditLogs } from "@/server/db/schema";
 import { logger } from "@/lib/logger";
-import { getPaymentProvider, type WebhookVerification } from "@/server/providers/payments";
+import {
+  getPaymentProvider,
+  type WebhookVerification,
+} from "@/server/providers/payments";
 import type { PaymentProviderValue } from "@/server/db/schema/enums";
 import * as paymentsService from "@/server/services/payments";
 import type { Payment } from "@/server/db/schema/payments";
@@ -27,15 +30,18 @@ import type { Payment } from "@/server/db/schema/payments";
  */
 export async function POST(req: Request) {
   const url = new URL(req.url);
-  const providerParam = url.searchParams.get("provider") as
-    | PaymentProviderValue
-    | null;
+  const providerParam = url.searchParams.get(
+    "provider",
+  ) as PaymentProviderValue | null;
 
   if (!providerParam) {
     return Response.json(
       {
         success: false,
-        error: { code: "VALIDATION_ERROR", message: "Missing 'provider' query parameter" },
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Missing 'provider' query parameter",
+        },
       },
       { status: 400 },
     );
@@ -48,7 +54,10 @@ export async function POST(req: Request) {
     return Response.json(
       {
         success: false,
-        error: { code: "VALIDATION_ERROR", message: `Unknown provider: ${providerParam}` },
+        error: {
+          code: "VALIDATION_ERROR",
+          message: `Unknown provider: ${providerParam}`,
+        },
       },
       { status: 400 },
     );
@@ -59,9 +68,18 @@ export async function POST(req: Request) {
   try {
     verification = await provider.verifyWebhook(req);
   } catch (err) {
-    logger.error("Webhook verify threw", { provider: provider.name, error: String(err) });
+    logger.error("Webhook verify threw", {
+      provider: provider.name,
+      error: String(err),
+    });
     return Response.json(
-      { success: false, error: { code: "PROVIDER_ERROR", message: "Webhook verification failed" } },
+      {
+        success: false,
+        error: {
+          code: "PROVIDER_ERROR",
+          message: "Webhook verification failed",
+        },
+      },
       { status: 400 },
     );
   }
@@ -69,18 +87,26 @@ export async function POST(req: Request) {
   if (!verification.valid) {
     logger.warn("Webhook signature invalid", { provider: provider.name });
     return Response.json(
-      { success: false, error: { code: "UNAUTHORIZED", message: "Invalid webhook signature" } },
+      {
+        success: false,
+        error: { code: "UNAUTHORIZED", message: "Invalid webhook signature" },
+      },
       { status: 401 },
     );
   }
 
   // 2. Find the payment by providerTransactionId (idempotency key).
   if (!verification.providerTransactionId) {
-    logger.warn("Webhook missing providerTransactionId", { provider: provider.name });
+    logger.warn("Webhook missing providerTransactionId", {
+      provider: provider.name,
+    });
     return Response.json(
       {
         success: false,
-        error: { code: "VALIDATION_ERROR", message: "Missing providerTransactionId" },
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Missing providerTransactionId",
+        },
       },
       { status: 400 },
     );
@@ -99,14 +125,25 @@ export async function POST(req: Request) {
         providerTransactionId: verification.providerTransactionId,
       });
       await logWebhook(provider.name, verification, null, "payment_not_found");
-      return Response.json({ success: true, data: { ack: true, reason: "payment_not_found" } });
+      return Response.json({
+        success: true,
+        data: { ack: true, reason: "payment_not_found" },
+      });
     }
 
     // Idempotency: if already succeeded, ack without re-processing.
     if (payment.status === "succeeded" && verification.status === "succeeded") {
       logger.info("Webhook idempotent re-play", { paymentId: payment.id });
-      await logWebhook(provider.name, verification, payment, "already_succeeded");
-      return Response.json({ success: true, data: { ack: true, reason: "already_succeeded" } });
+      await logWebhook(
+        provider.name,
+        verification,
+        payment,
+        "already_succeeded",
+      );
+      return Response.json({
+        success: true,
+        data: { ack: true, reason: "already_succeeded" },
+      });
     }
 
     // 3. Map provider status → DB status.
@@ -135,15 +172,26 @@ export async function POST(req: Request) {
       return Response.json(
         {
           success: false,
-          error: { code: "CONFLICT", message: "Amount mismatch — payment flagged" },
+          error: {
+            code: "CONFLICT",
+            message: "Amount mismatch — payment flagged",
+          },
         },
         { status: 409 },
       );
     }
 
     // 5. Update payment + activate subscription (side-effect).
-    const updated = await paymentsService.confirmPaymentFromWebhook(payment, newStatus);
-    await logWebhook(provider.name, verification, updated, `status_${newStatus}`);
+    const updated = await paymentsService.confirmPaymentFromWebhook(
+      payment,
+      newStatus,
+    );
+    await logWebhook(
+      provider.name,
+      verification,
+      updated,
+      `status_${newStatus}`,
+    );
 
     logger.info("Webhook processed", {
       paymentId: updated.id,
@@ -151,7 +199,10 @@ export async function POST(req: Request) {
       status: newStatus,
     });
 
-    return Response.json({ success: true, data: { paymentId: updated.id, status: newStatus } });
+    return Response.json({
+      success: true,
+      data: { paymentId: updated.id, status: newStatus },
+    });
   } catch (err) {
     logger.error("Webhook handler failed", {
       provider: provider.name,
@@ -159,7 +210,10 @@ export async function POST(req: Request) {
       error: String(err),
     });
     return Response.json(
-      { success: false, error: { code: "INTERNAL_ERROR", message: "Webhook processing failed" } },
+      {
+        success: false,
+        error: { code: "INTERNAL_ERROR", message: "Webhook processing failed" },
+      },
       { status: 500 },
     );
   }
@@ -175,7 +229,7 @@ export async function GET() {
   });
 }
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* -- Helpers ----------------------------------------------- */
 
 async function logWebhook(
   provider: string,

@@ -47,15 +47,18 @@ export function QuizResultsView({ results, viewer }: QuizResultsViewProps) {
     results;
 
   const level = quiz.level as Level | null;
-  const levelLabel = level
-    ? tClasses(`levelLabels.${level}` as const)
-    : null;
+  const levelLabel = level ? tClasses(`levelLabels.${level}` as const) : null;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" size="icon" aria-label={t("backToQuizzes")}>
+        <Button
+          asChild
+          variant="ghost"
+          size="icon"
+          aria-label={t("backToQuizzes")}
+        >
           <Link href="/teacher-quizzes">
             <ArrowLeft className="size-4" />
           </Link>
@@ -64,9 +67,7 @@ export function QuizResultsView({ results, viewer }: QuizResultsViewProps) {
           <h1 className="truncate font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {t("results")}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {quiz.title}
-          </p>
+          <p className="text-sm text-muted-foreground">{quiz.title}</p>
         </div>
       </div>
 
@@ -81,7 +82,9 @@ export function QuizResultsView({ results, viewer }: QuizResultsViewProps) {
         >
           <div
             className={`flex size-20 items-center justify-center rounded-full ${
-              passed ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
+              passed
+                ? "bg-success/15 text-success"
+                : "bg-destructive/15 text-destructive"
             }`}
           >
             {passed ? (
@@ -184,7 +187,7 @@ export function QuizResultsView({ results, viewer }: QuizResultsViewProps) {
   );
 }
 
-/* ── Per-question result ──────────────────────────────────── */
+/* -- Per-question result ------------------------------------ */
 
 function QuestionResult({
   index,
@@ -307,7 +310,7 @@ function QuestionResult({
   );
 }
 
-/* ── Meta helper ──────────────────────────────────────────── */
+/* -- Meta helper -------------------------------------------- */
 
 function Meta({
   label,

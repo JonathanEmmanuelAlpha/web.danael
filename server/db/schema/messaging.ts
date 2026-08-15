@@ -28,9 +28,9 @@ import {
   audienceEnum,
 } from "./enums";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * notifications — user inbox
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const notifications = pgTable(
   "notifications",
@@ -60,9 +60,9 @@ export const notifications = pgTable(
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * conversation_threads
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const conversationThreads = pgTable(
   "conversation_threads",
@@ -93,9 +93,9 @@ export const conversationThreads = pgTable(
 export type ConversationThread = typeof conversationThreads.$inferSelect;
 export type NewConversationThread = typeof conversationThreads.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * conversation_participants
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const conversationParticipants = pgTable(
   "conversation_participants",
@@ -126,9 +126,9 @@ export type ConversationParticipant =
 export type NewConversationParticipant =
   typeof conversationParticipants.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * messages
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const messages = pgTable(
   "messages",
@@ -162,9 +162,9 @@ export const messages = pgTable(
 export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * announcements — broadcast messages
- * ──────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------ */
 
 export const announcements = pgTable(
   "announcements",
@@ -203,7 +203,7 @@ export const announcements = pgTable(
 export type Announcement = typeof announcements.$inferSelect;
 export type NewAnnouncement = typeof announcements.$inferInsert;
 
-/* ─────────────────────────────────────────────────────────────
+/* ------------------------------------------------------───────
  * notification_preferences — per-user channel / category prefs
  * ──────────────────────────────────────────────────────────── */
 

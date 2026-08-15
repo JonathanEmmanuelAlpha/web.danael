@@ -89,7 +89,7 @@ export function TeacherQuestionsValidation({
 }: TeacherQuestionsValidationProps) {
   const t = useTranslations("AiQuestions");
 
-  /* ── Filter state ─────────────────────────────────────── */
+  /* -- Filter state --------------------------------------- */
   const [subjectId, setSubjectId] = React.useState<string>("");
   const [skillId, setSkillId] = React.useState<string>("");
   const [unverifiedOnly, setUnverifiedOnly] = React.useState(true);
@@ -97,28 +97,31 @@ export function TeacherQuestionsValidation({
   const [page, setPage] = React.useState(1);
   const pageSize = 10;
 
-  /* ── Data state ──────────────────────────────────────── */
-  const [items, setItems] = React.useState<GeneratedQuestionListItem[] | null>(null);
+  /* -- Data state ---------------------------------------- */
+  const [items, setItems] = React.useState<GeneratedQuestionListItem[] | null>(
+    null,
+  );
   const [total, setTotal] = React.useState(0);
   const [subjects, setSubjects] = React.useState<SubjectOption[]>([]);
   const [skills, setSkills] = React.useState<SkillOption[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  /* ── Selection / dialog state ────────────────────────── */
+  /* -- Selection / dialog state -------------------------- */
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
-  const [editQuestion, setEditQuestion] = React.useState<GeneratedQuestionListItem | null>(null);
+  const [editQuestion, setEditQuestion] =
+    React.useState<GeneratedQuestionListItem | null>(null);
   const [editOpen, setEditOpen] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [pendingAction, setPendingAction] = React.useState(false);
 
-  /* ── Initial load (subjects) ─────────────────────────── */
+  /* -- Initial load (subjects) --------------------------- */
   React.useEffect(() => {
     listSubjectsForFilterAction().then((res) => {
       if (res.success && res.data) setSubjects(res.data);
     });
   }, []);
 
-  /* ── Reload skills when the subject filter changes ──── */
+  /* -- Reload skills when the subject filter changes ---- */
   React.useEffect(() => {
     listSkillsForFilterAction(subjectId ? { subjectId } : {}).then((res) => {
       if (res.success && res.data) setSkills(res.data);
@@ -126,7 +129,7 @@ export function TeacherQuestionsValidation({
     });
   }, [subjectId]);
 
-  /* ── Reload questions on filter change ──────────────── */
+  /* -- Reload questions on filter change ---------------- */
   React.useEffect(() => {
     const handle = setTimeout(() => {
       setLoading(true);
@@ -152,7 +155,7 @@ export function TeacherQuestionsValidation({
     return () => clearTimeout(handle);
   }, [subjectId, skillId, unverifiedOnly, search, page]);
 
-  /* ── Handlers ───────────────────────────────────────── */
+  /* -- Handlers ----------------------------------------- */
   function reload() {
     setLoading(true);
     listGeneratedQuestionsAction({
@@ -252,17 +255,19 @@ export function TeacherQuestionsValidation({
     setEditOpen(true);
   }
 
-  /* ── Derived ──────────────────────────────────────────── */
+  /* -- Derived -------------------------------------------- */
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const to = Math.min(total, page * pageSize);
   const allOnPageSelected =
-    items !== null && items.length > 0 && items.every((i) => selected.has(i.id));
+    items !== null &&
+    items.length > 0 &&
+    items.every((i) => selected.has(i.id));
 
-  /* ── Render ──────────────────────────────────────────── */
+  /* -- Render -------------------------------------------- */
   return (
     <div className="space-y-5">
-      {/* ── Filter bar ─────────────────────────────────────── */}
+      {/* -- Filter bar --------------------------------------- */}
       <div className="glass flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-end">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Filter className="size-4" />
@@ -355,7 +360,7 @@ export function TeacherQuestionsValidation({
         </div>
       </div>
 
-      {/* ── Bulk actions bar ──────────────────────────────── */}
+      {/* -- Bulk actions bar -------------------------------- */}
       {selected.size > 0 ? (
         <div className="glass-strong flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-2.5 animate-slide-up">
           <div className="flex items-center gap-2 text-sm">
@@ -388,13 +393,17 @@ export function TeacherQuestionsValidation({
         </div>
       ) : null}
 
-      {/* ── List ──────────────────────────────────────────── */}
+      {/* -- List -------------------------------------------- */}
       {loading && items === null ? (
         <GridSkeleton count={4} columns={1} />
       ) : items === null ? null : items.length === 0 ? (
         <EmptyState
           icon={Sparkles}
-          title={search || subjectId || skillId ? t("noMatchingQuestions") : t("noQuestions")}
+          title={
+            search || subjectId || skillId
+              ? t("noMatchingQuestions")
+              : t("noQuestions")
+          }
           description={
             search || subjectId || skillId
               ? t("noMatchingQuestionsHint")
@@ -410,7 +419,10 @@ export function TeacherQuestionsValidation({
               checked={allOnPageSelected}
               onCheckedChange={toggleSelectAll}
             />
-            <Label htmlFor="select-all" className="cursor-pointer text-xs text-muted-foreground">
+            <Label
+              htmlFor="select-all"
+              className="cursor-pointer text-xs text-muted-foreground"
+            >
               {t("selectPage")}
             </Label>
           </div>
@@ -457,7 +469,10 @@ export function TeacherQuestionsValidation({
                             ) : null}
                             {q.generatedByModel ? (
                               <span className="text-muted-foreground">
-                                {t("modelLabel")}: <span className="font-mono">{q.generatedByModel}</span>
+                                {t("modelLabel")}:{" "}
+                                <span className="font-mono">
+                                  {q.generatedByModel}
+                                </span>
                               </span>
                             ) : null}
                             <span className="text-muted-foreground">
@@ -519,7 +534,7 @@ export function TeacherQuestionsValidation({
             })}
           </ul>
 
-          {/* ── Pagination ────────────────────────────────── */}
+          {/* -- Pagination ---------------------------------- */}
           {totalPages > 1 ? (
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <p className="text-xs text-muted-foreground">
@@ -551,7 +566,7 @@ export function TeacherQuestionsValidation({
         </>
       )}
 
-      {/* ── Edit dialog ────────────────────────────────────── */}
+      {/* -- Edit dialog -------------------------------------- */}
       <QuestionEditDialog
         question={editQuestion}
         open={editOpen}
@@ -560,7 +575,7 @@ export function TeacherQuestionsValidation({
         onVerified={reload}
       />
 
-      {/* ── Delete confirmation ──────────────────────────── */}
+      {/* -- Delete confirmation ---------------------------- */}
       <AlertDialog
         open={deleteId !== null}
         onOpenChange={(o) => !o && setDeleteId(null)}
@@ -568,7 +583,9 @@ export function TeacherQuestionsValidation({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("delete")}</AlertDialogTitle>
-            <AlertDialogDescription>{t("deleteConfirm")}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t("deleteConfirm")}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={pendingAction}>

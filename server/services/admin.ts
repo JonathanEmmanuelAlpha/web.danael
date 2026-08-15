@@ -6,15 +6,7 @@
  * the server actions wrapping these functions, not here.
  */
 
-import {
-  and,
-  count,
-  desc,
-  eq,
-  ilike,
-  or,
-  type SQL,
-} from "drizzle-orm";
+import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { getDb } from "@/server/db";
 import {
@@ -39,7 +31,7 @@ import type {
   ListAdminPaymentsQuery,
 } from "@/server/validators/admin";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type { User, School, Content, Subscription, Payment };
 
@@ -53,7 +45,7 @@ export type AdminUserRow = Pick<
   | "role"
   | "level"
   | "series"
-  | "onboardingCompleted"
+  | "onboardingStatus"
   | "currentStreak"
   | "lastActiveAt"
   | "createdAt"
@@ -110,7 +102,7 @@ export type PlatformStats = {
   pendingReports: number;
 };
 
-/* ── Users ─────────────────────────────────────────────────── */
+/* -- Users --------------------------------------------------- */
 
 export async function listUsers(
   filters: ListUsersQuery,
@@ -123,7 +115,11 @@ export async function listUsers(
   if (search) {
     const pattern = `%${search}%`;
     conditions.push(
-      or(ilike(users.email, pattern), ilike(users.firstName, pattern), ilike(users.lastName, pattern))!,
+      or(
+        ilike(users.email, pattern),
+        ilike(users.firstName, pattern),
+        ilike(users.lastName, pattern),
+      )!,
     );
   }
   const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -139,7 +135,7 @@ export async function listUsers(
         role: users.role,
         level: users.level,
         series: users.series,
-        onboardingCompleted: users.onboardingCompleted,
+        onboardingStatus: users.onboardingStatus,
         currentStreak: users.currentStreak,
         lastActiveAt: users.lastActiveAt,
         createdAt: users.createdAt,
@@ -172,7 +168,7 @@ export async function getUserById(id: string): Promise<AdminUserDetail> {
       role: users.role,
       level: users.level,
       series: users.series,
-      onboardingCompleted: users.onboardingCompleted,
+      onboardingStatus: users.onboardingStatus,
       currentStreak: users.currentStreak,
       lastActiveAt: users.lastActiveAt,
       createdAt: users.createdAt,
@@ -243,7 +239,7 @@ export async function deactivateUser(userId: string): Promise<User> {
   return updated;
 }
 
-/* ── Schools ────────────────────────────────────────────────── */
+/* -- Schools -------------------------------------------------- */
 
 export async function listSchools(
   filters: ListAdminSchoolsQuery,
@@ -284,6 +280,7 @@ export async function listSchools(
         createdAt: schools.createdAt,
         updatedAt: schools.updatedAt,
         membersCount: count(schoolMembers.id),
+        joinCode: schools.joinCode,
       })
       .from(schools)
       .leftJoin(schoolMembers, eq(schoolMembers.schoolId, schools.id))
@@ -317,7 +314,7 @@ export async function verifySchool(
   return updated;
 }
 
-/* ── Contents ──────────────────────────────────────────────── */
+/* -- Contents ------------------------------------------------ */
 
 export async function listContents(
   filters: ListContentsAdminQuery,
@@ -374,7 +371,7 @@ export async function listContents(
   };
 }
 
-/* ── Subscriptions / Payments ──────────────────────────────── */
+/* -- Subscriptions / Payments -------------------------------- */
 
 export async function listSubscriptions(
   filters: ListAdminSubscriptionsQuery,
@@ -440,7 +437,7 @@ export async function listPayments(
   };
 }
 
-/* ── Platform stats ────────────────────────────────────────── */
+/* -- Platform stats ------------------------------------------ */
 
 export async function getPlatformStats(): Promise<PlatformStats> {
   const db = await getDb();
@@ -465,7 +462,8 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   );
 
   // Pending reports — lazy import to avoid circular deps with moderation service.
-  const { getPendingReportsCount } = await import("@/server/services/moderation");
+  const { getPendingReportsCount } =
+    await import("@/server/services/moderation");
   const pendingReports = await getPendingReportsCount();
 
   return {

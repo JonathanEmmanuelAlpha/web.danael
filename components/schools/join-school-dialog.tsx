@@ -55,13 +55,11 @@ export function JoinSchoolDialog({
       roleInSchool: defaultRole,
     });
     setPending(false);
-    if (!result.success || !result.data) {
-      toast.error(result.error?.message ?? "Code invalide");
+    if (!result.success) {
+      toast.error(result.error.message ?? "Code invalide");
       return;
     }
-    toast.success(
-      `Vous avez rejoint ${result.data.school.name} avec succès`,
-    );
+    toast.success(`Vous avez rejoint ${result.data.school.name} avec succès`);
     setOpen(false);
     setCode("");
     router.push("/dashboard");
@@ -166,8 +164,8 @@ export function JoinSchoolInline() {
       roleInSchool: "student",
     });
     setPending(false);
-    if (!result.success || !result.data) {
-      toast.error(result.error?.message ?? "Code invalide");
+    if (!result.success) {
+      toast.error(result.error.message ?? "Code invalide");
       return;
     }
     toast.success(`Bienvenue à ${result.data.school.name} !`);
@@ -188,8 +186,16 @@ export function JoinSchoolInline() {
           className="font-mono uppercase tracking-widest"
           maxLength={8}
         />
-        <Button type="submit" variant="brand" disabled={pending || !code.trim()}>
-          {pending ? <Loader2 className="size-4 animate-spin" /> : <ArrowLeft className="size-4" />}
+        <Button
+          type="submit"
+          variant="brand"
+          disabled={pending || !code.trim()}
+        >
+          {pending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <ArrowLeft className="size-4" />
+          )}
           {t("joinSchool")}
         </Button>
       </div>

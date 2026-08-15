@@ -17,7 +17,7 @@ import {
   PAYMENT_PROVIDER_VALUES,
 } from "@/server/db/schema/enums";
 
-/* ── Users ──────────────────────────────────────────────────── */
+/* -- Users ---------------------------------------------------- */
 
 export const listUsersQuerySchema = z.object({
   search: z.string().max(200).optional(),
@@ -39,7 +39,7 @@ export const deactivateUserSchema = z.object({
   userId: z.uuid(),
 });
 
-/* ── Schools ────────────────────────────────────────────────── */
+/* -- Schools -------------------------------------------------- */
 
 export const listAdminSchoolsQuerySchema = z.object({
   search: z.string().max(200).optional(),
@@ -53,7 +53,7 @@ export const verifySchoolSchema = z.object({
   verified: z.boolean().default(true),
 });
 
-/* ── Contents ───────────────────────────────────────────────── */
+/* -- Contents ------------------------------------------------- */
 
 export const listContentsAdminQuerySchema = z.object({
   search: z.string().max(200).optional(),
@@ -67,7 +67,7 @@ export const removeContentSchema = z.object({
   contentId: z.uuid(),
 });
 
-/* ── Subscriptions / Payments ──────────────────────────────── */
+/* -- Subscriptions / Payments -------------------------------- */
 
 export const listAdminSubscriptionsQuerySchema = z.object({
   status: z.enum(SUBSCRIPTION_STATUS_VALUES).optional(),
@@ -85,7 +85,7 @@ export const listAdminPaymentsQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-/* ── Moderation ─────────────────────────────────────────────── */
+/* -- Moderation ----------------------------------------------- */
 
 export const moderationTargetTypes = [
   "content",
@@ -126,7 +126,7 @@ export const removeMessageSchema = z.object({
   messageId: z.uuid(),
 });
 
-/* ── Audit ──────────────────────────────────────────────────── */
+/* -- Audit ---------------------------------------------------- */
 
 export const listAuditLogsQuerySchema = z.object({
   actorId: z.uuid().optional(),
@@ -144,7 +144,7 @@ export const getAuditLogSchema = z.object({
   id: z.uuid(),
 });
 
-/* ── Feature flags ──────────────────────────────────────────── */
+/* -- Feature flags -------------------------------------------- */
 
 export const createFlagSchema = z.object({
   key: z
@@ -165,7 +165,7 @@ export const getFlagSchema = z.object({
   key: z.string().min(1).max(120),
 });
 
-/* ── Inferred types ────────────────────────────────────────── */
+/* -- Inferred types ------------------------------------------ */
 
 export type ListUsersQuery = z.infer<typeof listUsersQuerySchema>;
 export type GetUserByIdInput = z.infer<typeof getUserByIdSchema>;
@@ -173,12 +173,16 @@ export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;
 export type DeactivateUserInput = z.infer<typeof deactivateUserSchema>;
 export type ListAdminSchoolsQuery = z.infer<typeof listAdminSchoolsQuerySchema>;
 export type VerifySchoolInput = z.infer<typeof verifySchoolSchema>;
-export type ListContentsAdminQuery = z.infer<typeof listContentsAdminQuerySchema>;
+export type ListContentsAdminQuery = z.infer<
+  typeof listContentsAdminQuerySchema
+>;
 export type RemoveContentInput = z.infer<typeof removeContentSchema>;
 export type ListAdminSubscriptionsQuery = z.infer<
   typeof listAdminSubscriptionsQuerySchema
 >;
-export type ListAdminPaymentsQuery = z.infer<typeof listAdminPaymentsQuerySchema>;
+export type ListAdminPaymentsQuery = z.infer<
+  typeof listAdminPaymentsQuerySchema
+>;
 export type CreateReportInput = z.infer<typeof createReportSchema>;
 export type ListReportsQuery = z.infer<typeof listReportsQuerySchema>;
 export type GetReportInput = z.infer<typeof getReportSchema>;

@@ -10,7 +10,7 @@ import { dirname, join } from "node:path";
 
 const SRC = join(process.cwd(), "");
 
-// ── Dossiers sans fichiers (remplis par les phases suivantes) ──────────────
+// -- Dossiers sans fichiers (remplis par les phases suivantes) --------------
 const DIRS = [
   // components/
   "components/ui",
@@ -63,7 +63,7 @@ const DIRS = [
   "app/api/notifications/sse",
 ];
 
-// ── Pages placeholder §8 : chemin relatif à app/ → titre affiché ───────────
+// -- Pages placeholder §8 : chemin relatif à app/ → titre affiché -----------
 const PAGES = {
   "(public)/page": "Danaël",
   "(public)/pricing/page": "Tarifs",
@@ -127,7 +127,7 @@ const PAGES = {
   "admin/analytics/page": "Admin — Analytique",
 };
 
-// ── Stubs de stores (§13.1) et hooks (§8) ───────────────────────────────────
+// -- Stubs de stores (§13.1) et hooks (§8) -----------------------------------
 const STUBS = {
   "stores/theme-store.ts": "theme (Phase 1)",
   "stores/ui-store.ts": "sidebar / command palette (Phase 1)",

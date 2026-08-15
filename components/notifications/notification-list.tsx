@@ -6,12 +6,7 @@ import { Bell, CheckCheck, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/shared/loading";
 import { EmptyState } from "@/components/shared/empty-state";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -101,8 +96,10 @@ export function NotificationList({ pageSize = 30 }: NotificationListProps) {
     const res = await markAsReadAction(id);
     setBusy(null);
     if (!res.success) return;
-    setItems((prev) =>
-      prev?.map((n) => (n.id === id ? { ...n, readAt: new Date() } : n)) ?? null,
+    setItems(
+      (prev) =>
+        prev?.map((n) => (n.id === id ? { ...n, readAt: new Date() } : n)) ??
+        null,
     );
   }
 
@@ -111,8 +108,8 @@ export function NotificationList({ pageSize = 30 }: NotificationListProps) {
     const res = await markAllAsReadAction();
     setBusy(null);
     if (!res.success) return;
-    setItems((prev) =>
-      prev?.map((n) => ({ ...n, readAt: new Date() })) ?? null,
+    setItems(
+      (prev) => prev?.map((n) => ({ ...n, readAt: new Date() })) ?? null,
     );
   }
 
@@ -157,7 +154,9 @@ export function NotificationList({ pageSize = 30 }: NotificationListProps) {
               variant="outline"
               size="sm"
               onClick={() => void handleMarkAll()}
-              disabled={busy === "all" || items?.every((n) => n.readAt) === true}
+              disabled={
+                busy === "all" || items?.every((n) => n.readAt) === true
+              }
             >
               {busy === "all" ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -238,11 +237,7 @@ function NotificationListItems({
   }
   if (items.length === 0) {
     return (
-      <EmptyState
-        icon={Bell}
-        title={t("empty")}
-        description={t("emptyHint")}
-      />
+      <EmptyState icon={Bell} title={t("empty")} description={t("emptyHint")} />
     );
   }
   return (
@@ -265,5 +260,5 @@ function NotificationListItems({
   );
 }
 
-/* ── Tree-shake friendly no-op for unused icon ── */
+/* -- Tree-shake friendly no-op for unused icon -- */
 void Trash2;

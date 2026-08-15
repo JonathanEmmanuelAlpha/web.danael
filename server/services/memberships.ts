@@ -30,7 +30,7 @@ import { AppError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 import { nanoid } from "nanoid";
 
-/* ── Helpers ───────────────────────────────────────────────────── */
+/* -- Helpers ----------------------------------------------------- */
 
 /**
  * Generate a short human-readable join code (6 uppercase alphanumeric).
@@ -70,7 +70,7 @@ async function requireClass(classId: string): Promise<Class> {
   return rows[0];
 }
 
-/* ── Join by code ──────────────────────────────────────────────── */
+/* -- Join by code ------------------------------------------------ */
 
 /**
  * Find a school by its joinCode (case-insensitive).
@@ -238,7 +238,7 @@ export async function joinClassByCode(params: {
   return { class: cls, member };
 }
 
-/* ── Join requests (request-to-join workflow) ─────────────────── */
+/* -- Join requests (request-to-join workflow) ------------------- */
 
 /**
  * Create a join request for a school. Idempotent: if a pending request
@@ -585,7 +585,7 @@ export async function cancelClassJoinRequest(
   return updated;
 }
 
-/* ── Queries: list requests ───────────────────────────────────── */
+/* -- Queries: list requests ------------------------------------- */
 
 export async function listMyJoinRequests(userId: string): Promise<
   Array<
@@ -714,7 +714,7 @@ export async function listClassJoinRequests(params: {
   }));
 }
 
-/* ── In-app invitations ───────────────────────────────────────── */
+/* -- In-app invitations ----------------------------------------- */
 
 /**
  * Create an invitation (in-app + email best-effort).

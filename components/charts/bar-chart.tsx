@@ -106,7 +106,11 @@ export function BarChartCard({
           {emptyMessage}
         </div>
       ) : (
-        <ShadcnChartContainer config={config} style={{ height }} className="w-full">
+        <ShadcnChartContainer
+          config={config}
+          style={{ height }}
+          className="w-full"
+        >
           <RechartsBarChart
             data={data}
             layout={layout}
@@ -126,8 +130,16 @@ export function BarChartCard({
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="0%" stopColor={entry.light} stopOpacity={0.95} />
-                    <stop offset="100%" stopColor={entry.fill} stopOpacity={0.55} />
+                    <stop
+                      offset="0%"
+                      stopColor={entry.light}
+                      stopOpacity={0.95}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor={entry.fill}
+                      stopOpacity={0.55}
+                    />
                   </linearGradient>
                 );
               })}
@@ -148,7 +160,9 @@ export function BarChartCard({
                   allowDecimals={false}
                   stroke="rgba(255,255,255,0.3)"
                   fontSize={12}
-                  tickFormatter={yFormatter ? (v) => yFormatter(Number(v)) : undefined}
+                  tickFormatter={
+                    yFormatter ? (v) => yFormatter(Number(v)) : undefined
+                  }
                 />
                 <YAxis
                   type="category"
@@ -158,7 +172,9 @@ export function BarChartCard({
                   width={110}
                   stroke="rgba(255,255,255,0.3)"
                   fontSize={12}
-                  tickFormatter={xFormatter ? (v) => xFormatter(String(v)) : undefined}
+                  tickFormatter={
+                    xFormatter ? (v) => xFormatter(String(v)) : undefined
+                  }
                 />
               </>
             ) : (
@@ -171,7 +187,9 @@ export function BarChartCard({
                   minTickGap={12}
                   stroke="rgba(255,255,255,0.3)"
                   fontSize={12}
-                  tickFormatter={xFormatter ? (v) => xFormatter(String(v)) : undefined}
+                  tickFormatter={
+                    xFormatter ? (v) => xFormatter(String(v)) : undefined
+                  }
                 />
                 <YAxis
                   width={36}
@@ -181,13 +199,32 @@ export function BarChartCard({
                   allowDecimals={false}
                   stroke="rgba(255,255,255,0.3)"
                   fontSize={12}
-                  tickFormatter={yFormatter ? (v) => yFormatter(Number(v)) : undefined}
+                  tickFormatter={
+                    yFormatter ? (v) => yFormatter(Number(v)) : undefined
+                  }
                 />
               </>
             )}
             <ChartTooltip
               cursor={{ fill: "rgba(147,217,26,0.06)", radius: 4 }}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={({
+                active,
+                payload,
+                label,
+                accessibilityLayer,
+                activeIndex,
+                coordinate,
+              }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                  indicator="dot"
+                  accessibilityLayer={accessibilityLayer}
+                  activeIndex={activeIndex}
+                  coordinate={coordinate}
+                />
+              )}
             />
             {series.map((s) => (
               <Bar

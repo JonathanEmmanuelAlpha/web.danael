@@ -15,7 +15,7 @@
  *  - Peer signals (batch-computed "students who struggled with X found Y helpful")
  *  - Weekly emotional check-ins
  *
- * ── Sandbox handling ───────────────────────────────────────────
+ * -- Sandbox handling -------------------------------------------
  * When `getCurrentDbUser()` returns the mock sandbox user
  * (`id = "sandbox-user-demo"`, not a valid UUID), every function below
  * short-circuits and returns a safe empty / mock value so the UI can still
@@ -80,7 +80,7 @@ import type {
   QuizQuestionOption,
 } from "@/server/db/schema/quizzes";
 
-/* ── Public re-exports ─────────────────────────────────────── */
+/* -- Public re-exports --------------------------------------- */
 export type {
   DiagnosticSession,
   DiagnosticAnswer,
@@ -93,9 +93,9 @@ export type {
   WarmupSession,
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Types (consumed by the UI / server actions)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 export interface DiagnosticQuestion {
   id: string;
@@ -220,9 +220,9 @@ export interface SkillUpdate {
   delta: number;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Constants & helpers
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
@@ -278,9 +278,9 @@ function getTodayDateKey(d: Date = new Date()): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Forgetting curve (Phase 2 — pure function)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Calculate the predicted mastery right now, accounting for the Ebbinghaus
@@ -305,9 +305,9 @@ export function calculatePredictedMastery(params: {
   return round1(params.currentMastery * retention);
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Skill graph management
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Build the full skill tree for a student with their per-skill mastery state.
@@ -482,9 +482,9 @@ export async function updateMastery(params: {
   return { newMastery, delta };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Adaptive diagnostic (IRT-inspired)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Build a snapshot of the student's current skill profile by categorising
@@ -937,9 +937,9 @@ export async function processDiagnosticResults(params: {
   return { score, skillUpdates };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Weekly plan generation
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /** Mutate any active plan for this student → isActive=false. */
 async function deactivateActivePlans(studentId: string): Promise<void> {
@@ -1250,9 +1250,9 @@ export async function updateTaskStatus(params: {
   return updated;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Learning events (batched flush from Zustand)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Record a batch of learning events (typically flushed from the client-side
@@ -1345,9 +1345,9 @@ async function processEvent(
   });
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Forgetting curve — batch refresh (Phase 2)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Get skills whose predicted mastery (accounting for the forgetting curve)
@@ -1403,9 +1403,9 @@ export async function refreshPredictedMastery(
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Warm-up sessions (Phase 2)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Get or create today's 3-question warm-up session, targeting the student's
@@ -1550,9 +1550,9 @@ export async function completeWarmup(params: {
   return { score, skillUpdates };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Projections (Phase 2)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Project when the student will reach `targetMastery` for a skill, based on
@@ -1671,9 +1671,9 @@ export async function getMasteryHistory(params: {
   return rows;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Peer signals (Phase 3)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Get peer signals for a skill — "students who struggled with X found Y
@@ -1784,9 +1784,9 @@ export async function computePeerSignals(): Promise<{ computed: number }> {
   return { computed };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Emotional check-in (Phase 3)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Record a weekly emotional check-in. If one already exists for the current
@@ -1855,9 +1855,9 @@ export async function getLatestCheckin(
   return rows.at(0) ?? null;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Plan summaries (used by getCurrentPlanAction)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 
 /**
  * Return the currently-active weekly plan for a student (or null).
@@ -1889,9 +1889,9 @@ export async function getActivePlan(
   };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
  * Unused-import suppression (kept for future raw queries)
- * ───────────────────────────────────────────────────────────── */
+ * ------------------------------------------------------------- */
 void isNotNull;
 void isNull;
 void lte;

@@ -5,10 +5,7 @@
 import { and, eq } from "drizzle-orm";
 
 import { getDb } from "@/server/db";
-import {
-  classSubjects,
-  subjects,
-} from "@/server/db/schema";
+import { classSubjects, subjects } from "@/server/db/schema";
 import { AppError } from "@/lib/api-response";
 import type {
   CreateSubjectInput,
@@ -16,13 +13,10 @@ import type {
   AssignSubjectInput,
   UpdateClassSubjectInput,
 } from "@/server/validators/subjects";
-import type {
-  Subject,
-  ClassSubject,
-} from "@/server/db/schema/schools";
+import type { Subject, ClassSubject } from "@/server/db/schema/schools";
 import type { User } from "@/server/db/schema/users";
 
-/* ── Types ─────────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------- */
 
 export type ClassSubjectWithRelations = ClassSubject & {
   subject: Subject;
@@ -32,7 +26,7 @@ export type ClassSubjectWithRelations = ClassSubject & {
   > | null;
 };
 
-/* ── Mutations ─────────────────────────────────────────────── */
+/* -- Mutations ----------------------------------------------- */
 
 export async function createSubject(
   input: CreateSubjectInput,
@@ -46,7 +40,9 @@ export async function createSubject(
     .where(eq(subjects.code, input.code))
     .limit(1);
   if (existing.length > 0) {
-    throw AppError.conflict("Subject code already in use", { code: input.code });
+    throw AppError.conflict("Subject code already in use", {
+      code: input.code,
+    });
   }
 
   const [created] = await db
@@ -146,7 +142,7 @@ export async function updateClassSubject(
   return updated;
 }
 
-/* ── Queries ───────────────────────────────────────────────── */
+/* -- Queries ------------------------------------------------- */
 
 export async function getSubjectById(id: string): Promise<Subject | null> {
   const db = await getDb();
@@ -158,9 +154,7 @@ export async function getSubjectById(id: string): Promise<Subject | null> {
   return rows.at(0) ?? null;
 }
 
-export async function getSubjectByCode(
-  code: string,
-): Promise<Subject | null> {
+export async function getSubjectByCode(code: string): Promise<Subject | null> {
   const db = await getDb();
   const rows = await db
     .select()

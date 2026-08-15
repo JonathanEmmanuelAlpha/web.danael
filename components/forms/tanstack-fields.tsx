@@ -40,12 +40,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import {
-  DatePicker,
-  type DatePickerProps,
-} from "@/components/forms/date-picker";
+import { DatePicker } from "@/components/forms/date-picker";
+import type { AnyFieldApi } from "@tanstack/react-form";
 
-/* ── Shared bits ──────────────────────────────────────────────── */
+/* -- Shared bits ------------------------------------------------ */
 
 interface FieldShellProps {
   label?: React.ReactNode;
@@ -87,9 +85,7 @@ function FieldShell({
   );
 }
 
-function useFieldError<TData>(
-  field: FieldApi<TData, any, any, any>,
-): string | undefined {
+function useFieldError<TData>(field: AnyFieldApi): string | undefined {
   return useStore(field.store, (state) => {
     const meta = state.meta;
     if (!meta.isTouched) return undefined;
@@ -104,10 +100,10 @@ function useFieldError<TData>(
   });
 }
 
-/* ── Text field ──────────────────────────────────────────────── */
+/* -- Text field ------------------------------------------------ */
 
 interface TextFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   placeholder?: string;
@@ -162,7 +158,7 @@ export function TextField<TData>({
           type={type}
           placeholder={placeholder}
           required={required}
-          disabled={disabled || field.state.valueIsInitialized === false}
+          disabled={disabled}
           autoFocus={autoFocus}
           aria-invalid={isInvalid}
           value={(field.state.value as string | undefined) ?? ""}
@@ -180,10 +176,10 @@ export function TextField<TData>({
   );
 }
 
-/* ── Textarea field ──────────────────────────────────────────── */
+/* -- Textarea field -------------------------------------------- */
 
 interface TextAreaFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   placeholder?: string;
@@ -233,10 +229,10 @@ export function TextAreaField<TData>({
   );
 }
 
-/* ── Select field ────────────────────────────────────────────── */
+/* -- Select field ---------------------------------------------- */
 
 interface SelectFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   placeholder?: string;
@@ -295,10 +291,10 @@ export function SelectField<TData>({
   );
 }
 
-/* ── Date field ──────────────────────────────────────────────── */
+/* -- Date field ------------------------------------------------ */
 
 interface DateFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
@@ -332,17 +328,16 @@ export function DateField<TData>({
       <DatePicker
         value={value ?? undefined}
         onChange={(d) => field.handleChange((d ?? null) as never)}
-        disabled={disabled}
         placeholder={placeholder}
       />
     </FieldShell>
   );
 }
 
-/* ── Checkbox field ──────────────────────────────────────────── */
+/* -- Checkbox field -------------------------------------------- */
 
 interface CheckboxFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   disabled?: boolean;
@@ -393,10 +388,10 @@ export function CheckboxField<TData>({
   );
 }
 
-/* ── Switch field ────────────────────────────────────────────── */
+/* -- Switch field ---------------------------------------------- */
 
 interface SwitchFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   disabled?: boolean;
@@ -447,10 +442,10 @@ export function SwitchField<TData>({
   );
 }
 
-/* ── Radio group field ───────────────────────────────────────── */
+/* -- Radio group field ----------------------------------------- */
 
 interface RadioGroupFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
@@ -518,10 +513,10 @@ export function RadioGroupField<TData>({
   );
 }
 
-/* ── Number field ────────────────────────────────────────────── */
+/* -- Number field ---------------------------------------------- */
 
 interface NumberFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   placeholder?: string;
@@ -587,10 +582,10 @@ export function NumberField<TData>({
   );
 }
 
-/* ── Search field (live search, no submit) ───────────────────── */
+/* -- Search field (live search, no submit) --------------------- */
 
 interface SearchFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   placeholder?: string;
   className?: string;
   onChange?: (value: string) => void;
@@ -621,10 +616,10 @@ export function SearchField<TData>({
   );
 }
 
-/* ── Time field ──────────────────────────────────────────────── */
+/* -- Time field ------------------------------------------------ */
 
 interface TimeFieldProps<TData> {
-  field: FieldApi<TData, any, any, any>;
+  field: AnyFieldApi;
   label?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
@@ -665,7 +660,7 @@ export function TimeField<TData>({
   );
 }
 
-/* ── Submit button ───────────────────────────────────────────── */
+/* -- Submit button --------------------------------------------- */
 
 interface SubmitButtonProps {
   pending?: boolean;
@@ -716,7 +711,7 @@ export function SubmitButton({
   );
 }
 
-/* ── Form error (top-level) ──────────────────────────────────── */
+/* -- Form error (top-level) ------------------------------------ */
 
 export function FormErrorBanner({ message }: { message?: string | null }) {
   if (!message) return null;

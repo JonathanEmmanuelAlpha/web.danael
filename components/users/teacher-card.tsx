@@ -8,7 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, BookOpen, FolderOpen, Star, Mail, UserPlus, Loader2 } from "lucide-react";
+import {
+  CheckCircle2,
+  BookOpen,
+  FolderOpen,
+  Star,
+  Mail,
+  UserPlus,
+  Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createInvitationAction } from "@/server/actions/memberships";
 import { startConversationAction } from "@/server/actions/messaging";
@@ -35,7 +43,11 @@ function initials(first?: string | null, last?: string | null): string {
  *  - Invite as teacher  → createInvitationAction({ target: school, role: teacher })
  *  - Message Me         → startConversationAction({ participantId })
  */
-export function TeacherCard({ teacher, schoolId, className }: TeacherCardProps) {
+export function TeacherCard({
+  teacher,
+  schoolId,
+  className,
+}: TeacherCardProps) {
   const t = useTranslations("Users");
   const router = useRouter();
   const [inviting, setInviting] = React.useState(false);
@@ -185,7 +197,7 @@ export function TeacherCard({ teacher, schoolId, className }: TeacherCardProps) 
   );
 }
 
-/* ── Internal stat tile ─────────────────────────────────────── */
+/* -- Internal stat tile --------------------------------------- */
 
 function Stat({
   icon,
@@ -206,7 +218,12 @@ function Stat({
         : "text-accent-amber-300";
   return (
     <div className="glass flex flex-col items-center gap-1 rounded-lg p-2.5 text-center">
-      <div className={cn("flex items-center gap-1 text-[10px] uppercase tracking-wide", toneClass)}>
+      <div
+        className={cn(
+          "flex items-center gap-1 text-[10px] uppercase tracking-wide",
+          toneClass,
+        )}
+      >
         {icon}
         <span>{label}</span>
       </div>

@@ -69,7 +69,7 @@ export function DashboardShell({
 
   return (
     <div className="relative flex min-h-screen bg-background">
-      {/* ── Decorative background halos ────────────────────────────── */}
+      {/* -- Decorative background halos ------------------------------ */}
       <div
         aria-hidden
         className="halo-lime pointer-events-none absolute -left-40 top-0 size-112 opacity-50 z-100"

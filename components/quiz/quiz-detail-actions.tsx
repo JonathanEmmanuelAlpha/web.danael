@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  publishQuizAction,
-} from "@/server/actions/quizzes";
+import { publishQuizAction } from "@/server/actions/quizzes";
 import { formatTime } from "@/stores/quiz-session-store";
 import Link from "next/link";
 
@@ -32,7 +30,10 @@ interface PublishQuizButtonProps {
 /**
  * §5.6 — Button to publish / unpublish a quiz (with confirmation dialog).
  */
-export function PublishQuizButton({ quizId, published }: PublishQuizButtonProps) {
+export function PublishQuizButton({
+  quizId,
+  published,
+}: PublishQuizButtonProps) {
   const t = useTranslations("Quizzes");
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -98,7 +99,7 @@ export function PublishQuizButton({ quizId, published }: PublishQuizButtonProps)
   );
 }
 
-/* ── Sessions list (client, with link to results) ──────────── */
+/* -- Sessions list (client, with link to results) ------------ */
 
 interface QuizSessionsListProps {
   sessions: Array<{
@@ -155,10 +156,7 @@ export function QuizSessionsList({
               </Badge>
               {s.status === "completed" ? (
                 <>
-                  <Badge
-                    variant={passed ? "success" : "destructive"}
-                    size="sm"
-                  >
+                  <Badge variant={passed ? "success" : "destructive"} size="sm">
                     {percentage}%
                   </Badge>
                   <Badge variant="secondary" size="sm">
@@ -167,7 +165,12 @@ export function QuizSessionsList({
                 </>
               ) : null}
               {s.status === "completed" ? (
-                <Button asChild variant="ghost" size="icon" aria-label={t("viewResults")}>
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("viewResults")}
+                >
                   <Link href={`/quizzes/session/${s.id}/results`}>
                     <Eye className="size-4" />
                   </Link>

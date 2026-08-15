@@ -57,8 +57,11 @@ import type {
   PaymentWithSubscription,
   InvoiceWithRelations,
 } from "@/server/services/payments";
-import type { EntitlementResult, PlanDefinition } from "@/server/services/entitlements";
-import type { PlanType } from "@/server/providers/payments/types";
+import type { EntitlementResult } from "@/server/services/entitlements";
+import type {
+  PlanDefinition,
+  PlanType,
+} from "@/server/providers/payments/types";
 
 /* ── Helpers ─────────────────────────────────────────────── */
 
@@ -66,7 +69,9 @@ async function requireDbUserOrThrow() {
   await requireSession();
   const dbUser = await getCurrentDbUser();
   if (!dbUser) {
-    throw AppError.notFound("User profile not found. Please complete onboarding.");
+    throw AppError.notFound(
+      "User profile not found. Please complete onboarding.",
+    );
   }
   return dbUser;
 }
@@ -78,7 +83,10 @@ function handleErr(err: unknown, label: string): ApiResponse<never> {
   logger.error(`${label} failed`, { error: String(err) });
   return {
     success: false,
-    error: { code: "INTERNAL_ERROR", message: "Could not complete the request" },
+    error: {
+      code: "INTERNAL_ERROR",
+      message: "Could not complete the request",
+    },
   };
 }
 
@@ -98,14 +106,19 @@ async function requireSubscriptionOwnerOrAdmin(
   }
   if (sub.schoolId) {
     const ok = await isSchoolMember(dbUser.id, sub.schoolId);
-    if (ok && (dbUser.role === "school_admin" || dbUser.role === "platform_admin")) {
+    if (
+      ok &&
+      (dbUser.role === "school_admin" || dbUser.role === "platform_admin")
+    ) {
       return { userId: dbUser.id, subscription: sub };
     }
   }
   if (dbUser.role === "platform_admin") {
     return { userId: dbUser.id, subscription: sub };
   }
-  throw AppError.forbidden("You are not authorized to act on this subscription");
+  throw AppError.forbidden(
+    "You are not authorized to act on this subscription",
+  );
 }
 
 /* ── Subscriptions ───────────────────────────────────────── */
@@ -123,8 +136,14 @@ export async function createSubscriptionAction(
     const data = parsed.data;
 
     // Only platform_admin can create subscriptions for other users / schools.
-    if (data.userId && data.userId !== dbUser.id && dbUser.role !== "platform_admin") {
-      throw AppError.forbidden("You can only create subscriptions for yourself");
+    if (
+      data.userId &&
+      data.userId !== dbUser.id &&
+      dbUser.role !== "platform_admin"
+    ) {
+      throw AppError.forbidden(
+        "You can only create subscriptions for yourself",
+      );
     }
     if (data.schoolId && dbUser.role !== "platform_admin") {
       const ok = await isSchoolMember(dbUser.id, data.schoolId);
@@ -132,7 +151,9 @@ export async function createSubscriptionAction(
         throw AppError.forbidden("You are not a member of this school");
       }
       if (dbUser.role !== "school_admin") {
-        throw AppError.unauthorized("Only school admins can manage school subscriptions");
+        throw AppError.unauthorized(
+          "Only school admins can manage school subscriptions",
+        );
       }
     }
     // If userId not provided, default to current user.
@@ -161,7 +182,9 @@ export async function getSubscriptionAction(
   }
 }
 
-export async function getMySubscriptionAction(): Promise<ApiResponse<Subscription | null>> {
+export async function getMySubscriptionAction(): Promise<
+  ApiResponse<Subscription | null>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
     const sub = await paymentsService.getUserSubscription(dbUser.id);
@@ -228,7 +251,11 @@ export async function updateSubscriptionAction(
 export async function initiatePaymentAction(
   input: InitiatePaymentInput,
 ): Promise<
-  ApiResponse<{ payment: Payment; providerTransactionId: string; redirectUrl?: string }>
+  ApiResponse<{
+    payment: Payment;
+    providerTransactionId: string;
+    redirectUrl?: string;
+  }>
 > {
   try {
     await requireSubscriptionOwnerOrAdmin(input.subscriptionId);
@@ -244,7 +271,9 @@ export async function initiatePaymentAction(
       (data.provider === "mtn_money" || data.provider === "orange_money") &&
       !data.payerMsisdn
     ) {
-      throw AppError.validation("payerMsisdn is required for Mobile Money payments");
+      throw AppError.validation(
+        "payerMsisdn is required for Mobile Money payments",
+      );
     }
 
     const { payment, provider } = await paymentsService.initiatePayment(data);
@@ -286,7 +315,14 @@ export async function confirmPaymentAction(
 
 export async function listPaymentsAction(
   filters: ListPaymentsQuery,
-): Promise<ApiResponse<{ items: PaymentWithSubscription[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: PaymentWithSubscription[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
     const parsed = listPaymentsQuerySchema.safeParse(filters);
@@ -311,14 +347,25 @@ export async function listSchoolPaymentsAction(
   schoolId: string,
   page = 1,
   pageSize = 20,
-): Promise<ApiResponse<{ items: PaymentWithSubscription[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: PaymentWithSubscription[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
     const ok = await isSchoolMember(dbUser.id, schoolId);
     if (!ok && dbUser.role !== "platform_admin") {
       throw AppError.forbidden("You are not a member of this school");
     }
-    const result = await paymentsService.listPayments({ schoolId, page, pageSize });
+    const result = await paymentsService.listPayments({
+      schoolId,
+      page,
+      pageSize,
+    });
     return { success: true, data: result };
   } catch (err) {
     return handleErr(err, "listSchoolPaymentsAction");
@@ -328,10 +375,21 @@ export async function listSchoolPaymentsAction(
 export async function listMyPaymentsAction(
   page = 1,
   pageSize = 20,
-): Promise<ApiResponse<{ items: PaymentWithSubscription[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: PaymentWithSubscription[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
-    const result = await paymentsService.listPayments({ userId: dbUser.id, page, pageSize });
+    const result = await paymentsService.listPayments({
+      userId: dbUser.id,
+      page,
+      pageSize,
+    });
     return { success: true, data: result };
   } catch (err) {
     return handleErr(err, "listMyPaymentsAction");
@@ -370,7 +428,14 @@ export async function getPaymentAction(
 
 export async function listInvoicesAction(
   filters: ListInvoicesQuery,
-): Promise<ApiResponse<{ items: Invoice[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: Invoice[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
     const parsed = listInvoicesQuerySchema.safeParse(filters);
@@ -423,7 +488,14 @@ export async function getInvoiceAction(
 
 export async function listSubscriptionsAction(
   filters: ListSubscriptionsQuery,
-): Promise<ApiResponse<{ items: Subscription[]; total: number; page: number; pageSize: number }>> {
+): Promise<
+  ApiResponse<{
+    items: Subscription[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>
+> {
   try {
     const dbUser = await requireDbUserOrThrow();
     requireRole(dbUser.role, "platform_admin", "support");
@@ -469,7 +541,10 @@ export async function canAccessFeatureAction(
     if (targetId !== dbUser.id && dbUser.role !== "platform_admin") {
       throw AppError.forbidden("You cannot check another user's entitlements");
     }
-    const ok = await entitlementsService.canAccessFeature(targetId, parsed.data.feature);
+    const ok = await entitlementsService.canAccessFeature(
+      targetId,
+      parsed.data.feature,
+    );
     return { success: true, data: ok };
   } catch (err) {
     return handleErr(err, "canAccessFeatureAction");

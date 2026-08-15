@@ -73,7 +73,7 @@ export default async function AssignmentDetailPage({
   const dueAt = assignment.dueAt ? new Date(assignment.dueAt) : null;
   const isLate = dueAt ? dueAt.getTime() < Date.now() : false;
 
-  /* ── Teacher / school admin / platform admin view ───────── */
+  /* -- Teacher / school admin / platform admin view --------- */
 
   if (
     role === "teacher" ||
@@ -248,7 +248,7 @@ export default async function AssignmentDetailPage({
     );
   }
 
-  /* ── Student view ──────────────────────────────────────── */
+  /* -- Student view ---------------------------------------- */
 
   // At this point `role` is narrowed to the remaining roles
   // (student / parent / tutor / content_moderator / support).

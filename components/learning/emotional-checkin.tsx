@@ -19,7 +19,10 @@ import { Heart, Send } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TextAreaField, SubmitButton } from "@/components/forms/tanstack-fields";
+import {
+  TextAreaField,
+  SubmitButton,
+} from "@/components/forms/tanstack-fields";
 import { recordEmotionalCheckinAction } from "@/server/actions/learning";
 import type { EmotionalStateValue } from "@/server/db/schema/enums";
 import { cn } from "@/lib/utils";
@@ -65,8 +68,7 @@ function getCurrentWeekKey(d: Date = new Date()): string {
   const week =
     1 +
     Math.round(
-      (date.getTime() - firstThursday.getTime()) /
-        (7 * 24 * 60 * 60 * 1000),
+      (date.getTime() - firstThursday.getTime()) / (7 * 24 * 60 * 60 * 1000),
     );
   return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
@@ -107,7 +109,7 @@ export function EmotionalCheckin({
     },
   });
 
-  // ── Already answered this week ────────────────────────────────
+  // -- Already answered this week --------------------------------
   if (doneThisWeek) {
     return (
       <Card
@@ -145,13 +147,10 @@ export function EmotionalCheckin({
     );
   }
 
-  // ── Active check-in form ──────────────────────────────────────
+  // -- Active check-in form --------------------------------------
   return (
     <Card
-      className={cn(
-        "relative overflow-hidden p-5 animate-fade-up",
-        className,
-      )}
+      className={cn("relative overflow-hidden p-5 animate-fade-up", className)}
     >
       <div
         aria-hidden
@@ -214,7 +213,9 @@ export function EmotionalCheckin({
                 <span
                   className={cn(
                     "text-[10px] leading-tight font-medium",
-                    isActive ? "text-accent-amber-300" : "text-muted-foreground",
+                    isActive
+                      ? "text-accent-amber-300"
+                      : "text-muted-foreground",
                   )}
                 >
                   {t(`emotionalStates.${state}` as const)}
@@ -236,9 +237,7 @@ export function EmotionalCheckin({
           )}
         </form.Field>
 
-        <form.Subscribe
-          selector={(state) => [state.isSubmitting] as const}
-        >
+        <form.Subscribe selector={(state) => [state.isSubmitting] as const}>
           {([isSubmitting]) => (
             <SubmitButton
               pending={submitting || isSubmitting}

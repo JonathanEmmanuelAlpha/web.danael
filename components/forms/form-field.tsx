@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { ReactNode } from "react";
 
-/* ─────────────────────────────────────────────────────────────
+/* -------------------------------------------------------------
    FormField helpers — bind TanStack Form fields to styled controls.
    Supports Zod v4 / v3.24+ Standard Schema (no adapter needed).
-   ───────────────────────────────────────────────────────────── */
+   ------------------------------------------------------------- */
 
 interface FieldMeta {
   isTouched: boolean;
@@ -35,10 +35,12 @@ function extractError(raw: unknown): string | undefined {
   return undefined;
 }
 
-export function hasFieldError<TValue>(
-  field: FieldApiLike<TValue>,
-): { hasError: boolean; errorMessage?: string } {
-  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+export function hasFieldError<TValue>(field: FieldApiLike<TValue>): {
+  hasError: boolean;
+  errorMessage?: string;
+} {
+  const hasError =
+    field.state.meta.isTouched && field.state.meta.errors.length > 0;
   const errorMessage = extractError(field.state.meta.errors[0]);
   return { hasError, errorMessage };
 }
@@ -91,8 +93,13 @@ export function TextField({
         <Input
           id={fieldId}
           type={type}
-          inputMode={type === "email" ? "email" : type === "tel" ? "tel" : undefined}
-          autoComplete={autoComplete ?? (type === "email" ? "email" : type === "tel" ? "tel" : "off")}
+          inputMode={
+            type === "email" ? "email" : type === "tel" ? "tel" : undefined
+          }
+          autoComplete={
+            autoComplete ??
+            (type === "email" ? "email" : type === "tel" ? "tel" : "off")
+          }
           placeholder={placeholder}
           value={field.state.value}
           onBlur={field.handleBlur}
@@ -102,13 +109,17 @@ export function TextField({
           className={cn(
             "h-12 rounded-xl",
             leftIcon && "pl-11",
-            hasError && "border-destructive/60 focus:border-destructive focus:ring-destructive/25",
+            hasError &&
+              "border-destructive/60 focus:border-destructive focus:ring-destructive/25",
             inputClassName,
           )}
         />
       </div>
       {hasError ? (
-        <p id={`${fieldId}-error`} className="flex items-center gap-1 text-xs text-destructive">
+        <p
+          id={`${fieldId}-error`}
+          className="flex items-center gap-1 text-xs text-destructive"
+        >
           <AlertCircle className="size-3.5 shrink-0" />
           {errorMessage ?? t("error")}
         </p>
