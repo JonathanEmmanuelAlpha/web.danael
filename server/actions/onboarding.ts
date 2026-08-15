@@ -494,7 +494,10 @@ export async function validateAdminCodeAction(input: {
     if (expectedCode.length < 8 || expectedCode !== parsed.data.code) {
       return {
         success: true,
-        data: { valid: false, message: "Code d'autorisation invalide" },
+        data: {
+          valid: false,
+          message: "Votre Code d'autorisation est invalide",
+        },
       };
     }
 
