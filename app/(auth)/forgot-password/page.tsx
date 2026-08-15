@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { useSafeSignIn } from "@/lib/safe-clerk";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -13,8 +12,8 @@ import AuthLayout from "@/components/layout/auth-layout";
 import { AuthPanel } from "@/components/layout/auth-panel";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { TextField, FormError } from "@/components/forms/form-field";
-import { SubmitButton } from "@/components/forms/submit-button";
 import type { ClerkError } from "@/types";
+import { useAppForm } from "@/components/forms/form-hook";
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("Auth");
@@ -36,7 +35,7 @@ export default function ForgotPasswordPage() {
     [t],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { email: prefillEmail },
     validators: { onChange: schema },
     onSubmit: async ({ value }) => {
@@ -89,7 +88,7 @@ export default function ForgotPasswordPage() {
               className="space-y-5"
               noValidate
             >
-              <form.Field name="email">
+              <form.AppField name="email">
                 {(field) => (
                   <TextField
                     field={field}
@@ -100,16 +99,17 @@ export default function ForgotPasswordPage() {
                     leftIcon={<Mail className="size-5" />}
                   />
                 )}
-              </form.Field>
+              </form.AppField>
 
-              <SubmitButton
-                form={form}
-                idleLabel={t("actions.signIn")}
-                pendingLabel={t("actions.signingIn")}
-                disabledExtra={!isLoaded}
-                size="lg"
-                className="danael-btn-primary w-full"
-              />
+              <form.AppForm>
+                <form.SubmitButton
+                  idleLabel={t("actions.signIn")}
+                  pendingLabel={t("actions.signingIn")}
+                  disabledExtra={!isLoaded}
+                  size="lg"
+                  className="danael-btn-primary w-full"
+                />
+              </form.AppForm>
             </form>
           </div>
         </div>

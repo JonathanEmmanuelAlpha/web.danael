@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { useSafeClerk, useSafeSignIn } from "@/lib/safe-clerk";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -15,9 +14,9 @@ import { AuthHeader } from "@/components/auth/auth-header";
 import { TextField, FormError } from "@/components/forms/form-field";
 import { PasswordInput } from "@/components/forms/password-input";
 import { PasswordStrength } from "@/components/forms/password-strength";
-import { SubmitButton } from "@/components/forms/submit-button";
 import { getAuthStatusAction } from "@/server/actions/auth-status";
 import type { ClerkError } from "@/types";
+import { useAppForm } from "@/components/forms/form-hook";
 
 /**
  * §5.2 — Reset password page.
@@ -45,7 +44,7 @@ export default function ResetPasswordPage() {
     [t],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { code: "", password: "" },
     validators: { onChange: schema },
     onSubmit: async ({ value }) => {
@@ -113,7 +112,7 @@ export default function ResetPasswordPage() {
               className="space-y-5"
               noValidate
             >
-              <form.Field name="code">
+              <form.AppField name="code">
                 {(field) => (
                   <TextField
                     field={field}
@@ -121,9 +120,9 @@ export default function ResetPasswordPage() {
                     placeholder={t("twoFactor.codePlaceholder")}
                   />
                 )}
-              </form.Field>
+              </form.AppField>
 
-              <form.Field name="password">
+              <form.AppField name="password">
                 {(field) => (
                   <div>
                     <PasswordInput
@@ -140,16 +139,17 @@ export default function ResetPasswordPage() {
                     <PasswordStrength password={field.state.value} />
                   </div>
                 )}
-              </form.Field>
+              </form.AppField>
 
-              <SubmitButton
-                form={form}
-                idleLabel={t("resetPassword.title")}
-                pendingLabel={t("actions.signingIn")}
-                disabledExtra={!isLoaded}
-                size="lg"
-                className="danael-btn-primary w-full"
-              />
+              <form.AppForm>
+                <form.SubmitButton
+                  idleLabel={t("resetPassword.title")}
+                  pendingLabel={t("actions.signingIn")}
+                  disabledExtra={!isLoaded}
+                  size="lg"
+                  className="danael-btn-primary w-full"
+                />
+              </form.AppForm>
             </form>
           </div>
         </div>

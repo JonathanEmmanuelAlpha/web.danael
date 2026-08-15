@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Search, X } from "lucide-react";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,9 +68,7 @@ function toFiltersValue(v: FiltersFormValues): TutorFiltersValue {
     search: v.search || undefined,
     subjectId: v.subjectId === "all" ? undefined : v.subjectId,
     level:
-      v.level === "all"
-        ? undefined
-        : (v.level as TutorFiltersValue["level"]),
+      v.level === "all" ? undefined : (v.level as TutorFiltersValue["level"]),
     location: v.location || undefined,
     minRating: v.minRating === "0" ? undefined : Number(v.minRating),
     maxRate: v.maxRate,
@@ -112,7 +110,7 @@ export function TutorSearchFilters({
     },
   });
 
-  const formValues = useStore(form.store, (s) => s.values);
+  const formValues = useSelector(form.store, (s) => s.values);
   useEffect(() => {
     onChange(toFiltersValue(formValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -215,9 +213,7 @@ export function TutorSearchFilters({
 
       <div className="flex items-center justify-between gap-2">
         <form.Field name="verifiedOnly">
-          {(field) => (
-            <CheckboxField field={field} label={t("verifiedOnly")} />
-          )}
+          {(field) => <CheckboxField field={field} label={t("verifiedOnly")} />}
         </form.Field>
 
         <div className="flex gap-2">

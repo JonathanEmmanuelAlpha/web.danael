@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "@tanstack/react-form";
-import { useSignUp, useClerk } from "@clerk/nextjs";
 import { useSafeSignUp, useSafeClerk } from "@/lib/safe-clerk";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 import Link from "next/link";
-import { Mail, ShieldCheck } from "lucide-react";
+import { Mail } from "lucide-react";
 import { toast } from "sonner";
 import AuthLayout from "@/components/layout/auth-layout";
 import { AuthPanel } from "@/components/layout/auth-panel";
@@ -16,9 +14,9 @@ import { AuthHeader, AuthSecureFooter } from "@/components/auth/auth-header";
 import { TextField, FormError, Divider } from "@/components/forms/form-field";
 import { PasswordInput } from "@/components/forms/password-input";
 import { PasswordStrength } from "@/components/forms/password-strength";
-import { SubmitButton } from "@/components/forms/submit-button";
 import { OAuthButtons } from "@/components/forms/oauth-buttons";
 import type { ClerkError, OAuthStrategy } from "@/types";
+import { useAppForm } from "@/components/forms/form-hook";
 
 /**
  * §5.2 — Sign-up page (refactored with reusable components).
@@ -54,7 +52,7 @@ export default function SignUpPage() {
     [t],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { email: "", password: "" },
     validators: { onChange: schema },
     onSubmit: async ({ value }) => {
@@ -95,7 +93,8 @@ export default function SignUpPage() {
           return;
         }
 
-        const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
+        const msg =
+          clerkError?.errors?.[0]?.longMessage ?? t("errors.unexpected");
         setGlobalError(msg);
       }
     },
@@ -113,7 +112,8 @@ export default function SignUpPage() {
       });
     } catch (err) {
       const clerkError = err as ClerkError;
-      const msg = clerkError?.errors?.[0]?.longMessage ?? t("errors.oauthFailed");
+      const msg =
+        clerkError?.errors?.[0]?.longMessage ?? t("errors.oauthFailed");
       toast.error(msg);
       setOauthPending(null);
     }
@@ -123,10 +123,15 @@ export default function SignUpPage() {
     <AuthLayout>
       <AuthPanel>
         <div className="animate-fade-up">
-          <AuthHeader title={t("signUp.title")} subtitle={t("signUp.subtitle")} />
+          <AuthHeader
+            title={t("signUp.title")}
+            subtitle={t("signUp.subtitle")}
+          />
 
           <div className="mt-8">
-            {globalError && <FormError message={globalError} className="mb-4" />}
+            {globalError && (
+              <FormError message={globalError} className="mb-4" />
+            )}
 
             <form
               onSubmit={(e) => {
@@ -137,7 +142,7 @@ export default function SignUpPage() {
               className="space-y-5"
               noValidate
             >
-              <form.Field name="email">
+              <form.AppField name="email">
                 {(field) => (
                   <TextField
                     field={field}
@@ -148,9 +153,9 @@ export default function SignUpPage() {
                     leftIcon={<Mail className="size-5" />}
                   />
                 )}
-              </form.Field>
+              </form.AppField>
 
-              <form.Field name="password">
+              <form.AppField name="password">
                 {(field) => (
                   <div>
                     <PasswordInput
@@ -160,25 +165,31 @@ export default function SignUpPage() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={
-                        field.state.meta.isTouched && field.state.meta.errors.length > 0
+                        field.state.meta.isTouched &&
+                        field.state.meta.errors.length > 0
                       }
                     />
                     <PasswordStrength password={field.state.value} />
                   </div>
                 )}
-              </form.Field>
+              </form.AppField>
 
               {/* Clerk's CAPTCHA widget */}
-              <div id="clerk-captcha" data-cl-theme="dark" data-cl-size="flexible" />
-
-              <SubmitButton
-                form={form}
-                idleLabel={t("actions.signUp")}
-                pendingLabel={t("actions.signingUp")}
-                disabledExtra={!isLoaded}
-                size="lg"
-                className="danael-btn-primary w-full"
+              <div
+                id="clerk-captcha"
+                data-cl-theme="dark"
+                data-cl-size="flexible"
               />
+
+              <form.AppForm>
+                <form.SubmitButton
+                  idleLabel={t("actions.signUp")}
+                  pendingLabel={t("actions.signingUp")}
+                  disabledExtra={!isLoaded}
+                  size="lg"
+                  className="danael-btn-primary w-full"
+                />
+              </form.AppForm>
             </form>
 
             <Divider label={t("actions.orContinueWith")} className="mt-6" />

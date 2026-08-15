@@ -44,7 +44,6 @@ const AUTH_ROUTES = [
   "/verify-account",
   "/forgot-password",
   "/reset-password",
-  // "/onboarding" retiré
 ];
 
 // Utilitaires

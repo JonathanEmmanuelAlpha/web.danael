@@ -20,11 +20,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  useStore,
-  type FieldApi,
-  type ValidationError,
-} from "@tanstack/react-form";
+import { useSelector, type ValidationError } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -86,7 +82,7 @@ function FieldShell({
 }
 
 function useFieldError<TData>(field: AnyFieldApi): string | undefined {
-  return useStore(field.store, (state) => {
+  return useSelector(field.store, (state) => {
     const meta = state.meta;
     if (!meta.isTouched) return undefined;
     const errs: ValidationError[] = meta.errors ?? [];

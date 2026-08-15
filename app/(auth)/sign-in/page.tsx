@@ -1,25 +1,23 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "@tanstack/react-form";
-import { useSignIn, useClerk } from "@clerk/nextjs";
 import { useSafeSignIn, useSafeClerk } from "@/lib/safe-clerk";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 import Link from "next/link";
-import { Mail, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { Mail } from "lucide-react";
 import AuthLayout from "@/components/layout/auth-layout";
 import { AuthPanel } from "@/components/layout/auth-panel";
 import { AuthHeader, AuthSecureFooter } from "@/components/auth/auth-header";
 import { TextField, FormError, Divider } from "@/components/forms/form-field";
 import { PasswordInput } from "@/components/forms/password-input";
 import { Input } from "@/components/ui/input";
-import { SubmitButton } from "@/components/forms/submit-button";
 import { OAuthButtons } from "@/components/forms/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { getAuthStatusAction } from "@/server/actions/auth-status";
 import type { ClerkError, OAuthStrategy } from "@/types";
+import { useAppForm } from "@/components/forms/form-hook";
 
 /**
  * §5.2 — Sign-in page (refactored with reusable components).
@@ -37,10 +35,8 @@ export default function SignInPage() {
   const isLoaded = fetchStatus === "idle";
   const { setActive } = useSafeClerk();
 
-  const [showPassword, setShowPassword] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [oauthPending, setOauthPending] = useState<OAuthStrategy | null>(null);
-  const [forgotPending, setForgotPending] = useState(false);
   const [needsSecondFactor, setNeedsSecondFactor] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState("");
 
@@ -59,7 +55,7 @@ export default function SignInPage() {
     [t],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { identifier: "", password: "" },
     validators: { onChange: schema },
     onSubmit: async ({ value }) => {
@@ -180,7 +176,7 @@ export default function SignInPage() {
                 className="space-y-5"
                 noValidate
               >
-                <form.Field name="identifier">
+                <form.AppField name="identifier">
                   {(field) => (
                     <TextField
                       field={field}
@@ -191,9 +187,9 @@ export default function SignInPage() {
                       leftIcon={<Mail className="size-5" />}
                     />
                   )}
-                </form.Field>
+                </form.AppField>
 
-                <form.Field name="password">
+                <form.AppField name="password">
                   {(field) => (
                     <div>
                       <PasswordInput
@@ -209,27 +205,27 @@ export default function SignInPage() {
                       />
                     </div>
                   )}
-                </form.Field>
+                </form.AppField>
 
                 <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={handleForgot}
-                    disabled={forgotPending}
                     className="text-sm font-medium text-primary-600 transition hover:text-primary-700 hover:underline disabled:opacity-50 dark:text-primary-400"
                   >
                     {t("actions.forgotPassword")}
                   </button>
                 </div>
 
-                <SubmitButton
-                  form={form}
-                  idleLabel={t("actions.signIn")}
-                  pendingLabel={t("actions.signingIn")}
-                  disabledExtra={!isLoaded}
-                  size="lg"
-                  className="danael-btn-primary w-full"
-                />
+                <form.AppForm>
+                  <form.SubmitButton
+                    idleLabel={t("actions.signIn")}
+                    pendingLabel={t("actions.signingIn")}
+                    disabledExtra={!isLoaded}
+                    size="lg"
+                    className="danael-btn-primary w-full"
+                  />
+                </form.AppForm>
               </form>
             ) : (
               <div className="space-y-5">

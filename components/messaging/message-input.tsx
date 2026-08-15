@@ -4,7 +4,7 @@ import { useState, useRef, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Send, Paperclip, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -74,7 +74,7 @@ export function MessageInput({ threadId, onSent }: MessageInputProps) {
     },
   });
 
-  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
+  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting);
 
   async function handleFileSelected(file: File): Promise<void> {
     if (file.size > 10 * 1024 * 1024) {
@@ -215,9 +215,7 @@ export function MessageInput({ threadId, onSent }: MessageInputProps) {
           </form.Field>
         </div>
         <form.Subscribe
-          selector={(state) =>
-            [state.isSubmitting, state.values.body] as const
-          }
+          selector={(state) => [state.isSubmitting, state.values.body] as const}
         >
           {([submitting, bodyValue]) => (
             <Button

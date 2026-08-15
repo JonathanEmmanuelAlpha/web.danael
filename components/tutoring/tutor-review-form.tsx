@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,11 +19,7 @@ interface TutorReviewFormProps {
 }
 
 const reviewSchema = z.object({
-  rating: z
-    .number()
-    .int()
-    .min(1, "Note requise")
-    .max(5, "Note invalide"),
+  rating: z.number().int().min(1, "Note requise").max(5, "Note invalide"),
   comment: z
     .string()
     .max(2000)
@@ -70,7 +66,7 @@ export function TutorReviewForm({
     },
   });
 
-  const rating = useStore(form.store, (s) => s.values.rating);
+  const rating = useSelector(form.store, (s) => s.values.rating);
 
   return (
     <form

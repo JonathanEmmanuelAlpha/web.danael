@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CalendarCheck } from "lucide-react";
 import { toast } from "sonner";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import {
   Dialog,
@@ -35,10 +35,7 @@ const bookingSchema = z.object({
   dateTime: z
     .date()
     .nullable()
-    .refine(
-      (d): d is Date => d !== null,
-      "Veuillez sélectionner une date",
-    ),
+    .refine((d): d is Date => d !== null, "Veuillez sélectionner une date"),
 });
 
 type BookingFormValues = {
@@ -89,7 +86,7 @@ export function CreateBookingDialog({
     },
   });
 
-  const dateTime = useStore(form.store, (s) => s.values.dateTime);
+  const dateTime = useSelector(form.store, (s) => s.values.dateTime);
   const hasAvailabilities = availabilities.length > 0;
 
   return (
