@@ -491,7 +491,10 @@ export async function validateAdminCodeAction(input: {
       };
     }
     const expectedCode = expected.split(":").slice(1).join(":").trim();
-    if (expectedCode.length < 8 || expectedCode !== parsed.data.code) {
+    if (
+      expectedCode.length < 8 ||
+      expectedCode.toUpperCase() !== parsed.data.code
+    ) {
       return {
         success: true,
         data: {
