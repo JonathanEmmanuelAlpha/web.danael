@@ -28,7 +28,7 @@ export function DatePicker({
 }: DatePickerProps) {
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger className="z-50">
         <Button
           variant="outline"
           className={cn(

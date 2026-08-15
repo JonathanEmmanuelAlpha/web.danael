@@ -30,16 +30,6 @@ import { Card } from "@/components/ui/card";
  * widget, and quick-link tiles to every admin module.
  */
 export default async function AdminDashboardPage() {
-  const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
-  if (
-    user.role !== "platform_admin" &&
-    user.role !== "content_moderator" &&
-    user.role !== "support"
-  ) {
-    redirect("/dashboard");
-  }
-
   const t = await getTranslations("Admin");
 
   const modules = [
