@@ -57,15 +57,19 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isLoading, user } = useUserStore();
+  const { isLoading, user: storeUser, _hasHydrated } = useUserStore();
 
-  if (isLoading || !user) return <Skeleton />;
+  // Tant que le store n'est pas hydraté, on affiche un loader
+  if (!_hasHydrated) return <Skeleton />;
 
-  if (!isLoading && !user) return null;
+  if (isLoading || !storeUser) return <Skeleton />;
 
-  const role = user.role as UserRole;
+  if (!isLoading && !storeUser) return null;
+
+  const role = storeUser.role as UserRole;
   const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
+    [storeUser.firstName, storeUser.lastName].filter(Boolean).join(" ") ||
+    undefined;
 
   return (
     <div className="relative flex min-h-screen bg-background">
@@ -84,9 +88,9 @@ export function DashboardShell({
       />
 
       {/* Hydrate Zustand stores from server-fetched data */}
-      {user && (
+      {storeUser && (
         <StoreHydrator
-          user={user}
+          user={storeUser}
           school={school ?? null}
           classes={classes}
           notifications={notifications}
@@ -128,8 +132,8 @@ export function DashboardShell({
         <Topbar
           role={role}
           userName={userName}
-          userImage={user.imageUrl ?? undefined}
-          userEmail={user.email}
+          userImage={storeUser.imageUrl ?? undefined}
+          userEmail={storeUser.email}
           onMenuClick={() => setMobileOpen(true)}
         />
         <main className="overflow-x-hidden relative flex-1 px-4 py-6 sm:px-6 lg:px-8">

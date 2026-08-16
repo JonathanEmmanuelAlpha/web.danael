@@ -11,12 +11,10 @@
  * Bénéfice direct : plus d'appels réseau répétés à l'API Clerk ni à la DB,
  * navigation instantanée entre pages.
  */
-
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface UserSessionData {
-  /** DB user id (uuid). */
   id: string;
   clerkId: string;
   email: string;
@@ -34,11 +32,7 @@ export interface UserSessionData {
     | "support";
   level?: string | null;
   series?: string | null;
-  onboardingStatus?:
-    | "not_started"
-    | "pending"
-    | "completed"
-    | "skipped";
+  onboardingStatus?: "not_started" | "pending" | "completed" | "skipped";
   language?: string;
   theme?: string;
   avatarUrl?: string | null;
@@ -49,6 +43,7 @@ interface UserStoreState {
   isLoading: boolean;
   error: string | null;
   lastFetchedAt: number | null;
+  _hasHydrated: boolean; // <- nouveau
 
   setUser: (user: UserSessionData | null) => void;
   setLoading: (loading: boolean) => void;
@@ -57,6 +52,7 @@ interface UserStoreState {
   clear: () => void;
   /** Patch partiel (utile après update de profil). */
   patch: (partial: Partial<UserSessionData>) => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useUserStore = create<UserStoreState>()(
@@ -66,6 +62,7 @@ export const useUserStore = create<UserStoreState>()(
       isLoading: false,
       error: null,
       lastFetchedAt: null,
+      _hasHydrated: false, // <- initialisation
 
       setUser: (user) => set({ user, lastFetchedAt: Date.now() }),
       setLoading: (isLoading) => set({ isLoading }),
@@ -81,15 +78,19 @@ export const useUserStore = create<UserStoreState>()(
         }),
       patch: (partial) =>
         set((state) =>
-          state.user
-            ? { user: { ...state.user, ...partial } }
-            : state,
+          state.user ? { user: { ...state.user, ...partial } } : state,
         ),
+      setHasHydrated: (state) => set({ _hasHydrated: state }), // <- nouveau
     }),
     {
       name: "danael-user-store",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user, lastFetchedAt: state.lastFetchedAt }),
+      partialize: (state) => ({
+        user: state.user,
+        lastFetchedAt: state.lastFetchedAt,
+      }),
+      skipHydration: true,
+      version: 1,
     },
   ),
 );
@@ -99,7 +100,9 @@ export const selectUser = (s: UserStoreState) => s.user;
 export const selectUserRole = (s: UserStoreState) => s.user?.role ?? null;
 export const selectUserDisplayName = (s: UserStoreState) => {
   if (!s.user) return undefined;
-  return [s.user.firstName, s.user.lastName].filter(Boolean).join(" ") || undefined;
+  return (
+    [s.user.firstName, s.user.lastName].filter(Boolean).join(" ") || undefined
+  );
 };
 export const selectUserInitials = (s: UserStoreState) => {
   if (!s.user) return "?";

@@ -46,10 +46,9 @@ export interface ClassContextData {
 interface SchoolStoreState {
   currentSchool: SchoolContextData | null;
   currentClass: ClassContextData | null;
-  /** Toutes les écoles auxquelles l'utilisateur appartient (multi-établissement). */
   schools: SchoolContextData[];
-  /** Toutes les classes de l'utilisateur. */
   classes: ClassContextData[];
+  _hasHydrated: boolean;
 
   setSchools: (schools: SchoolContextData[]) => void;
   setClasses: (classes: ClassContextData[]) => void;
@@ -61,6 +60,7 @@ interface SchoolStoreState {
   addClass: (cls: ClassContextData) => void;
   removeClass: (classId: string) => void;
   clear: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useSchoolStore = create<SchoolStoreState>()(
@@ -70,6 +70,7 @@ export const useSchoolStore = create<SchoolStoreState>()(
       currentClass: null,
       schools: [],
       classes: [],
+      _hasHydrated: false, // <- initialisation
 
       setSchools: (schools) =>
         set((state) => ({
@@ -94,9 +95,7 @@ export const useSchoolStore = create<SchoolStoreState>()(
       patchSchool: (partial) =>
         set((state) =>
           state.currentSchool
-            ? {
-                currentSchool: { ...state.currentSchool, ...partial },
-              }
+            ? { currentSchool: { ...state.currentSchool, ...partial } }
             : state,
         ),
       addClass: (cls) =>
@@ -118,10 +117,13 @@ export const useSchoolStore = create<SchoolStoreState>()(
           schools: [],
           classes: [],
         }),
+      setHasHydrated: (state) => set({ _hasHydrated: state }), // <- nouveau
     }),
     {
       name: "danael-school-store",
       storage: createJSONStorage(() => localStorage),
+      skipHydration: true, // <- désactive l'auto-hydratation
+      version: 1,
     },
   ),
 );

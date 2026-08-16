@@ -21,13 +21,19 @@
 
 import { useEffect, useRef } from "react";
 import { useUserStore, type UserSessionData } from "@/stores/user-store";
-import { useSchoolStore, type SchoolContextData, type ClassContextData } from "@/stores/school-store";
+import {
+  useSchoolStore,
+  type SchoolContextData,
+  type ClassContextData,
+} from "@/stores/school-store";
 import {
   useNotificationsStore,
   type NotificationItem,
   type InvitationItem,
   type JoinRequestItem,
 } from "@/stores/notifications-store";
+import { useLearningStore } from "@/stores/learning-store";
+import { useUIStore } from "@/stores/ui-store";
 
 export interface StoreHydratorProps {
   user: UserSessionData;
@@ -37,7 +43,6 @@ export interface StoreHydratorProps {
   invitations?: InvitationItem[];
   myJoinRequests?: JoinRequestItem[];
   receivedJoinRequests?: JoinRequestItem[];
-  /** Force re-hydrate even if data is the same (e.g. after navigation). */
   force?: boolean;
 }
 
@@ -51,50 +56,55 @@ export function StoreHydrator({
   receivedJoinRequests,
   force,
 }: StoreHydratorProps) {
-  const hydrateUser = useUserStore((s) => s.hydrate);
-  const hydrateSchool = useSchoolStore((s) => s.hydrateSchool);
-  const hydrateClasses = useSchoolStore((s) => s.hydrateClasses);
-  const hydrateNotifications = useNotificationsStore((s) => s.hydrate);
-
-  // Use a ref to track the last user id we hydrated, to avoid loops.
-  const lastUserId = useRef<string | null>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (force || lastUserId.current !== user.id) {
-      hydrateUser(user);
-      lastUserId.current = user.id;
+    if (initialized.current && !force) return;
+    initialized.current = true;
+
+    async function hydrateStores() {
+      // 1. Récupérer les stores persistants
+      const userStore = useUserStore;
+      const schoolStore = useSchoolStore;
+      const learningStore = useLearningStore;
+      const uiStore = useUIStore;
+
+      // 2. Déclencher manuellement l'hydratation depuis localStorage
+      await Promise.all([
+        userStore.persist.rehydrate(),
+        schoolStore.persist.rehydrate(),
+        learningStore.persist.rehydrate(),
+        uiStore.persist.rehydrate(),
+      ]);
+
+      // 3. Injecter les données fraîches du serveur (écrase les éventuelles données obsolètes)
+      if (user) {
+        userStore.getState().hydrate(user);
+      }
+      if (school) {
+        schoolStore.getState().hydrateSchool(school);
+      }
+      if (classes) {
+        schoolStore.getState().hydrateClasses(classes);
+      }
+
+      // Notifications (pas de persist)
+      useNotificationsStore.getState().hydrate({
+        notifications,
+        invitations,
+        myJoinRequests,
+        receivedJoinRequests,
+      });
+
+      // 4. Marquer tous les stores comme hydratés
+      userStore.getState().setHasHydrated(true);
+      schoolStore.getState().setHasHydrated(true);
+      learningStore.getState().setHasHydrated(true);
+      uiStore.getState().setHasHydrated(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.id]);
 
-  useEffect(() => {
-    if (school) {
-      hydrateSchool(school);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [school?.id]);
-
-  useEffect(() => {
-    if (classes) {
-      hydrateClasses(classes);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(classes)]);
-
-  useEffect(() => {
-    hydrateNotifications({
-      notifications,
-      invitations,
-      myJoinRequests,
-      receivedJoinRequests,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    JSON.stringify(notifications),
-    JSON.stringify(invitations),
-    JSON.stringify(myJoinRequests),
-    JSON.stringify(receivedJoinRequests),
-  ]);
+    hydrateStores();
+  }, [force]); // Ne dépend que de force, pas des props (on ne veut qu'une seule exécution)
 
   return null;
 }

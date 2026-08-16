@@ -182,6 +182,8 @@ interface LearningStoreState {
   // Diagnostic
   currentDiagnostic: DiagnosticSummary | null;
 
+  _hasHydrated: boolean;
+
   // Actions
   hydrate: (data: HydrationPayload) => void;
   setCurrentPlan: (plan: LearningPlanSummary) => void;
@@ -194,6 +196,7 @@ interface LearningStoreState {
   setWarmup: (warmup: WarmupSummary) => void;
   setEmotionalState: (state: EmotionalStateValue, weekKey: string) => void;
   setCurrentDiagnostic: (diagnostic: DiagnosticSummary | null) => void;
+  setHasHydrated: (state: boolean) => void;
   clear: () => void;
 }
 
@@ -238,6 +241,7 @@ export const useLearningStore = create<LearningStoreState>()(
       emotionalState: null,
       lastCheckinWeek: null,
       currentDiagnostic: null,
+      _hasHydrated: false,
 
       hydrate: (data) =>
         set((state) => ({
@@ -344,6 +348,7 @@ export const useLearningStore = create<LearningStoreState>()(
           currentDiagnostic: null,
         });
       },
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: "danael-learning-store",
@@ -355,6 +360,7 @@ export const useLearningStore = create<LearningStoreState>()(
         currentPlanId: state.currentPlanId,
         emotionalState: state.emotionalState,
         lastCheckinWeek: state.lastCheckinWeek,
+        skipHydration: true,
       }),
     },
   ),

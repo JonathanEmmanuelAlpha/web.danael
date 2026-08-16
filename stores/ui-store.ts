@@ -14,11 +14,13 @@ interface UIStoreState {
   commandPaletteOpen: boolean;
   /** Dernière route visitée — pour ré-ouvrir sur la bonne page après relogin. */
   lastRoute: string | null;
+  _hasHydrated: boolean;
 
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setLastRoute: (route: string) => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useUIStore = create<UIStoreState>()(
@@ -27,16 +29,21 @@ export const useUIStore = create<UIStoreState>()(
       sidebarCollapsed: false,
       commandPaletteOpen: false,
       lastRoute: null,
+      _hasHydrated: false,
 
       toggleSidebar: () =>
         set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-      setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
+      setCommandPaletteOpen: (commandPaletteOpen) =>
+        set({ commandPaletteOpen }),
       setLastRoute: (lastRoute) => set({ lastRoute }),
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: "danael-ui-store",
       storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
+      version: 1,
     },
   ),
 );

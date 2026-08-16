@@ -40,10 +40,10 @@ export function ProfileForm({ user }: { user: User }) {
           addressQuarter: z.string().optional().or(z.literal("")),
           birthDate: z.date().nullable(),
         })
-        .refine(
-          (d) => user.role !== "student" || d.birthDate !== null,
-          { path: ["birthDate"], message: "La date de naissance est requise" },
-        ),
+        .refine((d) => user.role !== "student" || d.birthDate !== null, {
+          path: ["birthDate"],
+          message: "La date de naissance est requise",
+        }),
     [user.role],
   );
 
@@ -88,7 +88,7 @@ export function ProfileForm({ user }: { user: User }) {
   });
 
   return (
-    <GlassCard className="space-y-5 p-6">
+    <div className="space-y-5 p-6">
       <h2 className="font-display text-xl font-semibold">
         {t("personalInfo")}
       </h2>
@@ -232,6 +232,6 @@ export function ProfileForm({ user }: { user: User }) {
           )}
         </form.Subscribe>
       </form>
-    </GlassCard>
+    </div>
   );
 }

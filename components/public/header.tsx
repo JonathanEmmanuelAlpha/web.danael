@@ -46,9 +46,10 @@ export function PublicHeader({
   const isDark = variant === "dark";
 
   const { isSignedIn } = useUser();
-  const { user } = useUserStore();
+  const { user, _hasHydrated } = useUserStore();
 
-  const dashboardLink = user ? getUserDashboardRoadByRole(user.role) : "";
+  const dashboardLink =
+    _hasHydrated && user ? getUserDashboardRoadByRole(user.role) : "/";
 
   return (
     <header
