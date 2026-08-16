@@ -14,6 +14,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { StoreInitializer } from "@/components/providers/store-initializer";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -131,6 +132,7 @@ export default async function RootLayout({
         className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <AuthProvider>
+          <StoreInitializer />
           <QueryProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
               <ThemeProvider
