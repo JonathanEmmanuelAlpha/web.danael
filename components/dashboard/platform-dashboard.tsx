@@ -71,7 +71,6 @@ const ROLE_COLORS: Record<string, string> = {
  */
 export function PlatformDashboard() {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Analytics");
   const tDash = useTranslations("Dashboard");
@@ -121,6 +120,8 @@ export function PlatformDashboard() {
     value: r.count,
     color: ROLE_COLORS[r.role],
   }));
+
+  if (!user) return null;
 
   return (
     <>

@@ -70,7 +70,6 @@ import { useUserStore } from "@/stores/user-store";
  */
 export function StudentDashboard() {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Analytics");
   const tDash = useTranslations("Dashboard");
@@ -135,6 +134,8 @@ export function StudentDashboard() {
     score: s.averageScore,
     completion: s.completionRate,
   }));
+
+  if (!user) return null;
 
   return (
     <>

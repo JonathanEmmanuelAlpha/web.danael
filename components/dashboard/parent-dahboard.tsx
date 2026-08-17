@@ -19,9 +19,10 @@ import { useUserStore } from "@/stores/user-store";
 
 export default function ParentDashboard() {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Dashboard");
+
+  if (!user) return null;
 
   return (
     <>

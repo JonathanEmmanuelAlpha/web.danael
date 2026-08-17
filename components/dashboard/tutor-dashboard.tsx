@@ -20,9 +20,10 @@ type Props = {};
 
 export default function TutorDashboard({}: Props) {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Dashboard");
+
+  if (!user) return null;
 
   return (
     <>

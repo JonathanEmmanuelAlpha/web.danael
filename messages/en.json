@@ -279,10 +279,26 @@
       "facebook": "Facebook"
     },
     "twoFactor": {
-      "instruction": "Enter the 6-digit code from your authenticator app",
-      "codePlaceholder": "6-digit code",
+      "title": "Two‑factor authentication",
+      "subtitle": "Enter the code from your authenticator app",
+      "instruction": "Open your authenticator app (Google Authenticator, Authy, etc.) and enter the 6‑digit code.",
+      "codePlaceholder": "6‑digit code",
       "verify": "Verify",
-      "back": "Back"
+      "back": "← Back"
+    },
+    "clientTrust": {
+      "title": "Security verification",
+      "subtitle": "We need to verify it's really you",
+      "emailSent": "A verification code has been sent to your email address.",
+      "smsSent": "A verification code has been sent via SMS.",
+      "checkEmail": "Enter the code you received by email.",
+      "checkSms": "Enter the code you received by SMS.",
+      "codePlaceholder": "Verification code",
+      "verify": "Verify",
+      "back": "← Back",
+      "invalidCode": "Invalid code. Please try again.",
+      "verificationFailed": "Verification failed.",
+      "noMethodAvailable": "No verification method available."
     },
     "footer": {
       "secure": "Secure and encrypted connection"

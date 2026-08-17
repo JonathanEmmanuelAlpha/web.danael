@@ -53,8 +53,6 @@ import type {
 } from "@/server/services/analytics";
 import { PageLoader } from "@/components/shared/loading";
 import { CreateSchoolForm } from "@/components/schools/create-school-form";
-import type { User } from "@/server/db/schema/users";
-import type { UserRole } from "@/types";
 import { useUserStore } from "@/stores/user-store";
 
 /**
@@ -74,7 +72,6 @@ import { useUserStore } from "@/stores/user-store";
  */
 export function SchoolDashboard() {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Analytics");
   const tSchool = useTranslations("Schools");
@@ -172,6 +169,8 @@ export function SchoolDashboard() {
     score: c.averageScore,
     completion: c.completionRate,
   }));
+
+  if (!user) return null;
 
   return (
     <>

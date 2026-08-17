@@ -235,6 +235,20 @@
       "title": "Créer un compte",
       "subtitle": "Rejoignez des milliers d'élèves qui réussissent avec Danaël"
     },
+    "clientTrust": {
+      "title": "Vérification de sécurité",
+      "subtitle": "Nous devons vérifier que c'est bien vous",
+      "emailSent": "Un code de vérification a été envoyé à votre adresse email.",
+      "smsSent": "Un code de vérification a été envoyé par SMS.",
+      "checkEmail": "Entrez le code reçu par email.",
+      "checkSms": "Entrez le code reçu par SMS.",
+      "codePlaceholder": "Code de vérification",
+      "verify": "Vérifier",
+      "back": "← Retour",
+      "invalidCode": "Code invalide. Veuillez réessayer.",
+      "verificationFailed": "La vérification a échoué.",
+      "noMethodAvailable": "Aucune méthode de vérification disponible."
+    },
     "verifyAccount": {
       "title": "Vérifiez votre email",
       "subtitle": "Nous avons envoyé un code à",
@@ -282,10 +296,12 @@
       "facebook": "Facebook"
     },
     "twoFactor": {
-      "instruction": "Entrez le code à 6 chiffres de votre application d'authentification",
+      "title": "Authentification à deux facteurs",
+      "subtitle": "Entrez le code de votre application d'authentification",
+      "instruction": "Ouvrez votre application d'authentification (Google Authenticator, Authy, etc.) et entrez le code à 6 chiffres.",
       "codePlaceholder": "Code à 6 chiffres",
       "verify": "Vérifier",
-      "back": "Retour"
+      "back": "← Retour"
     },
     "footer": {
       "secure": "Connexion sécurisée et chiffrée"

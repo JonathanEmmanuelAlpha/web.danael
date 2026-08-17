@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -45,8 +44,6 @@ import type {
   TeacherAssignmentStat,
   TeacherStudentNeedingAttention,
 } from "@/server/services/analytics";
-import type { User } from "@/server/db/schema/users";
-import type { UserRole } from "@/types";
 import { useUserStore } from "@/stores/user-store";
 
 /**
@@ -63,14 +60,10 @@ import { useUserStore } from "@/stores/user-store";
  */
 export function TeacherDashboard() {
   const user = useUserStore((s) => s.user);
-  if (!user) return null;
 
   const t = useTranslations("Analytics");
   const tDash = useTranslations("Dashboard");
   const tNav = useTranslations("Navigation");
-  const role = user.role as UserRole;
-  const userName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
   const [overview, setOverview] = useState<TeacherOverview | null>(null);
   const [classStats, setClassStats] = useState<TeacherClassStat[]>([]);
@@ -116,6 +109,8 @@ export function TeacherDashboard() {
     submissionRate: a.submissionRate,
     averageScore: a.averageScore,
   }));
+
+  if (!user) return null;
 
   return (
     <>
