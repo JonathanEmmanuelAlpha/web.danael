@@ -85,7 +85,7 @@ export function Sidebar({
             className="pointer-events-none absolute -inset-3 rounded-2xl bg-primary-500/20 blur-xl"
           />
           <Link
-            href="/dashboard"
+            href="/"
             onClick={onNavigate}
             aria-label="Danaël"
             className="relative block"
