@@ -227,22 +227,44 @@ export function ClassSubjectsList({
                 : null;
             return (
               <li key={cs.id}>
-                <Card className="flex items-center gap-4 p-4">
-                  <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/10 text-primary-700 dark:text-primary-400">
-                    <BookMarked className="size-5" />
+                <Card className="group relative w-full overflow-hidden rounded-2xl border-0 bg-slate-900/40 backdrop-blur-xl p-6 shadow-2xl transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_8px_32px_rgba(0,240,255,0.15)]">
+                  {/* Effet de bordure dégradée qui s'illumine au survol */}
+                  <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-cyan-500/30 via-transparent to-purple-500/30 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  {/* Fond de la carte */}
+                  <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 transition-colors duration-300 group-hover:bg-slate-800/50" />
+
+                  <div className="flex items-center gap-6">
+                    {/* Section Icône (Avec lueur et fond dégradé) */}
+                    <div className="relative flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 p-3 shadow-[0_0_25px_rgba(0,240,255,0.15)] ring-1 ring-cyan-500/20">
+                      <BookMarked className="size-8 text-cyan-400 drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]" />
+                    </div>
+
+                    {/* Section Texte (Typos modernes et gradients) */}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-lg font-bold tracking-tight text-white group-hover:text-cyan-50 transition-colors">
+                        {cs.subject.name}
+                      </p>
+                      <div className="mt-1 flex items-center gap-3">
+                        <span className="text-sm font-medium text-zinc-400">
+                          {cs.subject.code}
+                        </span>
+                        {teacherName && (
+                          <>
+                            <span className="text-zinc-600">·</span>
+                            <span className="text-sm text-zinc-500">
+                              {teacherName}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Section Badge (Style "Pill" brillante) */}
+                    <div className="rounded-full bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-400 ring-1 ring-emerald-500/30 backdrop-blur-sm transition-colors hover:bg-emerald-500/20 hover:ring-emerald-500/50">
+                      ×{cs.coefficient}
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {cs.subject.name}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {cs.subject.code}
-                      {teacherName ? ` · ${teacherName}` : ""}
-                    </p>
-                  </div>
-                  <Badge variant="brand" size="sm">
-                    ×{cs.coefficient}
-                  </Badge>
                 </Card>
               </li>
             );
