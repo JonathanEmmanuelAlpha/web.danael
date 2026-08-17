@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -15,11 +15,11 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "hover:border-border-strong hover:bg-input-bg-hover",
         "focus-visible:border-primary-500 focus-visible:bg-input-bg-focus focus-visible:ring-[3px] focus-visible:ring-primary-500/20 focus-visible:shadow-[0_0_20px_-4px_rgba(147,217,26,0.3)]",
         "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

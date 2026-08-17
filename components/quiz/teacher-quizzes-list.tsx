@@ -76,7 +76,7 @@ export function TeacherQuizzesList({ teacherId }: { teacherId: string }) {
         icon={QuizIcon}
         title={t("noQuizzes")}
         description={t("noQuizzesHint")}
-        action={{ href: "/quizzes/new", label: t("create") }}
+        action={{ href: "/teacher/quizzes/new", label: t("create") }}
       />
     );
   }
@@ -133,7 +133,7 @@ export function CreateQuizButton() {
   const t = useTranslations("Quizzes");
   return (
     <Button asChild variant="brand">
-      <Link href="/quizzes/new">
+      <Link href="/teacher/quizzes/new">
         <Plus className="size-4" />
         {t("create")}
       </Link>

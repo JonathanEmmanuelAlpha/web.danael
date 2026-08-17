@@ -80,7 +80,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
         { href: "/student/learning", labelKey: "learning", icon: Sparkles },
         { href: "/student/library", labelKey: "library", icon: Library },
         {
-          href: "/student/assignments",
+          href: "/assignments",
           labelKey: "assignments",
           icon: ClipboardList,
         },
@@ -129,7 +129,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
         { href: "/classes", labelKey: "classes", icon: School },
         { href: "/teacher/quizzes", labelKey: "quizzes", icon: HelpCircle },
         {
-          href: "/teacher/assignments",
+          href: "/assignments",
           labelKey: "assignments",
           icon: ClipboardList,
         },
