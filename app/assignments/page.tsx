@@ -42,7 +42,7 @@ export default async function AssignmentsPage() {
             actions={
               <Link
                 href="/assignments/new"
-                className="inline-flex h-10 items-center gap-2 rounded-md bg-gradient-to-br from-primary-500 to-primary-600 px-4 text-sm font-medium text-white shadow-[0_8px_24px_-8px_rgba(147,217,26,0.5)] hover:from-primary-600 hover:to-primary-700"
+                className="inline-flex h-10 items-center gap-2 rounded-md bg-gradient-to-br from-primary-500 to-primary-600 px-4 text-sm font-medium text-primary-foreground shadow-[0_8px_24px_-8px_rgba(147,217,26,0.5)] hover:from-primary-600 hover:to-primary-700"
               >
                 <Plus className="size-4" />
                 {t("create")}
