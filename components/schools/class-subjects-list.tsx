@@ -219,7 +219,7 @@ export function ClassSubjectsList({
           description={t("noSubjectsHint")}
         />
       ) : (
-        <ul className="space-y-2">
+        <ul className="gap-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {subjects.map((cs) => {
             const teacherName =
               cs.teacher && (cs.teacher.firstName || cs.teacher.lastName)
@@ -227,13 +227,7 @@ export function ClassSubjectsList({
                 : null;
             return (
               <li key={cs.id}>
-                <Card className="group relative w-full overflow-hidden rounded-2xl border-0 bg-slate-900/40 backdrop-blur-xl p-6 shadow-2xl transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_8px_32px_rgba(0,240,255,0.15)]">
-                  {/* Effet de bordure dégradée qui s'illumine au survol */}
-                  <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-cyan-500/30 via-transparent to-purple-500/30 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                  {/* Fond de la carte */}
-                  <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 transition-colors duration-300 group-hover:bg-slate-800/50" />
-
+                <Card className="group relative w-full overflow-hidden rounded-2xl border-0 bg-surface-2 backdrop-blur-xl p-6 shadow-2xl transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_8px_32px_rgba(0,240,255,0.15)]">
                   <div className="flex items-center gap-6">
                     {/* Section Icône (Avec lueur et fond dégradé) */}
                     <div className="relative flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 p-3 shadow-[0_0_25px_rgba(0,240,255,0.15)] ring-1 ring-cyan-500/20">

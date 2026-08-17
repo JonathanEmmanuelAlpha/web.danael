@@ -113,7 +113,7 @@ export function HeadTeacherAssigner({
       <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400">
         <GraduationCap className="size-5" />
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 text-center">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("headTeacher")}
         </p>

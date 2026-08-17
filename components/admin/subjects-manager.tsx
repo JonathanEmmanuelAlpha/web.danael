@@ -78,7 +78,9 @@ interface SubjectsManagerProps {
  *  - Edit existing subject
  *  - Delete subject (with confirmation dialog; warns if subject is in use)
  */
-export function SubjectsManager({ schoolScoped = false }: SubjectsManagerProps) {
+export function SubjectsManager({
+  schoolScoped = false,
+}: SubjectsManagerProps) {
   const t = useTranslations("Admin");
   const tCommon = useTranslations("Common");
 
@@ -116,7 +118,7 @@ export function SubjectsManager({ schoolScoped = false }: SubjectsManagerProps) 
 
   if (subjects === null) {
     return (
-      <div className="space-y-3">
+      <div className="gap-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} className="h-16 w-full rounded-xl" />
         ))}
@@ -128,9 +130,7 @@ export function SubjectsManager({ schoolScoped = false }: SubjectsManagerProps) 
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {schoolScoped
-            ? t("subjectsSchoolHint")
-            : t("subjectsPlatformHint")}
+          {schoolScoped ? t("subjectsSchoolHint") : t("subjectsPlatformHint")}
         </p>
         <CreateSubjectDialog
           open={createOpen}
@@ -148,11 +148,11 @@ export function SubjectsManager({ schoolScoped = false }: SubjectsManagerProps) 
           description={t("subjectsEmptyHint")}
         />
       ) : (
-        <div className="space-y-2">
+        <div className="gap-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/30"
+              className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/30 bg-surface-2"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400">
                 <BookOpen className="size-5" />
@@ -174,9 +174,10 @@ export function SubjectsManager({ schoolScoped = false }: SubjectsManagerProps) 
                 <EditSubjectDialog
                   subject={subject}
                   onUpdated={(updated) => {
-                    setSubjects((prev) =>
-                      prev?.map((s) => (s.id === updated.id ? updated : s)) ??
-                      null,
+                    setSubjects(
+                      (prev) =>
+                        prev?.map((s) => (s.id === updated.id ? updated : s)) ??
+                        null,
                     );
                   }}
                 />
@@ -274,7 +275,9 @@ function CreateSubjectDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("subjectsCreateTitle")}</DialogTitle>
-          <DialogDescription>{t("subjectsCreateDescription")}</DialogDescription>
+          <DialogDescription>
+            {t("subjectsCreateDescription")}
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -398,11 +401,7 @@ function EditSubjectDialog({
         >
           <form.Field name="name">
             {(field) => (
-              <TextField
-                field={field}
-                label={t("subjectsName")}
-                required
-              />
+              <TextField field={field} label={t("subjectsName")} required />
             )}
           </form.Field>
           <form.Field name="code">
