@@ -151,7 +151,7 @@ export function ContentForm({
         return;
       }
       toast.success(isEdit ? t("contentUpdated") : t("contentCreated"));
-      router.push("/teacher-contents");
+      router.push("/teacher/contents");
       router.refresh();
     },
   });
