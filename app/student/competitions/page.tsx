@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Trophy } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { StudentCompetitionsList } from "@/components/gamification/student-competitions-list";
 import type { UserRole } from "@/types";
@@ -14,6 +13,7 @@ import type { UserRole } from "@/types";
  */
 export default async function StudentCompetitionsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -24,7 +24,7 @@ export default async function StudentCompetitionsPage() {
   const tComp = await getTranslations("Competitions");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tComp("title")}
@@ -33,6 +33,6 @@ export default async function StudentCompetitionsPage() {
         />
         <StudentCompetitionsList userId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

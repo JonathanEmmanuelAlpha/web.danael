@@ -45,7 +45,6 @@ import type {
   TeacherAssignmentStat,
   TeacherStudentNeedingAttention,
 } from "@/server/services/analytics";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import type { User } from "@/server/db/schema/users";
 import type { UserRole } from "@/types";
 import { useUserStore } from "@/stores/user-store";
@@ -63,7 +62,7 @@ import { useUserStore } from "@/stores/user-store";
  *  - Recent submissions table inside a SectionCard.
  */
 export function TeacherDashboard() {
-  const { user } = useUserStore();
+  const user = useUserStore((s) => s.user);
   if (!user) return null;
 
   const t = useTranslations("Analytics");
@@ -119,7 +118,7 @@ export function TeacherDashboard() {
   }));
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tDash("welcome", { name: user.firstName ?? user.email })}
@@ -319,7 +318,7 @@ export function TeacherDashboard() {
           )}
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

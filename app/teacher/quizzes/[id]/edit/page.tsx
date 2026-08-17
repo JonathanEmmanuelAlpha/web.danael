@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { getCurrentDbUser } from "@/lib/clerk";
 import { getQuizAction, updateQuizAction } from "@/server/actions/quizzes";
 import { listSubjectsAction } from "@/server/actions/subjects";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { QuizForm } from "@/components/quiz/quiz-form";
 import type { UserRole } from "@/types";
 import type {
@@ -21,6 +20,7 @@ export default async function EditQuizPage({
 }) {
   const { id } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -112,7 +112,7 @@ export default async function EditQuizPage({
   }
 
   return (
-    <DashboardShell>
+    <>
       <QuizForm
         mode="edit"
         initialQuiz={initialQuiz}
@@ -120,6 +120,6 @@ export default async function EditQuizPage({
         subjects={subjects}
         submitAction={submitAction}
       />
-    </DashboardShell>
+    </>
   );
 }

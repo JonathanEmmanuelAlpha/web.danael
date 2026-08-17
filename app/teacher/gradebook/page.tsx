@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { TeacherGradebookView } from "@/components/assignments/teacher-gradebook-view";
 import { BookOpen } from "lucide-react";
@@ -13,12 +12,13 @@ import { getTranslations } from "next-intl/server";
  */
 export default async function GradebookPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Assignments");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("gradebook")}
@@ -27,6 +27,6 @@ export default async function GradebookPage() {
         />
         <TeacherGradebookView teacherId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import { Upload } from "lucide-react";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentForm } from "@/components/contents/content-form";
 import { listSubjectsAction } from "@/server/actions/subjects";
@@ -18,7 +17,7 @@ export default async function NewContentPage() {
   const subjects: Subject[] = subjectsRes.success ? subjectsRes.data : [];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("newContent")}
@@ -29,6 +28,6 @@ export default async function NewContentPage() {
           <ContentForm subjects={subjects} />
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

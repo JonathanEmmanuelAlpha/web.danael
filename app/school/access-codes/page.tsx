@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { KeyRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -26,7 +25,7 @@ export default async function AccessCodesPage() {
   // No school yet → show empty state with CTA to create one.
   if (!school) {
     return (
-      <DashboardShell>
+      <>
         <PageHeader
           title={tNav("accessCodes")}
           description={t("noSchoolForAccessCodes")}
@@ -43,7 +42,7 @@ export default async function AccessCodesPage() {
             }}
           />
         </div>
-      </DashboardShell>
+      </>
     );
   }
 
@@ -52,7 +51,7 @@ export default async function AccessCodesPage() {
   const codes = codesRes.success ? codesRes.data : [];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tNav("accessCodes")}
@@ -78,6 +77,6 @@ export default async function AccessCodesPage() {
           </Button>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

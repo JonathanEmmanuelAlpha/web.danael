@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Activity, Target, TrendingUp, Trophy } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { XpCard } from "@/components/gamification/xp-card";
@@ -24,6 +23,7 @@ import {
  */
 export default async function ProgressPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const tProg = await getTranslations("Gamification");
@@ -38,7 +38,7 @@ export default async function ProgressPage() {
   const xpData = await getPointsAction();
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tProg("progress")}
@@ -91,6 +91,6 @@ export default async function ProgressPage() {
           />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

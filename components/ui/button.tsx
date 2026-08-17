@@ -1,8 +1,8 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
@@ -23,8 +23,7 @@ const buttonVariants = cva(
           "border border-border bg-surface-glass backdrop-blur-md text-foreground shadow-sm hover:bg-surface-3 hover:border-border-strong hover:-translate-y-0.5",
         secondary:
           "bg-secondary-600 text-secondary-foreground shadow-sm hover:bg-secondary-500 hover:-translate-y-0.5",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
+        ghost: "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
         link: "text-primary-400 underline-offset-4 hover:underline hover:text-primary-300",
         glass:
           "glass text-foreground hover:bg-surface-glass-hover hover:border-border-strong",
@@ -32,8 +31,7 @@ const buttonVariants = cva(
           "bg-gradient-to-br from-accent-amber-400 to-accent-amber-600 text-secondary-900 font-semibold shadow-[0_8px_24px_-8px_rgba(251,191,36,0.5)] hover:from-accent-amber-300 hover:to-accent-amber-500 hover:-translate-y-0.5",
         violet:
           "bg-gradient-to-br from-accent-violet-400 to-accent-violet-600 text-white font-semibold shadow-[0_8px_24px_-8px_rgba(167,139,250,0.5)] hover:from-accent-violet-300 hover:to-accent-violet-500 hover:-translate-y-0.5",
-        cyan:
-          "bg-gradient-to-br from-accent-cyan-400 to-accent-cyan-600 text-secondary-900 font-semibold shadow-[0_8px_24px_-8px_rgba(34,211,238,0.5)] hover:from-accent-cyan-300 hover:to-accent-cyan-500 hover:-translate-y-0.5",
+        cyan: "bg-gradient-to-br from-accent-cyan-400 to-accent-cyan-600 text-secondary-900 font-semibold shadow-[0_8px_24px_-8px_rgba(34,211,238,0.5)] hover:from-accent-cyan-300 hover:to-accent-cyan-500 hover:-translate-y-0.5",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -49,20 +47,21 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 function Button({
   className,
   variant,
   size,
   asChild = false,
+  type = "button",
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -70,7 +69,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
-  )
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

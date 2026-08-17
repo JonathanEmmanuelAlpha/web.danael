@@ -123,7 +123,7 @@ export const useSchoolStore = create<SchoolStoreState>()(
       name: "danael-school-store",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true, // <- désactive l'auto-hydratation
-      version: 1,
+      version: 2,
     },
   ),
 );

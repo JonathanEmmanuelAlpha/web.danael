@@ -28,6 +28,8 @@ import {
   Sparkles,
   Search,
   KeyRound,
+  Flag,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react";
 import type { UserRole } from "@/types";
@@ -48,6 +50,16 @@ export interface NavSection {
 /**
  * Role-based navigation config (§6.3).
  * The labelKey is resolved against the "Navigation" namespace in messages.
+ *
+ * Each role has a distinct sidebar structure adapted to its use cases:
+ *  - student: learn + me sections
+ *  - teacher: teach + me sections
+ *  - school_admin: school management sections
+ *  - parent: children + family sections
+ *  - tutor: tutoring business sections
+ *  - platform_admin: full platform admin with oversight + moderation + system sections
+ *  - content_moderator: focused on moderation queue + content review
+ *  - support: focused on user support + messaging
  */
 export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
   student: [
@@ -85,6 +97,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
       items: [
         { href: "/student/progress", labelKey: "progress", icon: TrendingUp },
         { href: "/student/badges", labelKey: "badges", icon: Award },
+        { href: "/student/favorites", labelKey: "favorites", icon: Star },
         {
           href: "/student/learning/diagnostic",
           labelKey: "diagnostic",
@@ -133,6 +146,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           labelKey: "aiQuestions",
           icon: ShieldCheck,
         },
+        { href: "/teacher/analytics", labelKey: "analytics", icon: BarChart3 },
       ],
     },
     {
@@ -149,7 +163,11 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
     {
       titleKey: null,
       items: [
-        { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard },
+        {
+          href: "/school/dashboard",
+          labelKey: "dashboard",
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
@@ -168,7 +186,8 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           icon: Search,
         },
         { href: "/classes", labelKey: "classes", icon: School },
-        { href: "/school/requests", labelKey: "requests", icon: Inbox },
+        { href: "/school/subjects", labelKey: "subjects", icon: BookOpen },
+        { href: "/requests", labelKey: "requests", icon: Inbox },
         {
           href: "/school/access-codes",
           labelKey: "accessCodes",
@@ -234,7 +253,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
     {
       titleKey: "me",
       items: [
-        { href: "/profile", labelKey: "profile", icon: Users },
+        { href: "/tutor/profile", labelKey: "profile", icon: Users },
         { href: "/settings", labelKey: "settings", icon: Settings },
       ],
     },
@@ -248,21 +267,39 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           labelKey: "dashboard",
           icon: LayoutDashboard,
         },
+        { href: "/admin/analytics", labelKey: "analytics", icon: BarChart3 },
+      ],
+    },
+    {
+      titleKey: "platform",
+      items: [
         { href: "/admin/users", labelKey: "users", icon: Users },
         { href: "/admin/schools", labelKey: "schools", icon: School },
-        { href: "/admin/contents", labelKey: "contents", icon: FolderOpen },
+        { href: "/admin/subjects", labelKey: "subjects", icon: BookOpen },
         {
           href: "/admin/subscriptions",
           labelKey: "subscriptions",
           icon: CreditCard,
         },
         { href: "/admin/payments", labelKey: "payments", icon: DollarSign },
+      ],
+    },
+    {
+      titleKey: "moderation",
+      items: [
+        { href: "/admin/contents", labelKey: "contents", icon: FolderOpen },
         {
           href: "/admin/moderation",
           labelKey: "moderation",
           icon: ShieldAlert,
         },
-        { href: "/admin/analytics", labelKey: "analytics", icon: BarChart3 },
+      ],
+    },
+    {
+      titleKey: "system",
+      items: [
+        { href: "/admin/audit", labelKey: "audit", icon: ScrollText },
+        { href: "/admin/feature-flags", labelKey: "featureFlags", icon: Flag },
       ],
     },
   ],
@@ -278,6 +315,13 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
         { href: "/admin/contents", labelKey: "contents", icon: FolderOpen },
       ],
     },
+    {
+      titleKey: "me",
+      items: [
+        { href: "/messages", labelKey: "messages", icon: MessageSquare },
+        { href: "/settings", labelKey: "settings", icon: Settings },
+      ],
+    },
   ],
   support: [
     {
@@ -286,6 +330,10 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
         { href: "/admin/users", labelKey: "users", icon: Users },
         { href: "/messages", labelKey: "messages", icon: MessageSquare },
       ],
+    },
+    {
+      titleKey: "me",
+      items: [{ href: "/settings", labelKey: "settings", icon: Settings }],
     },
   ],
 };
@@ -296,6 +344,9 @@ export const SECTION_LABELS: Record<string, string> = {
   teach: "sections.teach",
   school: "sections.school",
   me: "sections.me",
+  platform: "sections.platform",
+  moderation: "sections.moderation",
+  system: "sections.system",
 };
 
 export function getNavForRole(role: UserRole): NavSection[] {

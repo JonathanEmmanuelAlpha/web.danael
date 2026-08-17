@@ -10,7 +10,7 @@ import { ArrowRight } from "lucide-react";
 import { GlassCard } from "../shared/glass-card";
 import {
   TextField,
-  SelectField,
+  RadioGroupField,
   DateField,
   SubmitButton,
   FormErrorBanner,
@@ -132,18 +132,6 @@ export function ProfileForm({ user }: { user: User }) {
               />
             )}
           </form.Field>
-          <form.Field name="gender">
-            {(field) => (
-              <SelectField
-                field={field}
-                label={t("genderSelect")}
-                options={[
-                  { value: "male", label: t("genderMale") },
-                  { value: "female", label: t("genderFemale") },
-                ]}
-              />
-            )}
-          </form.Field>
           {user.role === "student" && (
             <form.Field name="birthDate">
               {(field) => (
@@ -152,10 +140,25 @@ export function ProfileForm({ user }: { user: User }) {
                   label={t("birthDate")}
                   placeholder={t("birthDate")}
                   required
+                  birthDateMode
                 />
               )}
             </form.Field>
           )}
+          <form.Field name="gender">
+            {(field) => (
+              <RadioGroupField
+                field={field}
+                label={t("genderSelect")}
+                groupClassName="flex flex-row"
+                required
+                options={[
+                  { value: "male", label: t("genderMale") },
+                  { value: "female", label: t("genderFemale") },
+                ]}
+              />
+            )}
+          </form.Field>
         </div>
 
         <h3 className="font-display mt-6 text-lg font-semibold">

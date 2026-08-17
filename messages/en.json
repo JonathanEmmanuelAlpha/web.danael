@@ -182,7 +182,11 @@
       "teach": "Teach",
       "school": "School",
       "me": "Account"
-    }
+    },
+    "subjects": "Subjects",
+    "audit": "Audit log",
+    "featureFlags": "Feature flags",
+    "favorites": "Favorites"
   },
   "Users": {
     "findTeachers": "Find a teacher",
@@ -744,7 +748,19 @@
       "2nde": "Tenth grade",
       "1ere": "Eleventh grade",
       "Tle": "Twelfth grade"
-    }
+    },
+    "headTeacherNone": "No head teacher assigned",
+    "headTeacherAssign": "Assign",
+    "headTeacherChange": "Change",
+    "headTeacherUnassign": "Remove",
+    "headTeacherAssignTitle": "Assign a head teacher",
+    "headTeacherAssignDescription": "Choose a teacher who is a member of the class as the head teacher.",
+    "headTeacherSelectPlaceholder": "Select a teacher…",
+    "headTeacherNoTeachers": "No teachers are members of this class yet. Invite teachers to join the class first.",
+    "headTeacherAssigned": "Head teacher assigned",
+    "headTeacherUnassigned": "Head teacher removed",
+    "headTeacherAssignFailed": "Could not assign head teacher",
+    "cancel": "Cancel"
   },
   "Contents": {
     "title": "Library",
@@ -1798,7 +1814,32 @@
       "exercice": "Exercise",
       "devoir_modele": "Model assignment",
       "sujet_blanc": "Mock exam"
-    }
+    },
+    "subjects": "Subjects",
+    "subjectsHint": "Manage the subject catalog",
+    "subjectsDescription": "Create, edit, and delete subjects in the global catalog.",
+    "subjectsCreate": "New subject",
+    "subjectsCreateTitle": "Create a subject",
+    "subjectsCreateDescription": "Add a subject to the global catalog.",
+    "subjectsCreateFailed": "Could not create subject",
+    "subjectsCreated": "Subject created",
+    "subjectsEditTitle": "Edit subject",
+    "subjectsEditDescription": "Edit the subject information.",
+    "subjectsUpdateFailed": "Could not update subject",
+    "subjectsUpdated": "Subject updated",
+    "subjectsDeleteConfirm": "Delete this subject?",
+    "subjectsDeleteWarning": "This action is irreversible. If the subject is used by classes, deletion will fail.",
+    "subjectsDeleteFailed": "Could not delete subject",
+    "subjectsDeleted": "Subject deleted",
+    "subjectsName": "Name",
+    "subjectsCode": "Code",
+    "subjectsCodeHint": "Uppercase letters, digits, _ and - only. Ex: MATHS, PC, SVT.",
+    "subjectsDescriptionField": "Description",
+    "subjectsDescriptionPlaceholder": "Describe this subject in a few words…",
+    "subjectsEmpty": "No subjects",
+    "subjectsEmptyHint": "Create your first subject to get started.",
+    "subjectsPlatformHint": "Global catalog of subjects available on the platform.",
+    "subjectsSchoolHint": "Subject catalog. Assign them to your classes via each class detail page."
   },
   "Landing": {
     "badge": "Next-generation school platform",

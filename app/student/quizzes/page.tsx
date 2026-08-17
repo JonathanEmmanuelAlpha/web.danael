@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { HelpCircle } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { StudentQuizzesList } from "@/components/quiz/student-quizzes-list";
 import type { UserRole } from "@/types";
@@ -14,6 +13,7 @@ import type { UserRole } from "@/types";
  */
 export default async function StudentQuizzesPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -27,7 +27,7 @@ export default async function StudentQuizzesPage() {
   void tNav;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tQuiz("availableQuizzes")}
@@ -36,6 +36,6 @@ export default async function StudentQuizzesPage() {
         />
         <StudentQuizzesList studentId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

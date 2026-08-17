@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -40,7 +39,7 @@ export default async function TutorProfilePage() {
   const profile = profileData.success ? profileData.data : null;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("profile")}
@@ -76,6 +75,6 @@ export default async function TutorProfilePage() {
           </SectionCard>
         )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

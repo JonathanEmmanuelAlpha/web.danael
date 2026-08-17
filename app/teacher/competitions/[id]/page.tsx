@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { CalendarClock, Gift, Trophy, Users } from "lucide-react";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -28,14 +27,14 @@ export default async function TeacherCompetitionDetailPage({
   const res = await getCompetitionAction(id);
   if (!res.success) {
     return (
-      <DashboardShell>
+      <>
         <EmptyState
           icon={Trophy}
           title={tComp("notFound")}
           description={tComp("notFoundHint")}
           action={{ label: tCommon("back"), href: "/teacher-competitions" }}
         />
-      </DashboardShell>
+      </>
     );
   }
 
@@ -51,7 +50,7 @@ export default async function TeacherCompetitionDetailPage({
     now <= competition.endAt;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={competition.title}
@@ -142,7 +141,7 @@ export default async function TeacherCompetitionDetailPage({
           )}
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

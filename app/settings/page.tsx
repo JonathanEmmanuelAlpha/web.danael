@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { CreateSchoolForm } from "@/components/schools/create-school-form";
 import { SchoolSettingsForm } from "@/components/schools/school-settings-form";
@@ -18,6 +18,7 @@ import type { UserRole } from "@/types";
  */
 export default async function SettingsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Schools");
@@ -27,7 +28,7 @@ export default async function SettingsPage() {
   // Non-school_admin → simple placeholder.
   if (role !== "school_admin" && role !== "platform_admin") {
     return (
-      <DashboardShell>
+      <DashboardShellServer user={user}>
         <PageHeader
           title={tNav("settings")}
           description={t("comingSoon")}
@@ -36,7 +37,7 @@ export default async function SettingsPage() {
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-14 text-center">
           <p className="text-sm text-muted-foreground">{t("comingSoonHint")}</p>
         </div>
-      </DashboardShell>
+      </DashboardShellServer>
     );
   }
 
@@ -46,7 +47,7 @@ export default async function SettingsPage() {
 
   if (!school) {
     return (
-      <DashboardShell>
+      <DashboardShellServer user={user}>
         <div className="mx-auto max-w-2xl">
           <PageHeader
             title={tNav("settings")}
@@ -55,12 +56,12 @@ export default async function SettingsPage() {
           />
           <CreateSchoolForm />
         </div>
-      </DashboardShell>
+      </DashboardShellServer>
     );
   }
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title={t("schoolSettings")}
@@ -69,6 +70,6 @@ export default async function SettingsPage() {
         />
         <SchoolSettingsForm school={school} />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

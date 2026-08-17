@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { FolderOpen } from "lucide-react";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { ContentsTable } from "@/components/admin/contents-table";
@@ -16,7 +15,7 @@ export default async function AdminContentsPage() {
   const t = await getTranslations("Admin");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("contents")}
@@ -27,6 +26,6 @@ export default async function AdminContentsPage() {
           <ContentsTable />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

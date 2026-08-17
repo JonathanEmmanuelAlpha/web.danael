@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { MyJoinRequestsList } from "@/components/memberships/my-join-requests-list";
 import { listMyJoinRequestsAction } from "@/server/actions/memberships";
 import { Send } from "lucide-react";
@@ -9,6 +9,7 @@ import type { UserRole } from "@/types";
 
 export default async function MyRequestsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -38,7 +39,7 @@ export default async function MyRequestsPage() {
       : [];
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
@@ -51,6 +52,6 @@ export default async function MyRequestsPage() {
         </div>
         <MyJoinRequestsList requests={myRequests} />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

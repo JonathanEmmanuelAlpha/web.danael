@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ChildrenList } from "@/components/parent/children-list";
 import { Baby } from "lucide-react";
@@ -15,7 +14,7 @@ export default async function ChildrenPage() {
   const tNav = await getTranslations("Navigation");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tNav("children")}
@@ -24,6 +23,6 @@ export default async function ChildrenPage() {
         />
         <ChildrenList />
       </div>
-    </DashboardShell>
+    </>
   );
 }

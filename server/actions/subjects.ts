@@ -215,3 +215,65 @@ export async function listSubjectsAction(): Promise<ApiResponse<Subject[]>> {
     };
   }
 }
+
+export async function deleteSubjectAction(
+  id: string,
+): Promise<ApiResponse<{ id: string }>> {
+  try {
+    const session = await requireSession();
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    if (dbUser.role !== "platform_admin" && dbUser.role !== "school_admin") {
+      throw AppError.unauthorized(
+        "Only platform or school admins can delete subjects",
+      );
+    }
+
+    await subjectsService.deleteSubject(id);
+    logger.info("Subject deleted", {
+      subjectId: id,
+      byUserId: dbUser.id,
+      clerkId: session.clerkId,
+    });
+    revalidatePath("/admin/subjects");
+    revalidatePath("/school/subjects");
+    return { success: true, data: { id } };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("deleteSubjectAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not delete subject" },
+    };
+  }
+}
+
+export async function removeClassSubjectAction(
+  classSubjectId: string,
+): Promise<ApiResponse<{ id: string }>> {
+  try {
+    const session = await requireSession();
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    await subjectsService.removeClassSubject(classSubjectId);
+    logger.info("Class subject removed", {
+      classSubjectId,
+      byUserId: dbUser.id,
+      clerkId: session.clerkId,
+    });
+    return { success: true, data: { id: classSubjectId } };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("removeClassSubjectAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not remove class subject" },
+    };
+  }
+}

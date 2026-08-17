@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClipboardList } from "lucide-react";
@@ -12,7 +11,7 @@ export default async function StudentAssignmentsPage() {
   const t = await getTranslations("Navigation");
 
   return (
-    <DashboardShell>
+    <>
       <PageHeader
         title={t("assignments")}
         description="Vos devoirs à rendre"
@@ -23,6 +22,6 @@ export default async function StudentAssignmentsPage() {
         title="Aucun devoir à faire"
         description="Les devoirs assignés par vos enseignants apparaîtront ici. Rejoignez une classe pour commencer."
       />
-    </DashboardShell>
+    </>
   );
 }

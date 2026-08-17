@@ -2,6 +2,7 @@ import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getCurrentDbUserByClerkId } from "./lib/clerk";
 import { getUserDashboardRoadByRole } from "./lib/utils";
+import type { UserRole } from "@/types";
 
 // Types d'onboarding (à partager avec la base de données)
 export const ONBOARDING_STATUS = [
@@ -45,6 +46,57 @@ const AUTH_ROUTES = [
   "/forgot-password",
   "/reset-password",
 ];
+
+/**
+ * RBAC matrix — maps a route prefix to the set of roles allowed to access it.
+ * The middleware checks the user's role against this map. If the user's role
+ * is not in the allowed set, they are redirected to their own dashboard.
+ *
+ * Routes NOT in this map (e.g. /classes, /messages, /settings) are accessible
+ * to any authenticated + onboarded user — they are "shared" routes that adapt
+ * their UI based on the user's role at the page level.
+ *
+ * Key principle: the middleware enforces coarse-grained route protection.
+ * Fine-grained permission checks (e.g. "can this user edit this class?")
+ * are handled by server actions and server components using the
+ * permissions system in server/permissions/.
+ */
+const RBAC_ROUTES: Array<{
+  prefix: string;
+  roles: UserRole[];
+}> = [
+  // Student area
+  { prefix: "/student", roles: ["student"] },
+  // Teacher area
+  { prefix: "/teacher", roles: ["teacher"] },
+  // School admin area
+  { prefix: "/school", roles: ["school_admin"] },
+  // Parent area
+  { prefix: "/parent", roles: ["parent"] },
+  // Tutor area
+  { prefix: "/tutor", roles: ["tutor"] },
+  // Admin area (platform_admin + content_moderator + support)
+  {
+    prefix: "/admin",
+    roles: ["platform_admin", "content_moderator", "support"],
+  },
+];
+
+/**
+ * Returns the RBAC rule matching the given pathname, or null if no rule
+ * applies (shared route).
+ */
+function getRbacRule(pathname: string): {
+  prefix: string;
+  roles: UserRole[];
+} | null {
+  for (const rule of RBAC_ROUTES) {
+    if (pathname === rule.prefix || pathname.startsWith(`${rule.prefix}/`)) {
+      return rule;
+    }
+  }
+  return null;
+}
 
 // Utilitaires
 function isPublicRoute(pathname: string): boolean {
@@ -202,6 +254,15 @@ export default clerkMiddleware(async (auth, req) => {
       }
       // Fallback
       return NextResponse.redirect(new URL("/onboarding/role", req.url));
+    }
+
+    // ── RBAC: role-based route protection ──────────────────────────
+    // If the route is role-scoped (e.g. /admin/*, /student/*), check that
+    // the user's role is allowed. If not, redirect to their own dashboard.
+    const rbacRule = getRbacRule(pathname);
+    if (rbacRule && role && !rbacRule.roles.includes(role as UserRole)) {
+      const userDashboard = getUserDashboardRoadByRole(role as UserRole);
+      return NextResponse.redirect(new URL(userDashboard, req.url));
     }
 
     return NextResponse.next();

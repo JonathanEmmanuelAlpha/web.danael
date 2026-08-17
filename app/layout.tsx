@@ -1,12 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Geist,
-  Geist_Mono,
-  Inter,
-  JetBrains_Mono,
-  Plus_Jakarta_Sans,
-  Sora,
-} from "next/font/google";
+import { Inter, JetBrains_Mono, Sora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { NextIntlClientProvider } from "next-intl";

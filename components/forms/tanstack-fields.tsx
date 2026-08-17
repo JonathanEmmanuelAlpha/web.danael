@@ -297,6 +297,12 @@ interface DateFieldProps<TData> {
   disabled?: boolean;
   className?: string;
   placeholder?: string;
+  /** Restrict to a birth-date range: [1970-01-01, current year - 1]. */
+  birthDateMode?: boolean;
+  /** Disable dates before this one (inclusive). */
+  fromDate?: Date;
+  /** Disable dates after this one (inclusive). */
+  toDate?: Date;
 }
 
 export function DateField<TData>({
@@ -307,6 +313,9 @@ export function DateField<TData>({
   disabled,
   className,
   placeholder,
+  birthDateMode,
+  fromDate,
+  toDate,
 }: DateFieldProps<TData>) {
   const error = useFieldError(field);
   const fieldId = `field-${field.name}`;
@@ -325,6 +334,9 @@ export function DateField<TData>({
         value={value ?? undefined}
         onChange={(d) => field.handleChange((d ?? null) as never)}
         placeholder={placeholder}
+        birthDateMode={birthDateMode}
+        fromDate={fromDate}
+        toDate={toDate}
       />
     </FieldShell>
   );
@@ -447,6 +459,7 @@ interface RadioGroupFieldProps<TData> {
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  groupClassName?: string;
   options: Array<{
     value: string;
     label: React.ReactNode;
@@ -461,6 +474,7 @@ export function RadioGroupField<TData>({
   required,
   disabled,
   className,
+  groupClassName,
   options,
 }: RadioGroupFieldProps<TData>) {
   const error = useFieldError(field);
@@ -478,7 +492,7 @@ export function RadioGroupField<TData>({
         value={value}
         onValueChange={(v) => field.handleChange(v as never)}
         disabled={disabled}
-        className="gap-2"
+        className={cn("gap-2", groupClassName)}
       >
         {options.map((opt) => (
           <div

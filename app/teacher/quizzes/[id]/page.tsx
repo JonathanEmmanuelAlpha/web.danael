@@ -16,7 +16,6 @@ import {
   getQuizAction,
   listSessionsForQuizAction,
 } from "@/server/actions/quizzes";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { StatCard } from "@/components/shared/stat-card";
@@ -43,6 +42,7 @@ export default async function QuizDetailPage({
 }) {
   const { id } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -96,7 +96,7 @@ export default async function QuizDetailPage({
   const levelLabel = level ? tClasses(`levelLabels.${level}` as const) : null;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={quiz.title}
@@ -299,7 +299,7 @@ export default async function QuizDetailPage({
           )}
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

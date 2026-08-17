@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { DollarSign } from "lucide-react";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { PaymentsTable } from "@/components/admin/payments-table";
@@ -15,7 +14,7 @@ export default async function AdminPaymentsPage() {
   const t = await getTranslations("Admin");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("payments")}
@@ -26,6 +25,6 @@ export default async function AdminPaymentsPage() {
           <PaymentsTable />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

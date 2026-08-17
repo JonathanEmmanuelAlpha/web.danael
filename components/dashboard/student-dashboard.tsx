@@ -52,7 +52,6 @@ import type {
   TimelinePoint,
   StreakDay,
 } from "@/server/services/analytics";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { LearningCompanionWidget } from "@/components/learning/learning-companion-widget";
 import { useLearningEventFlusher } from "@/hooks/use-learning-event-flusher";
 import { useUserStore } from "@/stores/user-store";
@@ -70,7 +69,7 @@ import { useUserStore } from "@/stores/user-store";
  *  - Recent assignments in SectionCard.
  */
 export function StudentDashboard() {
-  const { user } = useUserStore();
+  const user = useUserStore((s) => s.user);
   if (!user) return null;
 
   const t = useTranslations("Analytics");
@@ -138,7 +137,7 @@ export function StudentDashboard() {
   }));
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tDash("welcome", { name: user.firstName ?? user.email })}
@@ -408,7 +407,7 @@ export function StudentDashboard() {
           )}
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

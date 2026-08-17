@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { Inbox } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -28,7 +27,7 @@ export default async function AccessRequestsPage() {
   // No school yet → show empty state with CTA to create one.
   if (!school) {
     return (
-      <DashboardShell>
+      <>
         <PageHeader
           title={tNav("accessRequests")}
           description={t("noSchoolForAccessCodes")}
@@ -45,7 +44,7 @@ export default async function AccessRequestsPage() {
             }}
           />
         </div>
-      </DashboardShell>
+      </>
     );
   }
 
@@ -54,7 +53,7 @@ export default async function AccessRequestsPage() {
   const requests = reqsRes.success ? reqsRes.data : [];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tNav("accessRequests")}
@@ -79,6 +78,6 @@ export default async function AccessRequestsPage() {
           </Button>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

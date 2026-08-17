@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
 import { getTranslations } from "next-intl/server";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { BillingView } from "@/components/billing/billing-view";
 import * as schoolsService from "@/server/services/schools";
 import type { UserRole } from "@/types";
@@ -15,6 +14,7 @@ import type { UserRole } from "@/types";
  */
 export default async function BillingPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -30,11 +30,11 @@ export default async function BillingPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <BillingView
         schoolId={schoolId}
         schoolMode={role === "school_admin" && Boolean(schoolId)}
       />
-    </DashboardShell>
+    </>
   );
 }

@@ -78,6 +78,19 @@ export async function updateSubject(
   return updated;
 }
 
+export async function deleteSubject(id: string): Promise<void> {
+  const db = await getDb();
+  // Note: class_subjects has ON DELETE RESTRICT for subject_id, so this
+  // will throw if any class is still using the subject. The UI should
+  // warn the user before calling this.
+  await db.delete(subjects).where(eq(subjects.id, id));
+}
+
+export async function removeClassSubject(classSubject_id: string): Promise<void> {
+  const db = await getDb();
+  await db.delete(classSubjects).where(eq(classSubjects.id, classSubject_id));
+}
+
 export async function assignSubjectToClass(
   input: AssignSubjectInput,
 ): Promise<ClassSubject> {

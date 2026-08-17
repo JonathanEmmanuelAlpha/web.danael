@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { NotificationList } from "@/components/notifications/notification-list";
@@ -17,7 +17,7 @@ export default async function NotificationsPage() {
   const tNotif = await getTranslations("Notifications");
 
   return (
-    <DashboardShell>
+    <DashboardShellServer >
       <div className="space-y-6">
         <PageHeader
           title={tNav("notifications")}
@@ -44,6 +44,6 @@ export default async function NotificationsPage() {
           </SectionCard>
         </div>
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

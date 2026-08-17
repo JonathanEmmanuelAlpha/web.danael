@@ -32,6 +32,8 @@ import {
   useNotificationsStore,
   selectUnreadCount,
 } from "@/stores/notifications-store";
+import { useLearningStore } from "@/stores/learning-store";
+import { useUIStore } from "@/stores/ui-store";
 import { useClerk } from "@clerk/nextjs";
 
 export interface TopbarProps {
@@ -103,11 +105,18 @@ export function Topbar({
   const email = storeUser?.email ?? userEmail ?? "";
 
   function handleSignOut() {
-    // Clear local stores before signing out
+    // Clear all local Zustand stores so no stale data leaks between sessions.
     useUserStore.getState().clear();
     useSchoolStore.getState().clear();
+    useLearningStore.getState().clear();
+    useUIStore.getState().clear();
+    // Sign out from Clerk and redirect to /sign-in.
     if (signOut) {
-      void signOut(() => router.push("/sign-in"));
+      void signOut(() => {
+        router.push("/sign-in");
+      });
+    } else {
+      window.location.href = "/sign-in";
     }
   }
 
@@ -215,7 +224,7 @@ export function Topbar({
           <DropdownMenuContent
             align="end"
             className={cn(
-              "glass-strong min-w-56 animate-scale-in border-border-strong p-1",
+              "bg-surface-solid min-w-56 animate-scale-in border-border-strong p-1",
               "data-[state=open]:animate-scale-in",
             )}
           >

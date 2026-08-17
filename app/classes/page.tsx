@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { ClassesList } from "@/components/schools/classes-list";
 import { CreateClassDialog } from "@/components/schools/create-class-dialog";
@@ -20,6 +20,7 @@ import type { UserRole } from "@/types";
  */
 export default async function ClassesPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const tNav = await getTranslations("Navigation");
@@ -33,18 +34,18 @@ export default async function ClassesPage() {
 
     if (!school) {
       return (
-        <DashboardShell>
+        <DashboardShellServer user={user}>
           <PageHeader
             title={tNav("classes")}
             description={tCls("createClassDescription")}
             icon={<School className="size-6" />}
           />
-        </DashboardShell>
+        </DashboardShellServer>
       );
     }
 
     return (
-      <DashboardShell>
+      <DashboardShellServer user={user}>
         <div className="space-y-6">
           <PageHeader
             title={tNav("classes")}
@@ -59,14 +60,14 @@ export default async function ClassesPage() {
             emptyHint={tCls("noMembersHint")}
           />
         </div>
-      </DashboardShell>
+      </DashboardShellServer>
     );
   }
 
   // teacher path
   if (role === "teacher") {
     return (
-      <DashboardShell>
+      <DashboardShellServer user={user}>
         <div className="space-y-6">
           <PageHeader
             title={tNav("classes")}
@@ -87,13 +88,13 @@ export default async function ClassesPage() {
             emptyHint={tCls("noMembersHint")}
           />
         </div>
-      </DashboardShell>
+      </DashboardShellServer>
     );
   }
 
   // student path (and any other role)
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <PageHeader
           title={tNav("classes")}
@@ -109,6 +110,6 @@ export default async function ClassesPage() {
           emptyHint={tCls("noMembersHint")}
         />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

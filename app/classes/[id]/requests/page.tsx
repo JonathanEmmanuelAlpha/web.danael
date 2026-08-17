@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { JoinRequestsManager } from "@/components/memberships/join-requests-manager";
 import { listReceivedJoinRequestsAction } from "@/server/actions/memberships";
 import { Inbox } from "lucide-react";
@@ -44,7 +44,7 @@ export default async function RequestsPage({
   }
 
   return (
-    <DashboardShell receivedJoinRequests={requests}>
+    <DashboardShellServer receivedJoinRequests={requests}>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
@@ -79,6 +79,6 @@ export default async function RequestsPage({
           </div>
         )}
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ChildDetailView } from "@/components/parent/child-detail-view";
 import { isParentOf } from "@/server/permissions";
 import { getDb } from "@/server/db";
@@ -20,6 +19,7 @@ export default async function ChildDetailPage({
   params: Promise<{ studentId: string }>;
 }) {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
   if (user.role !== "parent" && user.role !== "platform_admin") {
     redirect("/dashboard");
@@ -50,9 +50,9 @@ export default async function ChildDetailPage({
   const t = await getTranslations("Parent");
 
   return (
-    <DashboardShell>
+    <>
       <ChildDetailView studentId={studentId} />
       <p className="sr-only">{t("childOverview")}</p>
-    </DashboardShell>
+    </>
   );
 }

@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Award } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { BadgeGrid } from "@/components/gamification/badge-grid";
@@ -16,6 +15,7 @@ import type { UserRole } from "@/types";
  */
 export default async function BadgesPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -26,7 +26,7 @@ export default async function BadgesPage() {
   const tBadge = await getTranslations("Gamification");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tBadge("badges")}
@@ -40,6 +40,6 @@ export default async function BadgesPage() {
           <BadgeGrid userId={user.id} />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

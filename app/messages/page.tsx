@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { MessageSquare } from "lucide-react";
 import { ThreadList } from "@/components/messaging/thread-list";
@@ -23,7 +23,7 @@ export default async function MessagesPage() {
   const tMsg = await getTranslations("Messaging");
 
   return (
-    <DashboardShell>
+    <DashboardShellServer >
       <div className="space-y-6">
         <PageHeader
           title={tNav("messages")}
@@ -52,6 +52,6 @@ export default async function MessagesPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

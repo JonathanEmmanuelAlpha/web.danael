@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Check } from "lucide-react";
 import { PublicHeader } from "@/components/public/header";
+import { DashboardLinkButton } from "@/components/public/dashboard-link-button";
 import { HeroSection } from "@/components/public/hero-section";
 import { StatsBar } from "@/components/public/stats-bar";
 import { FeaturesGrid } from "@/components/public/features-grid";
@@ -34,6 +35,7 @@ import { Button } from "@/components/ui/button";
  */
 export default async function LandingPage() {
   const t = await getTranslations("Landing");
+  const tNav = await getTranslations("Public.nav");
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -92,7 +94,10 @@ export default async function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <PublicHeader variant="dark" />
+      <PublicHeader
+        variant="dark"
+        dashboardSlot={<DashboardLinkButton label={tNav("dashboard")} />}
+      />
 
       <main className="flex-1">
         {/* 1. Hero */}

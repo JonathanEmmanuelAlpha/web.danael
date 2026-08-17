@@ -1,8 +1,9 @@
 import { getCurrentDbUser } from "@/lib/clerk";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { GraduationCap } from "lucide-react";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { PageHeader } from "@/components/shared/page-header";
 import { TutorsExplorer } from "@/components/users/tutors-explorer";
@@ -21,6 +22,8 @@ import {
 export default async function TutorsPage() {
   const tUsers = await getTranslations("Users");
   const user = await getCurrentDbUser();
+
+  if (!user) redirect("/sign-in");
 
   // First page of tutors + subject filter options — server-side.
   const [tutorsRes, subjectsRes] = await Promise.all([
@@ -55,7 +58,7 @@ export default async function TutorsPage() {
   }
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <PageHeader
           title={tUsers("findTutors")}
@@ -68,6 +71,6 @@ export default async function TutorsPage() {
           subjects={subjects}
         />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

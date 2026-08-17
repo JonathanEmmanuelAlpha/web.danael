@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -120,6 +119,7 @@ function buildMasteryHistory(avgMastery: number, now: number) {
 
 export default async function LearningPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Learning");
@@ -179,7 +179,7 @@ export default async function LearningPage() {
   const streak = user.currentStreak ?? 0;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         {/* ── Top: page header + streak + weekly progress ─────────────── */}
         <PageHeader
@@ -333,6 +333,6 @@ export default async function LearningPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

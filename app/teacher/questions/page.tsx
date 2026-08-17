@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ShieldCheck } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import {
   TeacherQuestionsValidation,
@@ -18,12 +17,13 @@ import {
  */
 export default async function TeacherQuestionsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("AiQuestions");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("title")}
@@ -33,6 +33,6 @@ export default async function TeacherQuestionsPage() {
         />
         <TeacherQuestionsValidation teacherId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

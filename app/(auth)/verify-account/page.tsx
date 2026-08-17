@@ -49,19 +49,6 @@ export default function VerifyAccountPage() {
     return () => clearInterval(tick);
   }, []);
 
-  useEffect(() => {
-    if (!isLoaded || !signUp || pending) return;
-
-    // If email is already verified, redirect immediately.
-    if (signUp.status === "complete") {
-      void finalize();
-      return;
-    }
-
-    // Auto-send the code on page load.
-    void sendVerificationCode();
-  }, [isLoaded, signUp, pending]);
-
   async function sendVerificationCode() {
     if (!signUp || hasSentCode.current) return;
     hasSentCode.current = true;
@@ -93,11 +80,10 @@ export default function VerifyAccountPage() {
         code,
       });
 
+      if (completeSignUp.error) toast.error(completeSignUp.error.message);
+
       if (!completeSignUp.error) {
-        await signUp.finalize();
-        await setActive({ session: signUp.createdSessionId });
-        toast.success(t("verifyAccount.success"));
-        router.push("/onboarding/role");
+        await finalize();
       } else if (completeSignUp.error.code === "form_code_incorrect") {
         toast.error(t("verifyAccount.invalidCode"));
       }

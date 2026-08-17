@@ -181,8 +181,15 @@
       "learn": "Apprendre",
       "teach": "Enseigner",
       "school": "École",
-      "me": "Mon compte"
-    }
+      "me": "Mon compte",
+      "platform": "Plateforme",
+      "moderation": "Modération",
+      "system": "Système"
+    },
+    "subjects": "Matières",
+    "audit": "Journal d'audit",
+    "featureFlags": "Feature flags",
+    "favorites": "Favoris"
   },
   "Users": {
     "findTeachers": "Trouver un enseignant",
@@ -744,7 +751,19 @@
       "2nde": "Seconde",
       "1ere": "Première",
       "Tle": "Terminale"
-    }
+    },
+    "headTeacherNone": "Aucun professeur principal assigné",
+    "headTeacherAssign": "Assigner",
+    "headTeacherChange": "Changer",
+    "headTeacherUnassign": "Retirer",
+    "headTeacherAssignTitle": "Assigner un professeur principal",
+    "headTeacherAssignDescription": "Choisissez un enseignant membre de la classe comme professeur principal.",
+    "headTeacherSelectPlaceholder": "Sélectionnez un enseignant…",
+    "headTeacherNoTeachers": "Aucun enseignant n'est membre de cette classe. Invitez d'abord des enseignants à rejoindre la classe.",
+    "headTeacherAssigned": "Professeur principal assigné",
+    "headTeacherUnassigned": "Professeur principal retiré",
+    "headTeacherAssignFailed": "Impossible d'assigner le professeur principal",
+    "cancel": "Annuler"
   },
   "Contents": {
     "title": "Bibliothèque",
@@ -1798,7 +1817,32 @@
       "exercice": "Exercice",
       "devoir_modele": "Devoir modèle",
       "sujet_blanc": "Sujet blanc"
-    }
+    },
+    "subjects": "Matières",
+    "subjectsHint": "Gérez le catalogue des matières",
+    "subjectsDescription": "Créez, modifiez et supprimez les matières du catalogue global.",
+    "subjectsCreate": "Nouvelle matière",
+    "subjectsCreateTitle": "Créer une matière",
+    "subjectsCreateDescription": "Ajoutez une matière au catalogue global.",
+    "subjectsCreateFailed": "Impossible de créer la matière",
+    "subjectsCreated": "Matière créée",
+    "subjectsEditTitle": "Modifier la matière",
+    "subjectsEditDescription": "Modifiez les informations de la matière.",
+    "subjectsUpdateFailed": "Impossible de modifier la matière",
+    "subjectsUpdated": "Matière modifiée",
+    "subjectsDeleteConfirm": "Supprimer cette matière ?",
+    "subjectsDeleteWarning": "Cette action est irréversible. Si la matière est utilisée par des classes, la suppression échouera.",
+    "subjectsDeleteFailed": "Impossible de supprimer la matière",
+    "subjectsDeleted": "Matière supprimée",
+    "subjectsName": "Nom",
+    "subjectsCode": "Code",
+    "subjectsCodeHint": "Lettres majuscules, chiffres, _ et - uniquement. Ex: MATHS, PC, SVT.",
+    "subjectsDescriptionField": "Description",
+    "subjectsDescriptionPlaceholder": "Décrivez cette matière en quelques mots…",
+    "subjectsEmpty": "Aucune matière",
+    "subjectsEmptyHint": "Créez votre première matière pour commencer.",
+    "subjectsPlatformHint": "Catalogue global des matières disponibles sur la plateforme.",
+    "subjectsSchoolHint": "Catalogue des matières. Assignez-les à vos classes via la page détail de chaque classe."
   },
   "Landing": {
     "badge": "Plateforme scolaire nouvelle génération",

@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Flag } from "lucide-react";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { FeatureFlagsList } from "@/components/admin/feature-flags-list";
@@ -16,7 +15,7 @@ export default async function AdminFeatureFlagsPage() {
   const t = await getTranslations("Admin");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("featureFlags")}
@@ -30,6 +29,6 @@ export default async function AdminFeatureFlagsPage() {
           <FeatureFlagsList />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

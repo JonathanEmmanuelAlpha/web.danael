@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus, FolderOpen } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { TeacherContentsList } from "@/components/contents/teacher-contents-list";
@@ -24,6 +23,7 @@ export const dynamic = "force-dynamic";
  */
 export default async function ContentsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Contents");
@@ -35,7 +35,7 @@ export default async function ContentsPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("myContentsTitle")}
@@ -52,6 +52,6 @@ export default async function ContentsPage() {
         />
         <TeacherContentsList teacherId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

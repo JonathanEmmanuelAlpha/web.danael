@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { StudentsExplorer } from "@/components/users/students-explorer";
 import { getMySchoolAction } from "@/server/actions/schools";
@@ -22,7 +21,7 @@ export default async function FindStudentsPage() {
 
   if (!school) {
     return (
-      <DashboardShell>
+      <>
         <PageHeader
           title={tUsers("findStudents")}
           description={tUsers("findStudentsSubtitle")}
@@ -32,7 +31,7 @@ export default async function FindStudentsPage() {
           Aucun établissement à administrer pour le moment. Créez ou rejoignez
           une école pour pouvoir inviter des élèves.
         </div>
-      </DashboardShell>
+      </>
     );
   }
 
@@ -42,7 +41,7 @@ export default async function FindStudentsPage() {
   const total = studentsRes.success ? studentsRes.data.total : 0;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tUsers("findStudents")}
@@ -55,6 +54,6 @@ export default async function FindStudentsPage() {
           initialTotal={total}
         />
       </div>
-    </DashboardShell>
+    </>
   );
 }

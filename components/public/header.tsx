@@ -3,13 +3,12 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { cn, getUserDashboardRoadByRole } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { LanguageThemeBar } from "./language-theme-bar";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { useUserStore } from "@/stores/user-store";
 
 interface NavLink {
   href: string;
@@ -28,6 +27,11 @@ const LINKS: NavLink[] = [
 interface PublicHeaderProps {
   variant?: "dark" | "light";
   className?: string;
+  /** Server-rendered dashboard link element (when the user is signed in).
+   *  Computed server-side via <DashboardLinkButton /> so the link points to
+   *  the correct role-based dashboard, even though the Zustand user store
+   *  isn't hydrated on public pages. */
+  dashboardSlot?: React.ReactNode;
 }
 
 /**
@@ -36,20 +40,23 @@ interface PublicHeaderProps {
  *
  * `variant="dark"` is used on the landing hero (transparent over dark bg).
  * `variant="light"` is used on inner public pages (light card background).
+ *
+ * NOTE: The "Dashboard" button is now rendered server-side via the
+ * `dashboardSlot` prop. This avoids the bug where the button always
+ * pointed to "/" because the Zustand user store isn't hydrated on public
+ * pages. The parent layout (server component) fetches the user and passes
+ * the correct <DashboardLinkButton /> as `dashboardSlot`.
  */
 export function PublicHeader({
   variant = "light",
   className,
+  dashboardSlot,
 }: PublicHeaderProps) {
   const t = useTranslations("Public.nav");
   const [open, setOpen] = React.useState(false);
   const isDark = variant === "dark";
 
   const { isSignedIn } = useUser();
-  const { user, _hasHydrated } = useUserStore();
-
-  const dashboardLink =
-    _hasHydrated && user ? getUserDashboardRoadByRole(user.role) : "/";
 
   return (
     <header
@@ -93,10 +100,8 @@ export function PublicHeader({
 
         <div className="flex items-center gap-2">
           <LanguageThemeBar variant={isDark ? "outline" : "ghost"} />
-          {isSignedIn ? (
-            <Button asChild variant="brand" size="sm">
-              <Link href={dashboardLink}>{t("dashboard")}</Link>
-            </Button>
+          {isSignedIn && dashboardSlot ? (
+            dashboardSlot
           ) : (
             <>
               <Button

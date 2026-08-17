@@ -251,7 +251,7 @@
   --ring-offset: #030913;
 
   /* Popover */
-  --popover: rgba(8, 20, 41, 0.95);
+  --popover: rgba(8, 20, 41);
   --popover-foreground: #f4f6ef;
 
   --primary-foreground: #030913;
@@ -259,7 +259,7 @@
   --muted-foreground: hsl(215 20.2% 65.1%);
 
   /* Sidebar */
-  --sidebar: rgba(6, 14, 30, 0.6);
+  --sidebar: rgba(6, 14, 30);
   --sidebar-primary-foreground: #030913;
 
   /* Charts */
@@ -325,7 +325,7 @@
   --secondary-foreground: #f4f6ef;
   --muted-foreground: hsl(215 16.3% 46.9%);
 
-  --sidebar: rgba(255, 255, 255, 0.7);
+  --sidebar: rgba(255, 255, 255);
   --sidebar-primary-foreground: #030913;
 
   --chart-1: #7cb912;
@@ -442,6 +442,15 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+  }
+
+  .auth-dot-grid {
+    background-image: radial-gradient(
+      circle,
+      rgba(147, 217, 26, 0.12) 1.5px,
+      transparent 1.5px
+    );
+    background-size: 28px 28px;
   }
 
   /* ── Glassmorphism surfaces ── */

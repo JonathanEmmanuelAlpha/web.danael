@@ -2,7 +2,6 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentDbUser } from "@/lib/clerk";
 import { getQuizAction, getSessionAction } from "@/server/actions/quizzes";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { QuizSessionView } from "@/components/quiz/quiz-session-view";
 import type { UserRole } from "@/types";
 
@@ -20,6 +19,7 @@ export default async function QuizSessionPage({
 }) {
   const { id: sessionId } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -54,10 +54,10 @@ export default async function QuizSessionPage({
   const quiz = quizRes.data;
 
   return (
-    <DashboardShell>
+    <>
       <div className="mx-auto max-w-3xl space-y-6">
         <QuizSessionView quiz={quiz} session={session} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

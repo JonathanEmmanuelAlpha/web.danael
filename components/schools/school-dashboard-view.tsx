@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2, School as SchoolIcon } from "lucide-react";
 import { toast } from "sonner";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+
 import { PageLoader } from "@/components/shared/loading";
 import { CreateSchoolForm } from "@/components/schools/create-school-form";
 import { getMySchoolAction } from "@/server/actions/schools";
@@ -46,15 +46,15 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
 
   if (school === undefined) {
     return (
-      <DashboardShell>
+      <>
         <PageLoader />
-      </DashboardShell>
+      </>
     );
   }
 
   if (!school) {
     return (
-      <DashboardShell>
+      <>
         <CreateSchoolForm
           onCreated={(s) => {
             setSchool(s);
@@ -62,14 +62,14 @@ export function SchoolDashboardView({ user }: SchoolDashboardViewProps) {
             router.refresh();
           }}
         />
-      </DashboardShell>
+      </>
     );
   }
 
   return (
-    <DashboardShell>
+    <>
       <SchoolOverview school={school} />
-    </DashboardShell>
+    </>
   );
 }
 

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { InvitationsList } from "@/components/memberships/invitations-list";
 import { listMyInvitationsAction } from "@/server/actions/memberships";
 import { Mail } from "lucide-react";
@@ -8,7 +8,6 @@ import type { InvitationItem } from "@/stores/notifications-store";
 
 export default async function InvitationsPage() {
   const user = await getCurrentDbUser();
-  if (!user) redirect("/sign-in");
 
   // Fetch invitations on the server
   const invitationsRes = await listMyInvitationsAction();
@@ -34,7 +33,7 @@ export default async function InvitationsPage() {
       : [];
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
@@ -48,6 +47,6 @@ export default async function InvitationsPage() {
         </div>
         <InvitationsList invitations={invitations} />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

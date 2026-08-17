@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Library } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentDetailView } from "@/components/contents/content-detail-view";
 import { getContentAction } from "@/server/actions/contents";
@@ -22,6 +22,7 @@ export default async function ContentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const { id } = await params;
@@ -40,7 +41,7 @@ export default async function ContentDetailPage({
     user.role === "content_moderator";
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <Link
           href="/student/library"
@@ -56,6 +57,6 @@ export default async function ContentDetailPage({
         />
         <ContentDetailView content={content} canEdit={canEdit} />
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

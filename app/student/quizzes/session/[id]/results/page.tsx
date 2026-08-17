@@ -5,7 +5,6 @@ import {
   getSessionAction,
   getSessionResultsAction,
 } from "@/server/actions/quizzes";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { QuizResultsView } from "@/components/quiz/quiz-results-view";
 import type { UserRole } from "@/types";
 
@@ -26,6 +25,7 @@ export default async function QuizSessionResultsPage({
 }) {
   const { id: sessionId } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const role = user.role as UserRole;
@@ -61,10 +61,10 @@ export default async function QuizSessionResultsPage({
   const viewer: "student" | "teacher" = isOwner ? "student" : "teacher";
 
   return (
-    <DashboardShell>
+    <>
       <div className="mx-auto max-w-3xl">
         <QuizResultsView results={results} viewer={viewer} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

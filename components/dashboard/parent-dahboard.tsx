@@ -1,6 +1,5 @@
 "use client";
 
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
 import { SectionCard } from "@/components/shared/section-card";
@@ -19,13 +18,13 @@ import Link from "next/link";
 import { useUserStore } from "@/stores/user-store";
 
 export default function ParentDashboard() {
-  const { user } = useUserStore();
+  const user = useUserStore((s) => s.user);
   if (!user) return null;
 
   const t = useTranslations("Dashboard");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("welcome", { name: user.firstName ?? user.email })}
@@ -92,6 +91,6 @@ export default function ParentDashboard() {
           </Card>
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

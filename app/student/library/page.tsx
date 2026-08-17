@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { Library } from "lucide-react";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentFilters } from "@/components/contents/content-filters";
 import { LibraryContent } from "@/components/contents/library-content";
@@ -23,7 +22,7 @@ export default async function LibraryPage() {
   const subjects: Subject[] = subjectsRes.success ? subjectsRes.data : [];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("libraryTitle")}
@@ -37,6 +36,6 @@ export default async function LibraryPage() {
           <LibraryContent />
         </Suspense>
       </div>
-    </DashboardShell>
+    </>
   );
 }

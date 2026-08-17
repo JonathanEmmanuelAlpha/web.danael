@@ -1,10 +1,10 @@
 import { TeacherDashboard } from "@/components/dashboard/teacher-dashboard";
 
 /**
- * §5.3 + §5.9 — Role-aware dashboard.
+ * §5.3 + §5.9 — Teacher dashboard.
  *
- * Phase 11 enrichment: each role branch now renders a dedicated
- * analytics-rich dashboard component (charts, tables, KPIs).
+ * The <DashboardShell> is provided by <TeacherLayout> — this page just
+ * renders the dashboard content.
  */
 export default async function DashboardPage() {
   return <TeacherDashboard />;

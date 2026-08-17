@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { TeacherAssignmentsList } from "@/components/assignments/teacher-assignments-list";
 import { StudentAssignmentsList } from "@/components/assignments/student-assignments-list";
@@ -21,6 +20,7 @@ import type { UserRole } from "@/types";
  */
 export default async function AssignmentsPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Assignments");
@@ -33,7 +33,7 @@ export default async function AssignmentsPage() {
     role === "platform_admin"
   ) {
     return (
-      <DashboardShell>
+      <>
         <div className="space-y-6">
           <PageHeader
             title={t("title")}
@@ -51,13 +51,13 @@ export default async function AssignmentsPage() {
           />
           <TeacherAssignmentsList />
         </div>
-      </DashboardShell>
+      </>
     );
   }
 
   // Student (and any other role) view.
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("title")}
@@ -66,6 +66,6 @@ export default async function AssignmentsPage() {
         />
         <StudentAssignmentsList />
       </div>
-    </DashboardShell>
+    </>
   );
 }

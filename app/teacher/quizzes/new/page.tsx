@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { listSubjectsAction } from "@/server/actions/subjects";
 import { createQuizAction } from "@/server/actions/quizzes";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { QuizForm } from "@/components/quiz/quiz-form";
 
 /**
@@ -32,8 +31,8 @@ export default async function NewQuizPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <QuizForm mode="create" subjects={subjects} submitAction={submitAction} />
-    </DashboardShell>
+    </>
   );
 }

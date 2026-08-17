@@ -1,10 +1,10 @@
 import { SchoolDashboard } from "@/components/dashboard/school-dashboard";
 
 /**
- * §5.3 + §5.9 — Role-aware dashboard.
+ * §5.3 + §5.9 — School admin dashboard.
  *
- * Phase 11 enrichment: each role branch now renders a dedicated
- * analytics-rich dashboard component (charts, tables, KPIs).
+ * The <DashboardShell> is provided by <SchoolLayout> — this page just
+ * renders the dashboard content.
  */
 export default async function DashboardPage() {
   return <SchoolDashboard />;

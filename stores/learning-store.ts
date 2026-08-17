@@ -353,7 +353,7 @@ export const useLearningStore = create<LearningStoreState>()(
     {
       name: "danael-learning-store",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         streak: state.streak,
         lastActiveDate: state.lastActiveDate,

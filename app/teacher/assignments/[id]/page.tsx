@@ -1,7 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { StatCard } from "@/components/shared/stat-card";
@@ -58,6 +57,7 @@ export default async function AssignmentDetailPage({
 }) {
   const { id } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const t = await getTranslations("Assignments");
@@ -93,7 +93,7 @@ export default async function AssignmentDetailPage({
         .join(" ");
 
     return (
-      <DashboardShell>
+      <>
         <div className="space-y-6">
           <PageHeader
             title={assignment.title}
@@ -244,7 +244,7 @@ export default async function AssignmentDetailPage({
             </Button>
           </div>
         </div>
-      </DashboardShell>
+      </>
     );
   }
 
@@ -280,7 +280,7 @@ export default async function AssignmentDetailPage({
     assignment.status === "published" || assignment.status === "closed";
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={assignment.title}
@@ -462,6 +462,6 @@ export default async function AssignmentDetailPage({
           </SectionCard>
         )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

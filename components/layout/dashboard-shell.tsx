@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { StoreHydrator } from "@/components/providers/store-hydrator";
 import type { UserRole } from "@/types";
-import { useUserStore, type UserSessionData } from "@/stores/user-store";
+import type { UserSessionData } from "@/stores/user-store";
 import type {
   SchoolContextData,
   ClassContextData,
@@ -25,6 +25,8 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "../shared/loading";
 
 export interface DashboardShellProps {
+  /** Server-fetched user (REQUIRED). The shell hydrates the Zustand store with it. */
+  user: UserSessionData;
   school?: SchoolContextData | null;
   classes?: ClassContextData[];
   notifications?: NotificationItem[];
@@ -37,17 +39,25 @@ export interface DashboardShellProps {
 /**
  * Full dashboard chrome: sidebar (desktop) + mobile sheet + topbar + content.
  *
- * HYDRATION: When `user` prop is provided, the StoreHydrator pushes it into
- * the Zustand user store on mount. Topbar & Sidebar then read from the store
- * instead of calling useUser() / Clerk API on every render.
+ * HYDRATION (production pattern):
+ *  - The `user` prop is fetched server-side by the parent layout/page and
+ *    passed in. The <StoreHydrator /> pushes it into the Zustand user store
+ *    on mount. All client components (Topbar, Sidebar, pages…) then read
+ *    from the store instead of calling useUser() / Clerk API on every render.
+ *  - We DO NOT block the first paint waiting for the store to be hydrated:
+ *    since `user` is already available as a prop, we render the chrome
+ *    immediately with that data. The store hydration happens in parallel
+ *    via <StoreHydrator /> (a no-op render component).
+ *  - This avoids the "black screen" bug where the shell returned `null`
+ *    while waiting for the store to be hydrated.
  *
  * Refonte "Aurora Navy":
  *  - root container decorated with subtle decorative halos (lime + violet)
  *  - main content area layered over a soft dot-grid + aurora background
  *  - mobile sidebar uses glass-strong for a consistent glassmorphic look
- *  - StoreHydrator remains the single hydration entry point
  */
 export function DashboardShell({
+  user,
   school,
   classes,
   notifications,
@@ -57,19 +67,16 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isLoading, user: storeUser, _hasHydrated } = useUserStore();
 
-  // Tant que le store n'est pas hydraté, on affiche un loader
-  if (!_hasHydrated) return <Skeleton />;
+  // Guard: if no user prop, render a skeleton (shouldn't happen in practice —
+  // the layout always fetches and passes the user).
+  if (!user) {
+    return <Skeleton />;
+  }
 
-  if (isLoading || !storeUser) return <Skeleton />;
-
-  if (!isLoading && !storeUser) return null;
-
-  const role = storeUser.role as UserRole;
+  const role = user.role as UserRole;
   const userName =
-    [storeUser.firstName, storeUser.lastName].filter(Boolean).join(" ") ||
-    undefined;
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || undefined;
 
   return (
     <div className="relative flex min-h-screen bg-background">
@@ -87,18 +94,18 @@ export function DashboardShell({
         className="halo-amber pointer-events-none absolute bottom-0 left-1/4 size-96 opacity-50 z-100"
       />
 
-      {/* Hydrate Zustand stores from server-fetched data */}
-      {storeUser && (
-        <StoreHydrator
-          user={storeUser}
-          school={school ?? null}
-          classes={classes}
-          notifications={notifications}
-          invitations={invitations}
-          myJoinRequests={myJoinRequests}
-          receivedJoinRequests={receivedJoinRequests}
-        />
-      )}
+      {/* Hydrate Zustand stores from server-fetched data.
+          This is a no-op render component — it just calls useEffect to push
+          the server data into the client stores. */}
+      <StoreHydrator
+        user={user}
+        school={school ?? null}
+        classes={classes}
+        notifications={notifications}
+        invitations={invitations}
+        myJoinRequests={myJoinRequests}
+        receivedJoinRequests={receivedJoinRequests}
+      />
 
       {/* Desktop sidebar */}
       <aside className="relative z-20 hidden w-64 shrink-0 lg:block">
@@ -132,8 +139,8 @@ export function DashboardShell({
         <Topbar
           role={role}
           userName={userName}
-          userImage={storeUser.imageUrl ?? undefined}
-          userEmail={storeUser.email}
+          userImage={user.imageUrl ?? undefined}
+          userEmail={user.email}
           onMenuClick={() => setMobileOpen(true)}
         />
         <main className="overflow-x-hidden relative flex-1 px-4 py-6 sm:px-6 lg:px-8">

@@ -1,7 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { ContentForm } from "@/components/contents/content-form";
 import { getContentAction } from "@/server/actions/contents";
@@ -23,6 +22,7 @@ export default async function EditContentPage({
   params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const { id } = await params;
@@ -48,7 +48,7 @@ export default async function EditContentPage({
   const subjects: Subject[] = subjectsRes.success ? subjectsRes.data : [];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("editContent")}
@@ -59,6 +59,6 @@ export default async function EditContentPage({
           <ContentForm subjects={subjects} initialContent={content} />
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

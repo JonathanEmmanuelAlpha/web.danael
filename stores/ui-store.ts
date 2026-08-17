@@ -21,6 +21,7 @@ interface UIStoreState {
   setCommandPaletteOpen: (open: boolean) => void;
   setLastRoute: (route: string) => void;
   setHasHydrated: (state: boolean) => void;
+  clear: () => void;
 }
 
 export const useUIStore = create<UIStoreState>()(
@@ -38,12 +39,18 @@ export const useUIStore = create<UIStoreState>()(
         set({ commandPaletteOpen }),
       setLastRoute: (lastRoute) => set({ lastRoute }),
       setHasHydrated: (state) => set({ _hasHydrated: state }),
+      clear: () =>
+        set({
+          sidebarCollapsed: false,
+          commandPaletteOpen: false,
+          lastRoute: null,
+        }),
     }),
     {
       name: "danael-ui-store",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
-      version: 1,
+      version: 2,
     },
   ),
 );

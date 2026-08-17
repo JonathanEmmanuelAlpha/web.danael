@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { MembersList } from "@/components/schools/members-list";
 import { getMySchoolAction } from "@/server/actions/schools";
@@ -18,18 +17,18 @@ export default async function TeachersPage() {
 
   if (!school) {
     return (
-      <DashboardShell>
+      <>
         <PageHeader
           title={tNav("teachers")}
           description={t("noSchoolHint")}
           icon={<GraduationCap className="size-6" />}
         />
-      </DashboardShell>
+      </>
     );
   }
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tNav("teachers")}
@@ -56,6 +55,6 @@ export default async function TeachersPage() {
           emptyHint={t("noMembersHint")}
         />
       </div>
-    </DashboardShell>
+    </>
   );
 }

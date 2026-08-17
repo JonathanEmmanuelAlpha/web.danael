@@ -44,7 +44,6 @@ import type {
   RoleDistributionEntry,
   TimelinePoint,
 } from "@/server/services/analytics";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import type { UserRole } from "@/types";
 import { useUserStore } from "@/stores/user-store";
 
@@ -71,7 +70,7 @@ const ROLE_COLORS: Record<string, string> = {
  *  - System-health strip with pulse-glow indicator (decorative).
  */
 export function PlatformDashboard() {
-  const { user } = useUserStore();
+  const user = useUserStore((s) => s.user);
   if (!user) return null;
 
   const t = useTranslations("Analytics");
@@ -124,7 +123,7 @@ export function PlatformDashboard() {
   }));
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tDash("welcome", { name: user.firstName ?? user.email })}
@@ -312,7 +311,7 @@ export function PlatformDashboard() {
           </SectionCard>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

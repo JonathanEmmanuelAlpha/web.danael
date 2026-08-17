@@ -90,7 +90,7 @@ export const useUserStore = create<UserStoreState>()(
         lastFetchedAt: state.lastFetchedAt,
       }),
       skipHydration: true,
-      version: 1,
+      version: 2,
     },
   ),
 );

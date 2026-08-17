@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { AssignmentForm } from "@/components/assignments/assignment-form";
@@ -20,7 +19,7 @@ export default async function NewAssignmentPage({
   const t = await getTranslations("Assignments");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("new")}
@@ -31,6 +30,6 @@ export default async function NewAssignmentPage({
           <AssignmentForm defaultClassId={classId} />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </>
   );
 }

@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { HelpCircle } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import {
   TeacherQuizzesList,
@@ -19,12 +18,13 @@ import type { UserRole } from "@/types";
  */
 export default async function TeacherQuizzesPage() {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const tQuiz = await getTranslations("Quizzes");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={tQuiz("myQuizzes")}
@@ -34,6 +34,6 @@ export default async function TeacherQuizzesPage() {
         />
         <TeacherQuizzesList teacherId={user.id} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

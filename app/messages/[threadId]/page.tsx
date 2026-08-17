@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { ThreadList } from "@/components/messaging/thread-list";
 import { ThreadView } from "@/components/messaging/thread-view";
 
@@ -18,11 +18,12 @@ export default async function ThreadPage({
   params: Promise<{ threadId: string }>;
 }) {
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
   const { threadId } = await params;
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="grid h-[calc(100vh-9rem)] grid-cols-1 overflow-hidden rounded-xl border border-border bg-card lg:grid-cols-[360px_1fr]">
         {/* List — desktop only. */}
         <div className="hidden border-r border-border lg:flex">
@@ -38,6 +39,6 @@ export default async function ThreadPage({
           />
         </div>
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

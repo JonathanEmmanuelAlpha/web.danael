@@ -1,12 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import { getCurrentDbUser } from "@/lib/clerk";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardShellServer } from "@/components/layout/dashboard-shell-server";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
 import { SectionCard } from "@/components/shared/section-card";
 import { ClassMembersList } from "@/components/schools/class-members-list";
 import { ClassSubjectsList } from "@/components/schools/class-subjects-list";
 import { InviteCodeField } from "@/components/schools/invite-code-field";
+import { HeadTeacherAssigner } from "@/components/schools/head-teacher-assigner";
 import { getClassAction } from "@/server/actions/classes";
 import {
   isClassMember,
@@ -41,6 +42,7 @@ export default async function ClassDetailPage({
 }) {
   const { id } = await params;
   const user = await getCurrentDbUser();
+
   if (!user) redirect("/sign-in");
 
   const tCls = await getTranslations("Classes");
@@ -81,7 +83,7 @@ export default async function ClassDetailPage({
   const myMember = memberRows.at(0) ?? null;
 
   return (
-    <DashboardShell>
+    <DashboardShellServer user={user}>
       <div className="space-y-6">
         <PageHeader
           title={cls.name}
@@ -155,6 +157,20 @@ export default async function ClassDetailPage({
           </SectionCard>
         )}
 
+        {/* Head teacher assignment (visible to school_admin / platform_admin) */}
+        <HeadTeacherAssigner
+          classId={id}
+          currentHeadTeacherId={cls.headTeacher?.id ?? null}
+          currentHeadTeacherName={
+            cls.headTeacher
+              ? [cls.headTeacher.firstName, cls.headTeacher.lastName]
+                  .filter(Boolean)
+                  .join(" ") || cls.headTeacher.email
+              : null
+          }
+          canManage={canManage}
+        />
+
         {/* Subjects */}
         <SectionCard
           title={tCls("subjects")}
@@ -183,6 +199,6 @@ export default async function ClassDetailPage({
           <ClassMembersList classId={id} canManage={canManage} />
         </SectionCard>
       </div>
-    </DashboardShell>
+    </DashboardShellServer>
   );
 }

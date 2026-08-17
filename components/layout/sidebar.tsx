@@ -8,6 +8,12 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/stores/user-store";
+import { useSchoolStore } from "@/stores/school-store";
+import { useLearningStore } from "@/stores/learning-store";
+import { useUIStore } from "@/stores/ui-store";
 import { getNavForRole, isPathActive, SECTION_LABELS } from "./nav-config";
 import type { UserRole } from "@/types";
 
@@ -20,6 +26,9 @@ export interface SidebarProps {
 /**
  * Sidebar with role-based navigation (§6.3).
  * Used inside <DashboardShell /> (desktop) and mobile sheet.
+ *
+ * The sign-out button calls Clerk's `signOut()` and clears all local
+ * Zustand stores before redirecting to /sign-in.
  *
  * Refonte "Aurora Navy":
  *  - glass-strong background with subtle halo-lime in the top-right corner
@@ -37,6 +46,28 @@ export function Sidebar({
   const t = useTranslations("Navigation");
   const pathname = usePathname();
   const sections = getNavForRole(role);
+  const { signOut } = useClerk();
+  const router = useRouter();
+
+  function handleSignOut() {
+    // 1. Clear all local Zustand stores so no stale data leaks between sessions.
+    useUserStore.getState().clear();
+    useSchoolStore.getState().clear();
+    useLearningStore.getState().clear();
+    useUIStore.getState().clear();
+
+    // 2. Sign out from Clerk and redirect to /sign-in.
+    //    In Clerk v7, signOut accepts a callback or an options object.
+    //    We use the callback form for backward compatibility.
+    if (signOut) {
+      void signOut(() => {
+        router.push("/sign-in");
+      });
+    } else {
+      // Fallback: navigate to sign-in directly.
+      window.location.href = "/sign-in";
+    }
+  }
 
   return (
     <div className="glass-strong relative flex h-full flex-col overflow-hidden border-r border-border">
@@ -132,10 +163,7 @@ export function Sidebar({
             "hover:border-accent-coral-500/30 hover:bg-accent-coral-500/10 hover:text-accent-coral-400 hover:shadow-[0_0_12px_-4px_rgba(251,113,133,0.4)]",
           )}
           style={{ transitionTimingFunction: "var(--ease-smooth)" }}
-          onClick={() => {
-            // Clerk sign-out handled by <UserButton /> in topbar; this is a fallback.
-            window.location.href = "/sign-in";
-          }}
+          onClick={handleSignOut}
         >
           <LogOut className="size-[18px] transition-transform group-hover:translate-x-0.5" />
           {t("signOut")}

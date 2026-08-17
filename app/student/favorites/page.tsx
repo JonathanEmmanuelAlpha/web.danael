@@ -1,5 +1,4 @@
 import { Heart } from "lucide-react";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { FavoritesList } from "@/components/contents/favorites-list";
 import { getTranslations } from "next-intl/server";
@@ -13,7 +12,7 @@ export default async function FavoritesPage() {
   const t = await getTranslations("Contents");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <PageHeader
           title={t("favoritesTitle")}
@@ -22,6 +21,6 @@ export default async function FavoritesPage() {
         />
         <FavoritesList />
       </div>
-    </DashboardShell>
+    </>
   );
 }
