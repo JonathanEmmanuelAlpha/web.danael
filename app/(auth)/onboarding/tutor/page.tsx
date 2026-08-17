@@ -65,7 +65,7 @@ export default function TutorOnboardingPage() {
         return;
       }
       toast.success("Onboarding terminé ! Bienvenue 🎉");
-      router.push("/dashboard");
+      router.push("/tutor/dashboard");
     },
   });
 
@@ -132,7 +132,9 @@ export default function TutorOnboardingPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Matières</label>
+              <label className="text-sm font-medium text-white/80">
+                Matières
+              </label>
               <div className="flex flex-wrap gap-2">
                 {COMMON_SUBJECTS.map((s) => {
                   const isSelected = subjects.includes(s);
@@ -147,7 +149,11 @@ export default function TutorOnboardingPage() {
                           : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
                       }`}
                     >
-                      {isSelected ? <X className="size-3" /> : <Plus className="size-3" />}
+                      {isSelected ? (
+                        <X className="size-3" />
+                      ) : (
+                        <Plus className="size-3" />
+                      )}
                       {s}
                     </button>
                   );

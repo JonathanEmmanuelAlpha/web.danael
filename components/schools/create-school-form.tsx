@@ -75,7 +75,7 @@ export function CreateSchoolForm({ onCreated }: CreateSchoolFormProps) {
       }
       toast.success(t("schoolCreated"));
       onCreated?.(result.data);
-      router.push("/dashboard");
+      router.push("/school/dashboard");
       router.refresh();
     },
   });

@@ -49,7 +49,7 @@ export default function StudentOnboardingPage() {
         return;
       }
       toast.success("Onboarding terminé ! Bienvenue 🎉");
-      router.push("/dashboard");
+      router.push("/student/dashboard");
     },
   });
 

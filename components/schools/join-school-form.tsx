@@ -79,6 +79,8 @@ export function JoinSchoolForm({ onJoined }: JoinSchoolFormProps) {
       toast.success(t("joinRequestSent"));
       onJoined(result.data.requestId, result.data.schoolId);
       setSubmitted({ schoolName: result.data.schoolName });
+      router.push("/school/dashboard");
+      router.refresh();
     },
   });
 

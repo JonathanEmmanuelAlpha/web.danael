@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { getAuthStatusAction } from "@/server/actions/auth-status";
 import type { ClerkError, OAuthStrategy } from "@/types";
 import { useAppForm } from "@/components/forms/form-hook";
+import { toast } from "sonner";
 
 /**
  * §5.2 — Sign-in page (refactored with reusable components).
@@ -69,6 +70,10 @@ export default function SignInPage() {
           password: value.password,
         });
 
+        if (signIn.status === "needs_client_trust") {
+          // TODO
+        }
+
         if (signIn.status === "complete") {
           await signIn.finalize();
           await setActive({ session: signIn.createdSessionId });
@@ -78,7 +83,7 @@ export default function SignInPage() {
           if (status.success)
             router.push(
               status.data.onboardingCompleted
-                ? "/dashboard"
+                ? "/settings"
                 : "/onboarding/role",
             );
 
@@ -110,7 +115,7 @@ export default function SignInPage() {
 
         if (status.success)
           router.push(
-            status.data.onboardingCompleted ? "/dashboard" : "/onboarding/role",
+            status.data.onboardingCompleted ? "/settings" : "/onboarding/role",
           );
 
         router.refresh();

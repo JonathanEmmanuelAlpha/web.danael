@@ -28,9 +28,7 @@ const COMMON_SUBJECTS = [
 ];
 
 const teacherSchema = z.object({
-  subjects: z
-    .array(z.string())
-    .min(1, "Sélectionnez au moins une matière"),
+  subjects: z.array(z.string()).min(1, "Sélectionnez au moins une matière"),
 });
 
 type TeacherValues = z.infer<typeof teacherSchema>;
@@ -53,7 +51,7 @@ export default function TeacherOnboardingPage() {
         return;
       }
       toast.success("Onboarding terminé ! Bienvenue 🎉");
-      router.push("/dashboard");
+      router.push("/teacher/dashboard");
     },
   });
 

@@ -309,7 +309,7 @@ export async function completeSchoolOnboardingAction(
       userId: dbUser.id,
       schoolName: school.name,
     });
-    revalidatePath("/dashboard");
+    revalidatePath("/school/dashboard");
 
     return { success: true, data: { completed: true } };
   } catch (err) {

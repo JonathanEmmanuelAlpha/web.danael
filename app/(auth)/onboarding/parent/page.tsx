@@ -43,7 +43,7 @@ export default function ParentOnboardingPage() {
         return;
       }
       toast.success("Onboarding terminé ! Bienvenue 🎉");
-      router.push("/dashboard");
+      router.push("/parent/dashboard");
     },
   });
 
