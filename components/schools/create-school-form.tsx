@@ -20,7 +20,7 @@ import { SCHOOL_TYPE_VALUES } from "@/server/db/schema/enums";
 import type { SchoolWithCounts } from "@/server/services/schools";
 
 interface CreateSchoolFormProps {
-  onCreated?: (school: SchoolWithCounts) => void;
+  onCreated: (school: SchoolWithCounts) => void;
 }
 
 const createSchoolSchema = z.object({
@@ -74,7 +74,7 @@ export function CreateSchoolForm({ onCreated }: CreateSchoolFormProps) {
         return;
       }
       toast.success(t("schoolCreated"));
-      onCreated?.(result.data);
+      onCreated(result.data);
       router.push("/dashboard");
       router.refresh();
     },

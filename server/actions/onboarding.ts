@@ -19,7 +19,9 @@ import { getCurrentDbUser, getSessionUser, requireSession } from "@/lib/clerk";
 import { AppError, type ApiResponse } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 import type { UserRole, Level, Series } from "@/types";
-import { createSchool } from "../services/schools";
+import { createSchool, getSchoolById } from "../services/schools";
+import { CreateSchoolInput } from "../validators";
+import { getAccessRequestAction } from "./school-access";
 
 /* ── Schemas ───────────────────────────────────────────────── */
 
@@ -283,18 +285,18 @@ export async function completeTeacherOnboardingAction(
 }
 
 export async function completeSchoolOnboardingAction(
-  input: z.infer<typeof schoolOnboardingSchema>,
+  schoolId: string,
 ): Promise<ApiResponse<{ completed: boolean }>> {
   try {
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
 
-    const parsed = schoolOnboardingSchema.safeParse(input);
-    if (!parsed.success) {
-      throw AppError.validation("Invalid input", parsed.error.flatten());
-    }
-
     const db = await getDb();
+
+    const school = await getSchoolById(schoolId);
+    if (!school || !school.id || school.clerkOrgId !== dbUser.id)
+      throw AppError.notFound("No school associated to your account");
+
     await db
       .update(users)
       .set({
@@ -303,20 +305,57 @@ export async function completeSchoolOnboardingAction(
       })
       .where(eq(users.id, dbUser.id));
 
-    await createSchool(
-      {
-        name: parsed.data.schoolName,
-        city: parsed.data.city,
-        region: parsed.data.region,
-        type: parsed.data.schoolType,
-        clerkOrgId: dbUser.clerkId,
-      },
-      dbUser.id,
-    );
-
     logger.info("Onboarding: school completed", {
       userId: dbUser.id,
-      schoolName: parsed.data.schoolName,
+      schoolName: school.name,
+    });
+    revalidatePath("/dashboard");
+
+    return { success: true, data: { completed: true } };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
+    }
+    logger.error("completeSchoolOnboardingAction failed", {
+      error: String(err),
+    });
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Could not complete onboarding",
+      },
+    };
+  }
+}
+
+export async function completeJoinSchoolOnboardingAction(
+  requestId: string,
+  schoolId: string,
+): Promise<ApiResponse<{ completed: boolean }>> {
+  try {
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    const db = await getDb();
+
+    const result = await getAccessRequestAction(requestId, schoolId);
+    if (!result.success)
+      throw AppError.notFound("School join request failed to finalize");
+
+    await db
+      .update(users)
+      .set({
+        onboardingStatus: "completed",
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, dbUser.id));
+
+    logger.info("Onboarding: join school completed", {
+      userId: dbUser.id,
     });
     revalidatePath("/dashboard");
 

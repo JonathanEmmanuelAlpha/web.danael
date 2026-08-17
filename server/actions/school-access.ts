@@ -101,12 +101,9 @@ export async function createAccessCodeAction(input: {
     if (
       input.expiresInSeconds !== undefined &&
       input.expiresInSeconds !== null &&
-      (typeof input.expiresInSeconds !== "number" ||
-        input.expiresInSeconds < 1)
+      (typeof input.expiresInSeconds !== "number" || input.expiresInSeconds < 1)
     ) {
-      throw AppError.validation(
-        "expiresInSeconds must be a positive integer",
-      );
+      throw AppError.validation("expiresInSeconds must be a positive integer");
     }
 
     const created = await accessService.createAccessCode({
@@ -155,6 +152,7 @@ export async function joinSchoolManagementAction(input: {
   ApiResponse<{
     requestId: string;
     status: string;
+    schoolId: string;
     schoolName?: string;
   }>
 > {
@@ -200,6 +198,18 @@ export async function joinSchoolManagementAction(input: {
       },
     };
   }
+}
+
+export async function getAccessRequestAction(
+  requestId: string,
+  schoolId: string,
+): Promise<ApiResponse<{ requestId: string }>> {
+  const request = await accessService.getAccessRequest(requestId, schoolId);
+
+  if (!request || !request.id)
+    throw AppError.validation("Demande d'accès non finalisée");
+
+  return { success: true, data: { requestId: request.id } };
 }
 
 /**
@@ -297,7 +307,10 @@ export async function deactivateAccessCodeAction(input: {
     logger.info("Access code deactivated (action)", { codeId: input.codeId });
 
     revalidatePath("/access-codes");
-    return { success: true, data: { status: updated.isActive ? "active" : "inactive" } };
+    return {
+      success: true,
+      data: { status: updated.isActive ? "active" : "inactive" },
+    };
   } catch (err) {
     if (err instanceof AppError) {
       return {

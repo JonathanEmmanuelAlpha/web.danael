@@ -7,6 +7,10 @@ import { AuthPanel } from "@/components/layout/auth-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateSchoolForm } from "@/components/schools/create-school-form";
 import { JoinSchoolForm } from "@/components/schools/join-school-form";
+import {
+  completeJoinSchoolOnboardingAction,
+  completeSchoolOnboardingAction,
+} from "@/server/actions/onboarding";
 
 /**
  * §5.2 — School onboarding (tabbed: create / join).
@@ -36,11 +40,19 @@ export default function SchoolOnboardingPage() {
             </TabsList>
 
             <TabsContent value="create" className="mt-6">
-              <CreateSchoolForm />
+              <CreateSchoolForm
+                onCreated={async (school) =>
+                  await completeSchoolOnboardingAction(school.id)
+                }
+              />
             </TabsContent>
 
             <TabsContent value="join" className="mt-6">
-              <JoinSchoolForm />
+              <JoinSchoolForm
+                onJoined={async (requestId, schoolId) =>
+                  await completeJoinSchoolOnboardingAction(requestId, schoolId)
+                }
+              />
             </TabsContent>
           </Tabs>
         </div>

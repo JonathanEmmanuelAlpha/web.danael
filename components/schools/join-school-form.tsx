@@ -27,6 +27,10 @@ const joinSchema = z.object({
 
 type JoinValues = z.infer<typeof joinSchema>;
 
+interface JoinSchoolFormProps {
+  onJoined: (requestId: string, schoolId: string) => void;
+}
+
 /**
  * School onboarding — "Join" tab.
  *
@@ -39,7 +43,7 @@ type JoinValues = z.infer<typeof joinSchema>;
  *  - The user is NOT yet a member — they are "waiting" for the school
  *    creator to approve their request.
  */
-export function JoinSchoolForm() {
+export function JoinSchoolForm({ onJoined }: JoinSchoolFormProps) {
   const t = useTranslations("Schools");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -73,6 +77,7 @@ export function JoinSchoolForm() {
         return;
       }
       toast.success(t("joinRequestSent"));
+      onJoined(result.data.requestId, result.data.schoolId);
       setSubmitted({ schoolName: result.data.schoolName });
     },
   });

@@ -88,6 +88,7 @@ export async function createSchoolAction(
       byUserId: dbUser.id,
       clerkId: session.clerkId,
     });
+
     revalidatePath("/dashboard");
     revalidatePath("/settings");
     // Return the enriched version with member / class counts.
@@ -373,9 +374,7 @@ export async function listMembersAction(
   }
 }
 
-export async function listSchoolsAction(
-  filters: ListSchoolsQuery,
-): Promise<
+export async function listSchoolsAction(filters: ListSchoolsQuery): Promise<
   ApiResponse<{
     items: School[];
     total: number;

@@ -22,7 +22,7 @@ export default function SsoCallbackPage() {
         const status = await getAuthStatusAction();
         if (status.success)
           router.push(
-            status.data.onboardingCompleted ? "/dashboard" : "/onboarding/role",
+            status.data.onboardingCompleted ? "/settings" : "/onboarding/role",
           );
 
         router.refresh();

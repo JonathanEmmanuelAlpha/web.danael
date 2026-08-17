@@ -199,6 +199,22 @@ export async function validateAccessCode(code: string): Promise<{
 
 /* -- Request access --------------------------------------------- */
 
+export async function getAccessRequest(requestId: string, schoolId: string) {
+  const db = await getDb();
+  const existingReq = await db
+    .select()
+    .from(schoolAdminAccess)
+    .where(
+      and(
+        eq(schoolAdminAccess.schoolId, schoolId),
+        eq(schoolAdminAccess.id, requestId),
+      ),
+    )
+    .limit(1);
+
+  return existingReq[0];
+}
+
 /**
  * Create an access request from a school_admin to co-manage a school.
  *
@@ -213,7 +229,12 @@ export async function validateAccessCode(code: string): Promise<{
 export async function requestSchoolAdminAccess(params: {
   schoolAdminId: string;
   accessCode: string;
-}): Promise<{ requestId: string; status: string; schoolName?: string }> {
+}): Promise<{
+  requestId: string;
+  status: string;
+  schoolId: string;
+  schoolName?: string;
+}> {
   const db = await getDb();
 
   // Validate the code
@@ -278,6 +299,7 @@ export async function requestSchoolAdminAccess(params: {
     return {
       requestId: existingReq[0].id,
       status: existingReq[0].status,
+      schoolId: schoolId,
       schoolName: schoolRow?.name,
     };
   }
@@ -320,6 +342,7 @@ export async function requestSchoolAdminAccess(params: {
     requestId: created.id,
     status: created.status,
     schoolName: schoolRow?.name,
+    schoolId: schoolId,
   };
 }
 
