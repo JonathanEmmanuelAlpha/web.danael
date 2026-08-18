@@ -71,10 +71,8 @@ export function AiGenerateDialog({
 }: AiGenerateDialogProps) {
   const t = useTranslations("AiQuestions");
   const tQuiz = useTranslations("Quizzes");
-  const tCommon = useTranslations("Common");
 
   const [open, setOpen] = React.useState(false);
-  const [subjectId, setSubjectId] = React.useState<string>("");
   const [skills, setSkills] = React.useState<SubjectSkill[]>([]);
   const [loadingSkills, setLoadingSkills] = React.useState(false);
   const [placeholderNotice, setPlaceholderNotice] = React.useState(false);

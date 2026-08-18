@@ -33,6 +33,7 @@ import type {
   GeneratedQuestionListItem,
   SkillOption,
 } from "@/server/services/ai-questions";
+import { getSubjectSkillById } from "@/server/services/subjects";
 
 /* ── Helpers ───────────────────────────────────────────────── */
 
@@ -43,7 +44,10 @@ function isTeacherRole(role: string | undefined): role is TeacherRole {
   return !!role && (TEACHER_ROLES as readonly string[]).includes(role);
 }
 
-async function requireTeacher(): Promise<{ userId: string; role: TeacherRole }> {
+async function requireTeacher(): Promise<{
+  userId: string;
+  role: TeacherRole;
+}> {
   await requireSession();
   const dbUser = await getCurrentDbUser();
   if (!dbUser) throw AppError.notFound("User profile not found");
@@ -110,14 +114,12 @@ const listSkillsForFilterSchema = z.object({
 
 /* ── Generate ──────────────────────────────────────────────── */
 
-export async function generateQuestionsAction(
-  input: {
-    skillId: string;
-    count?: number;
-    difficulty?: "easy" | "medium" | "hard" | "expert";
-    questionTypes?: string[];
-  },
-): Promise<ApiResponse<GenerateQuestionsResult>> {
+export async function generateQuestionsAction(input: {
+  skillId: string;
+  count?: number;
+  difficulty?: "easy" | "medium" | "hard" | "expert";
+  questionTypes?: string[];
+}): Promise<ApiResponse<GenerateQuestionsResult>> {
   try {
     const { userId, role } = await requireTeacher();
 
@@ -127,20 +129,36 @@ export async function generateQuestionsAction(
     }
 
     // Look up the skill so we can pass name + description to the AI prompt.
-    const skill = await aiQuestionsService
-      .listSkillsForFilter()
-      .then((skills) => skills.find((s) => s.id === parsed.data.skillId));
+    const skill = await getSubjectSkillById(input.skillId);
     if (!skill) {
-      throw AppError.notFound("Skill not found", { skillId: parsed.data.skillId });
+      throw AppError.notFound("Skill not found", {
+        skillId: parsed.data.skillId,
+      });
     }
 
     // The AI prompt expects only easy/medium/hard; coerce "expert" → "hard".
     const aiDifficulty =
       parsed.data.difficulty === "expert" ? "hard" : parsed.data.difficulty;
     const aiQuestionTypes = parsed.data.questionTypes.filter(
-      (t): t is "single_choice" | "multiple_choice" | "true_false" | "short_answer" =>
-        ["single_choice", "multiple_choice", "true_false", "short_answer"].includes(t),
-    ) as ("single_choice" | "multiple_choice" | "true_false" | "short_answer")[];
+      (
+        t,
+      ): t is
+        | "single_choice"
+        | "multiple_choice"
+        | "true_false"
+        | "short_answer" =>
+        [
+          "single_choice",
+          "multiple_choice",
+          "true_false",
+          "short_answer",
+        ].includes(t),
+    ) as (
+      | "single_choice"
+      | "multiple_choice"
+      | "true_false"
+      | "short_answer"
+    )[];
 
     const result = await aiQuestionsService.generateQuestionsForSkill({
       skillId: skill.id,
@@ -164,7 +182,10 @@ export async function generateQuestionsAction(
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("generateQuestionsAction failed", { error: String(err) });
     return {
@@ -179,16 +200,14 @@ export async function generateQuestionsAction(
 
 /* ── List ──────────────────────────────────────────────────── */
 
-export async function listGeneratedQuestionsAction(
-  input?: {
-    subjectId?: string;
-    skillId?: string;
-    unverifiedOnly?: boolean;
-    page?: number;
-    pageSize?: number;
-    search?: string;
-  },
-): Promise<
+export async function listGeneratedQuestionsAction(input?: {
+  subjectId?: string;
+  skillId?: string;
+  unverifiedOnly?: boolean;
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}): Promise<
   ApiResponse<{
     items: GeneratedQuestionListItem[];
     total: number;
@@ -206,7 +225,10 @@ export async function listGeneratedQuestionsAction(
     return { success: true, data: result };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listGeneratedQuestionsAction failed", { error: String(err) });
     return {
@@ -239,7 +261,10 @@ export async function verifyQuestionAction(input: {
     return { success: true, data: { status: updated.source } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("verifyQuestionAction failed", { error: String(err) });
     return {
@@ -269,7 +294,10 @@ export async function editQuestionAction(input: {
     return { success: true, data: { id: updated.id } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("editQuestionAction failed", { error: String(err) });
     return {
@@ -296,7 +324,10 @@ export async function deleteQuestionAction(input: {
     return { success: true, data: { deleted: true } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("deleteQuestionAction failed", { error: String(err) });
     return {
@@ -330,7 +361,10 @@ export async function bulkVerifyQuestionsAction(input: {
     return { success: true, data: { verified } };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("bulkVerifyQuestionsAction failed", { error: String(err) });
     return {
@@ -351,11 +385,16 @@ export async function listSkillsForFilterAction(input?: {
     if (!parsed.success) {
       throw AppError.validation("Invalid input", parsed.error.flatten());
     }
-    const skills = await aiQuestionsService.listSkillsForFilter(parsed.data.subjectId);
+    const skills = await aiQuestionsService.listSkillsForFilter(
+      parsed.data.subjectId,
+    );
     return { success: true, data: skills };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listSkillsForFilterAction failed", { error: String(err) });
     return {
@@ -380,7 +419,10 @@ export async function listSubjectsForFilterAction(): Promise<
     return { success: true, data: subjects };
   } catch (err) {
     if (err instanceof AppError) {
-      return { success: false, error: { code: err.code, message: err.message } };
+      return {
+        success: false,
+        error: { code: err.code, message: err.message },
+      };
     }
     logger.error("listSubjectsForFilterAction failed", { error: String(err) });
     return {

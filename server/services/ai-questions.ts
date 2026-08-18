@@ -884,9 +884,10 @@ export interface SkillOption {
  */
 export async function listSkillsForFilter(
   subjectId?: string,
+  requiredActive = true,
 ): Promise<SkillOption[]> {
   const db = await getDb();
-  const conditions: SQL<unknown>[] = [eq(skillNodes.isActive, true)];
+  const conditions: SQL<unknown>[] = [eq(skillNodes.isActive, requiredActive)];
   if (subjectId) {
     conditions.push(eq(skillNodes.subjectId, subjectId) as never);
   }
