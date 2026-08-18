@@ -194,7 +194,7 @@ export function AiGenerateDialog({
                   field={field}
                   label={t("skill")}
                   placeholder={loadingSkills ? "…" : t("selectSkill")}
-                  disabled={!subjectId || loadingSkills}
+                  disabled={!watchedSubjectId || loadingSkills}
                   required
                   options={skills.map((s) => ({
                     value: s.id,
