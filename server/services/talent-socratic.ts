@@ -4,11 +4,12 @@
  * A chatbot that guides students through their Talent Track challenges
  * using the Socratic method (asking questions instead of giving answers).
  *
- * Uses z-ai-web-dev-sdk at runtime when available; falls back to a
- * rule-based response generator when the SDK isn't installed.
+ * Uses the DeepSeek API (via OpenAI SDK) at runtime; falls back to a
+ * rule-based response generator when the API key is missing or the call fails.
  */
 
 import { and, asc, desc, eq, sql } from "drizzle-orm";
+import OpenAI from "openai";
 
 import { getDb } from "@/server/db";
 import {
@@ -23,6 +24,8 @@ import { logger } from "@/lib/logger";
 import type { SocraticConversation } from "@/server/db/schema/talent";
 
 /* ── Types ─────────────────────────────────────────────────── */
+
+export type Locale = "en" | "fr";
 
 export interface SocraticMessage {
   role: "user" | "assistant";
@@ -138,13 +141,16 @@ interface ConversationContext {
 }
 
 /**
- * Generate the next Socratic response using the z-ai-web-dev-sdk LLM.
- * Falls back to a rule-based generator if the SDK is unavailable.
+ * Generate the next Socratic response using the DeepSeek API (via OpenAI SDK).
+ * Falls back to a rule-based generator if the API key is missing or the call fails.
+ *
+ * @param locale - Language for the response ('en' or 'fr'), default 'fr' (legacy).
  */
 export async function generateSocraticResponse(
   studentId: string,
   conversationId: string,
   userMessage: string,
+  locale: Locale = "fr",
 ): Promise<string> {
   const db = await getDb();
   const conv = await getConversation(conversationId, studentId);
@@ -164,12 +170,12 @@ export async function generateSocraticResponse(
   // Try the LLM, fall back to rule-based.
   let assistantResponse: string;
   try {
-    assistantResponse = await callLlm(userMessage, context, history);
+    assistantResponse = await callLlm(userMessage, context, history, locale);
   } catch (err) {
     logger.warn("LLM call failed, falling back to rule-based", {
       error: String(err),
     });
-    assistantResponse = ruleBasedResponse(userMessage, context);
+    assistantResponse = ruleBasedResponse(userMessage, context, locale);
   }
 
   // Persist the updated history.
@@ -256,163 +262,194 @@ import type { SocraticConversation as SocraticConversationRow } from "@/server/d
 
 type SocraticConversationWithRelations = SocraticConversationWithMessages;
 
-/* ── LLM call (with fallback) ─────────────────────────────── */
+/* ── LLM call using DeepSeek API ──────────────────────────── */
 
 async function callLlm(
   userMessage: string,
   context: ConversationContext,
   history: SocraticMessage[],
+  locale: Locale,
 ): Promise<string> {
-  // Dynamic import so the package isn't required at build time.
-  let ZAI: { default?: unknown; chat?: unknown } | null = null;
-  try {
-    const mod = await import("z-ai-web-dev-sdk");
-    ZAI = mod as { default?: unknown; chat?: unknown };
-  } catch {
-    // SDK not installed — fall back to rule-based.
-    return ruleBasedResponse(userMessage, context);
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error("DEEPSEEK_API_KEY environment variable is not set");
   }
 
-  if (!ZAI?.chat && typeof ZAI?.default !== "function") {
-    return ruleBasedResponse(userMessage, context);
-  }
+  const client = new OpenAI({
+    baseURL: "https://api.deepseek.com/v1",
+    apiKey,
+  });
 
-  const systemPrompt = buildSystemPrompt(context);
+  const systemPrompt = buildSystemPrompt(context, locale);
   const chatHistory = history.map((m) => ({
     role: m.role,
     content: m.content,
   }));
 
-  try {
-    // Try the named export first (preferred shape).
-    if (ZAI.chat && typeof ZAI.chat === "function") {
-      const chat = (ZAI as unknown as { chat: unknown }).chat as {
-        completions?: {
-          create?: (params: unknown) => Promise<unknown>;
-        };
-      };
-      if (chat?.completions?.create) {
-        const result = (await chat.completions.create({
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...chatHistory,
-          ],
-          temperature: 0.7,
-          max_tokens: 500,
-        } as unknown)) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        const text = result?.choices?.[0]?.message?.content;
-        if (typeof text === "string" && text.length > 0) return text.trim();
-      }
-    }
-    // Fall back to default export.
-    if (typeof ZAI.default === "function") {
-      const zaiDefault = ZAI.default as unknown as () => Promise<{
-        chat?: {
-          completions?: {
-            create?: (params: unknown) => Promise<unknown>;
-          };
-        };
-      }>;
-      const zai = await zaiDefault();
-      if (zai?.chat?.completions?.create) {
-        const result = (await zai.chat.completions.create({
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...chatHistory,
-          ],
-          temperature: 0.7,
-          max_tokens: 500,
-        } as unknown)) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        const text = result?.choices?.[0]?.message?.content;
-        if (typeof text === "string" && text.length > 0) return text.trim();
-      }
-    }
-  } catch (err) {
-    logger.warn("LLM SDK threw, falling back to rule-based", {
-      error: String(err),
-    });
-  }
+  const response = await client.chat.completions.create({
+    model: "deepseek-chat",
+    messages: [{ role: "system", content: systemPrompt }, ...chatHistory],
+    temperature: 0.7,
+    max_tokens: 500,
+  });
 
-  return ruleBasedResponse(userMessage, context);
+  const text = response.choices?.[0]?.message?.content;
+  if (typeof text === "string" && text.length > 0) {
+    return text.trim();
+  }
+  throw new Error("Empty response from DeepSeek API");
 }
 
-function buildSystemPrompt(context: ConversationContext): string {
-  const parts: string[] = [
-    "Tu es un mentor Socratique qui aide un élève à progresser sur son talent.",
-    "Tu ne donnes JAMAIS la réponse directement.",
-    "Tu poses des questions guidantes, tu encourages, tu fais réfléchir.",
-    "Tu parles en français, de manière bienveillante et concise (max 3 phrases).",
-  ];
+/* ── System prompt builder (i18n) ────────────────────────── */
+
+function buildSystemPrompt(
+  context: ConversationContext,
+  locale: Locale,
+): string {
+  const isFrench = locale === "fr";
+
+  const lines: string[] = [];
+  if (isFrench) {
+    lines.push(
+      "Tu es un mentor Socratique qui aide un élève à progresser sur son talent.",
+      "Tu ne donnes JAMAIS la réponse directement.",
+      "Tu poses des questions guidantes, tu encourages, tu fais réfléchir.",
+      "Tu parles en français, de manière bienveillante et concise (max 3 phrases).",
+    );
+  } else {
+    lines.push(
+      "You are a Socratic mentor helping a student progress in their talent.",
+      "You NEVER give the answer directly.",
+      "You ask guiding questions, encourage, and make the student think.",
+      "You speak in English, kindly and concisely (max 3 sentences).",
+    );
+  }
+
   if (context.skillName) {
-    parts.push(`Le talent travaillé est : ${context.skillName}.`);
+    lines.push(
+      isFrench
+        ? `Le talent travaillé est : ${context.skillName}.`
+        : `The skill being worked on is: ${context.skillName}.`,
+    );
   }
   if (context.subjectName) {
-    parts.push(`Matière : ${context.subjectName}.`);
+    lines.push(
+      isFrench
+        ? `Matière : ${context.subjectName}.`
+        : `Subject: ${context.subjectName}.`,
+    );
   }
   if (context.challengeTitle) {
-    parts.push(`Challenge en cours : ${context.challengeTitle}.`);
+    lines.push(
+      isFrench
+        ? `Challenge en cours : ${context.challengeTitle}.`
+        : `Current challenge: ${context.challengeTitle}.`,
+    );
   }
   if (context.challengeDescription) {
-    parts.push(`Description du challenge : ${context.challengeDescription}`);
+    lines.push(
+      isFrench
+        ? `Description du challenge : ${context.challengeDescription}`
+        : `Challenge description: ${context.challengeDescription}`,
+    );
   }
   if (context.studentTier) {
-    parts.push(`Niveau actuel de l'élève : ${context.studentTier}.`);
+    lines.push(
+      isFrench
+        ? `Niveau actuel de l'élève : ${context.studentTier}.`
+        : `Current student level: ${context.studentTier}.`,
+    );
   }
-  return parts.join(" ");
+  return lines.join(" ");
 }
 
-/* ── Rule-based fallback (offline Socratic generator) ────── */
+/* ── Rule-based fallback (offline Socratic generator) i18n ── */
 
 function ruleBasedResponse(
   userMessage: string,
   context: ConversationContext,
+  locale: Locale,
 ): string {
   const msg = userMessage.toLowerCase().trim();
+  const isFrench = locale === "fr";
 
-  // Pattern: student asks for the answer directly.
+  // Patterns: student asks for the answer directly.
   if (
     msg.includes("donne-moi la réponse") ||
     msg.includes("quelle est la réponse") ||
-    msg.includes("je veux la solution")
+    msg.includes("je veux la solution") ||
+    (locale === "en" &&
+      (msg.includes("give me the answer") ||
+        msg.includes("what is the answer") ||
+        msg.includes("i want the solution")))
   ) {
-    return "Je ne peux pas te donner la réponse directement — ce serait te priver du plaisir de la trouver. Mais je peux te guider : qu'as-tu essayé jusqu'ici ?";
+    return isFrench
+      ? "Je ne peux pas te donner la réponse directement — ce serait te priver du plaisir de la trouver. Mais je peux te guider : qu'as-tu essayé jusqu'ici ?"
+      : "I can't give you the answer directly — that would rob you of the joy of finding it. But I can guide you: what have you tried so far?";
   }
 
-  // Pattern: student says they're stuck.
+  // Patterns: student says they're stuck.
   if (
     msg.includes("je bloque") ||
     msg.includes("je comprends pas") ||
     msg.includes("je suis perdu") ||
-    msg.includes("aide-moi")
+    msg.includes("aide-moi") ||
+    (locale === "en" &&
+      (msg.includes("i'm stuck") ||
+        msg.includes("i don't understand") ||
+        msg.includes("i'm lost") ||
+        msg.includes("help me")))
   ) {
     if (context.challengeHint) {
-      return `Pas de panique — c'est en séchant qu'on apprend. Voici un indice : ${context.challengeHint}. Qu'en penses-tu ?`;
+      return isFrench
+        ? `Pas de panique — c'est en séchant qu'on apprend. Voici un indice : ${context.challengeHint}. Qu'en penses-tu ?`
+        : `Don't panic — we learn by struggling. Here's a hint: ${context.challengeHint}. What do you think?`;
     }
-    return "Pas de panique — c'est en séchant qu'on apprend. Reprenons depuis le début : peux-tu me dire ce que tu sais déjà sur cette compétence ?";
+    return isFrench
+      ? "Pas de panique — c'est en séchant qu'on apprend. Reprenons depuis le début : peux-tu me dire ce que tu sais déjà sur cette compétence ?"
+      : "Don't panic — we learn by struggling. Let's start from the beginning: can you tell me what you already know about this skill?";
   }
 
-  // Pattern: student proposes an answer.
-  if (msg.includes("je pense que") || msg.includes("ma réponse est") || msg.includes("j'ai trouvé")) {
-    return "Intéressant ! Comment pourrais-tu vérifier ta réponse ? Qu'est-ce qui te fait dire que c'est correct ?";
+  // Patterns: student proposes an answer.
+  if (
+    msg.includes("je pense que") ||
+    msg.includes("ma réponse est") ||
+    msg.includes("j'ai trouvé") ||
+    (locale === "en" &&
+      (msg.includes("i think that") ||
+        msg.includes("my answer is") ||
+        msg.includes("i found")))
+  ) {
+    return isFrench
+      ? "Intéressant ! Comment pourrais-tu vérifier ta réponse ? Qu'est-ce qui te fait dire que c'est correct ?"
+      : "Interesting! How could you verify your answer? What makes you think it's correct?";
   }
 
-  // Pattern: student asks a "why" question.
-  if (msg.startsWith("pourquoi") || msg.startsWith("pourkoi")) {
-    return "Bonne question ! À ton avis, qu'est-ce qui pourrait expliquer ce phénomène ? Essaie d'imaginer une hypothèse.";
+  // Patterns: "why" question.
+  if (
+    msg.startsWith("pourquoi") ||
+    msg.startsWith("pourkoi") ||
+    (locale === "en" && msg.startsWith("why"))
+  ) {
+    return isFrench
+      ? "Bonne question ! À ton avis, qu'est-ce qui pourrait expliquer ce phénomène ? Essaie d'imaginer une hypothèse."
+      : "Good question! In your opinion, what could explain this phenomenon? Try to imagine a hypothesis.";
   }
 
-  // Pattern: student asks "how".
-  if (msg.startsWith("comment")) {
-    return "Décomposons le problème : quelle est la première étape que tu identifies ? On y va étape par étape.";
+  // Patterns: "how" question.
+  if (msg.startsWith("comment") || (locale === "en" && msg.startsWith("how"))) {
+    return isFrench
+      ? "Décomposons le problème : quelle est la première étape que tu identifies ? On y va étape par étape."
+      : "Let's break down the problem: what is the first step you identify? We'll go step by step.";
   }
 
   // Default: encourage + ask guiding question.
   const skillRef = context.skillName
-    ? ` sur ${context.skillName}`
+    ? isFrench
+      ? ` sur ${context.skillName}`
+      : ` on ${context.skillName}`
     : "";
-  return `Bonne réflexion${skillRef} ! Qu'est-ce qui te paraît le plus difficile dans ce que tu essaies de faire ?`;
+  return isFrench
+    ? `Bonne réflexion${skillRef} ! Qu'est-ce qui te paraît le plus difficile dans ce que tu essaies de faire ?`
+    : `Good thinking${skillRef}! What seems most difficult about what you're trying to do?`;
 }

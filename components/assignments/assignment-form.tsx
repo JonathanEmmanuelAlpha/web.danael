@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Trash2, X, Link as LinkIcon, Type, FileText } from "lucide-react";
-import { useForm } from "@tanstack/react-form";
-import { useStore } from "@tanstack/react-store";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,10 @@ import {
   SubmitButton,
   FormErrorBanner,
 } from "@/components/forms/tanstack-fields";
-import { createAssignmentAction, updateAssignmentAction } from "@/server/actions/assignments";
+import {
+  createAssignmentAction,
+  updateAssignmentAction,
+} from "@/server/actions/assignments";
 import { listClassesAction } from "@/server/actions/classes";
 import {
   listSubjectsAction,
@@ -229,7 +231,10 @@ export function AssignmentForm({
   });
 
   // Watch subjectId to dynamically load its skills.
-  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+  const watchedSubjectId = useSelector(
+    form.store,
+    (state) => state.values.subjectId,
+  );
   const hasSubject = !!watchedSubjectId && watchedSubjectId !== "none";
 
   useEffect(() => {
@@ -368,18 +373,11 @@ export function AssignmentForm({
       {/* DueAt + Points */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <form.Field name="dueAt">
-          {(field) => (
-            <DateField field={field} label={t("dueDate")} />
-          )}
+          {(field) => <DateField field={field} label={t("dueDate")} />}
         </form.Field>
         <form.Field name="points">
           {(field) => (
-            <NumberField
-              field={field}
-              label={t("points")}
-              min={0}
-              max={1000}
-            />
+            <NumberField field={field} label={t("points")} min={0} max={1000} />
           )}
         </form.Field>
       </div>

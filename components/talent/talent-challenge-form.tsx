@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useStore } from "@tanstack/react-store";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Save, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -24,9 +23,7 @@ import {
   TALENT_CHALLENGE_TYPE_VALUES,
   type TalentChallengeTypeValue,
 } from "@/server/db/schema/talent";
-import {
-  createTalentChallengeAction,
-} from "@/server/actions/talent";
+import { createTalentChallengeAction } from "@/server/actions/talent";
 import { listSubjectSkillsAction } from "@/server/actions/subjects";
 import type { Subject, SubjectSkill } from "@/server/db/schema/schools";
 import type { TalentChallengeWithRelations } from "@/server/services/talent";
@@ -114,7 +111,8 @@ export function TalentChallengeForm({
       description: initialChallenge?.description ?? "",
       difficulty: initialChallenge?.difficulty ?? 5,
       estimatedMinutes: initialChallenge?.estimatedMinutes ?? 30,
-      type: (initialChallenge?.type ?? "problem_set") as TalentChallengeTypeValue,
+      type: (initialChallenge?.type ??
+        "problem_set") as TalentChallengeTypeValue,
       requiredTier: (initialChallenge?.requiredTier ??
         "seedling") as TalentTier,
       solutionHint: initialChallenge?.solutionHint ?? "",
@@ -151,7 +149,7 @@ export function TalentChallengeForm({
   });
 
   // Watch subjectId to dynamically load its skills.
-  const watchedSubjectId = useStore(
+  const watchedSubjectId = useSelector(
     form.store,
     (state) => state.values.subjectId,
   );

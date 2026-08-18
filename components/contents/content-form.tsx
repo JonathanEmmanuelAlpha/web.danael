@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
-import { useForm } from "@tanstack/react-form";
-import { useStore } from "@tanstack/react-store";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { SectionCard } from "@/components/shared/section-card";
 import {
@@ -166,7 +165,10 @@ export function ContentForm({
   });
 
   // Watch subjectId to dynamically load its skills.
-  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+  const watchedSubjectId = useSelector(
+    form.store,
+    (state) => state.values.subjectId,
+  );
 
   useEffect(() => {
     if (!watchedSubjectId) {

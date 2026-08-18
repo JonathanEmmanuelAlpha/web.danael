@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Plus, Save } from "lucide-react";
 import { toast } from "sonner";
-import { useForm } from "@tanstack/react-form";
-import { useStore } from "@tanstack/react-store";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -205,7 +204,10 @@ export function QuizForm({
   // Watch subjectId to dynamically load its skills. The quiz form uses
   // "none" as the empty-subject sentinel (vs "" in content-form), so we
   // treat that value as "no subject".
-  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+  const watchedSubjectId = useSelector(
+    form.store,
+    (state) => state.values.subjectId,
+  );
   const hasSubject = Boolean(watchedSubjectId) && watchedSubjectId !== "none";
 
   useEffect(() => {
