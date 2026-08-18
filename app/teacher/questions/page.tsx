@@ -3,10 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { ShieldCheck } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/clerk";
 import { PageHeader } from "@/components/shared/page-header";
-import {
-  TeacherQuestionsValidation,
-  GenerateQuestionsButton,
-} from "@/components/quiz/teacher-questions-validation";
+import { TeacherQuestionsValidation } from "@/components/quiz/teacher-questions-validation";
+import { AiGenerateDialog } from "@/components/quiz/ai-generate-dialog";
+import { listSubjectsForFilterAction } from "@/server/actions/ai-questions";
 
 /**
  * §10.4 — Teacher page for validating AI-generated questions.
@@ -22,6 +21,9 @@ export default async function TeacherQuestionsPage() {
 
   const t = await getTranslations("AiQuestions");
 
+  const subjectsRes = await listSubjectsForFilterAction();
+  const subjects = subjectsRes.success ? subjectsRes.data : [];
+
   return (
     <>
       <div className="space-y-6">
@@ -29,9 +31,9 @@ export default async function TeacherQuestionsPage() {
           title={t("title")}
           description={t("description")}
           icon={<ShieldCheck className="size-6" />}
-          actions={<GenerateQuestionsButton />}
+          actions={<AiGenerateDialog subjects={subjects} />}
         />
-        <TeacherQuestionsValidation teacherId={user.id} />
+        <TeacherQuestionsValidation teacherId={user.id} subjects={subjects} />
       </div>
     </>
   );

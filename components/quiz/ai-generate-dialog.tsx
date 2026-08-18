@@ -32,14 +32,26 @@ import {
   DIFFICULTY_VALUES,
   QUIZ_QUESTION_TYPE_VALUES,
 } from "@/server/db/schema/enums";
-import type { SkillOption } from "@/server/services/ai-questions";
+import type {
+  SkillOption,
+  SubjectOption,
+} from "@/server/services/ai-questions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface AiGenerateDialogProps {
   /** Triggered when questions are successfully generated. */
   onGenerated?: () => void;
+  subjects: SubjectOption[];
 }
 
 const generateSchema = z.object({
+  subjectId: z.string().min(1, "Required"),
   skillId: z.string().min(1, "Required"),
   count: z.number().int().min(1).max(20),
   difficulty: z.enum(DIFFICULTY_VALUES),
@@ -57,10 +69,16 @@ type GenerateValues = z.infer<typeof generateSchema>;
  * question types, then triggers `generateQuestionsAction`. The dialog stays
  * open while generation is in progress and closes on success.
  */
-export function AiGenerateDialog({ onGenerated }: AiGenerateDialogProps) {
+export function AiGenerateDialog({
+  onGenerated,
+  subjects,
+}: AiGenerateDialogProps) {
   const t = useTranslations("AiQuestions");
   const tQuiz = useTranslations("Quizzes");
+  const tCommon = useTranslations("Common");
+
   const [open, setOpen] = React.useState(false);
+  const [subjectId, setSubjectId] = React.useState<string>("");
   const [skills, setSkills] = React.useState<SkillOption[]>([]);
   const [loadingSkills, setLoadingSkills] = React.useState(false);
   const [placeholderNotice, setPlaceholderNotice] = React.useState(false);
@@ -75,7 +93,7 @@ export function AiGenerateDialog({ onGenerated }: AiGenerateDialogProps) {
       if (cancelled) return;
       setLoadingSkills(true);
     });
-    listSkillsForFilterAction({})
+    listSkillsForFilterAction(subjectId ? { subjectId } : {})
       .then((res) => {
         if (cancelled) return;
         if (res.success && res.data) setSkills(res.data);
@@ -152,20 +170,47 @@ export function AiGenerateDialog({ onGenerated }: AiGenerateDialogProps) {
           }}
           className="space-y-5"
         >
-          <form.Field name="skillId">
-            {(field) => (
-              <SelectField
-                field={field}
-                label={t("skill")}
-                placeholder={loadingSkills ? "…" : t("selectSkill")}
-                required
-                options={skills.map((s) => ({
-                  value: s.id,
-                  label: `${s.name} (${s.code})`,
-                }))}
-              />
-            )}
-          </form.Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Subject */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">{t("subject")}</Label>
+              <Select
+                value={subjectId || "all"}
+                onValueChange={(v) => {
+                  setSubjectId(v === "all" ? "" : v);
+                }}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder={t("allSubjects")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("allSubjects")}</SelectItem>
+                  {subjects.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <form.Field name="skillId">
+              {(field) => {
+                return (
+                  <SelectField
+                    field={field}
+                    label={t("skill")}
+                    placeholder={loadingSkills ? "…" : t("selectSkill")}
+                    disabled={!subjectId || loadingSkills}
+                    required
+                    options={skills.map((s) => ({
+                      value: s.id,
+                      label: `${s.name} (${s.code})`,
+                    }))}
+                  />
+                );
+              }}
+            </form.Field>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <form.Field name="count">
@@ -196,10 +241,7 @@ export function AiGenerateDialog({ onGenerated }: AiGenerateDialogProps) {
 
           <form.Field name="questionTypes">
             {(field) => (
-              <QuestionTypesPicker
-                field={field}
-                label={t("questionTypes")}
-              />
+              <QuestionTypesPicker field={field} label={t("questionTypes")} />
             )}
           </form.Field>
 
@@ -222,10 +264,7 @@ export function AiGenerateDialog({ onGenerated }: AiGenerateDialogProps) {
                   >
                     {t("clearSelection")}
                   </Button>
-                  <SubmitButton
-                    pending={isSubmitting}
-                    disabled={!canSubmit}
-                  >
+                  <SubmitButton pending={isSubmitting} disabled={!canSubmit}>
                     {isSubmitting ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (

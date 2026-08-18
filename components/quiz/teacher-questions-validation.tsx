@@ -14,7 +14,6 @@ import {
   Search as SearchIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +41,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { GridSkeleton } from "@/components/shared/loading";
 import { QuestionCard } from "./question-card";
 import { QuestionEditDialog } from "./question-edit-dialog";
-import { AiGenerateDialog } from "./ai-generate-dialog";
 import {
   listGeneratedQuestionsAction,
   listSubjectsForFilterAction,
@@ -51,25 +49,16 @@ import {
   deleteQuestionAction,
   bulkVerifyQuestionsAction,
 } from "@/server/actions/ai-questions";
-import type { GeneratedQuestionListItem } from "@/server/services/ai-questions";
-
-interface SubjectOption {
-  id: string;
-  name: string;
-  code: string;
-}
-
-interface SkillOption {
-  id: string;
-  name: string;
-  code: string;
-  subjectId: string | null;
-  type: string;
-}
+import type {
+  GeneratedQuestionListItem,
+  SkillOption,
+  SubjectOption,
+} from "@/server/services/ai-questions";
 
 interface TeacherQuestionsValidationProps {
   /** Teacher's DB user id (for audit logs / ownership). */
   teacherId: string;
+  subjects: SubjectOption[];
 }
 
 /**
@@ -86,6 +75,7 @@ interface TeacherQuestionsValidationProps {
  */
 export function TeacherQuestionsValidation({
   teacherId,
+  subjects,
 }: TeacherQuestionsValidationProps) {
   const t = useTranslations("AiQuestions");
 
@@ -102,7 +92,6 @@ export function TeacherQuestionsValidation({
     null,
   );
   const [total, setTotal] = React.useState(0);
-  const [subjects, setSubjects] = React.useState<SubjectOption[]>([]);
   const [skills, setSkills] = React.useState<SkillOption[]>([]);
   const [loading, setLoading] = React.useState(false);
 
@@ -113,13 +102,6 @@ export function TeacherQuestionsValidation({
   const [editOpen, setEditOpen] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [pendingAction, setPendingAction] = React.useState(false);
-
-  /* -- Initial load (subjects) --------------------------- */
-  React.useEffect(() => {
-    listSubjectsForFilterAction().then((res) => {
-      if (res.success && res.data) setSubjects(res.data);
-    });
-  }, []);
 
   /* -- Reload skills when the subject filter changes ---- */
   React.useEffect(() => {
@@ -615,16 +597,3 @@ export function TeacherQuestionsValidation({
     </div>
   );
 }
-
-/**
- * Header action button — opens the AI generate dialog.
- * Exported separately so the page can drop it into the PageHeader `actions` slot.
- */
-export function GenerateQuestionsButton() {
-  // Re-export the trigger for convenience.
-  return <AiGenerateDialog />;
-}
-
-// Silence unused-import warnings for icons that may be tree-shaken in
-// future refactors.
-void cn;

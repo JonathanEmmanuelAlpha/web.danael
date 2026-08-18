@@ -116,6 +116,12 @@ export interface GeneratedQuestionListItem {
 
 const AI_MODEL_NAME = "deepseek"; // identifies the model used for generation
 
+export type SubjectOption = {
+  id: string;
+  name: string;
+  code: string;
+};
+
 /* -- Public API ----------------------------------------------- */
 
 /**
