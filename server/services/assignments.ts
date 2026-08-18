@@ -126,6 +126,7 @@ export async function createAssignment(
       description: input.description,
       classId: input.classId,
       subjectId: input.subjectId,
+      skillId: input.skillId,
       teacherId: input.teacherId,
       dueAt: input.dueAt ? new Date(input.dueAt) : null,
       points: input.points,
@@ -174,6 +175,7 @@ export async function updateAssignment(
         : {}),
       ...(input.classId !== undefined ? { classId: input.classId } : {}),
       ...(input.subjectId !== undefined ? { subjectId: input.subjectId } : {}),
+      ...(input.skillId !== undefined ? { skillId: input.skillId } : {}),
       ...(input.dueAt !== undefined
         ? { dueAt: input.dueAt ? new Date(input.dueAt) : null }
         : {}),

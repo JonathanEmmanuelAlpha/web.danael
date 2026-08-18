@@ -30,6 +30,10 @@ import {
   KeyRound,
   Flag,
   ScrollText,
+  Brain,
+  Target,
+  GitBranch,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import type { UserRole } from "@/types";
@@ -93,6 +97,43 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
       ],
     },
     {
+      titleKey: "talent",
+      items: [
+        { href: "/student/talent", labelKey: "talentDashboard", icon: Brain },
+        { href: "/student/talent/track", labelKey: "myTrack", icon: Target },
+        {
+          href: "/student/talent/challenges",
+          labelKey: "challengesLibrary",
+          icon: Trophy,
+        },
+        {
+          href: "/student/talent/tree",
+          labelKey: "talentTree",
+          icon: GitBranch,
+        },
+        {
+          href: "/student/talent/mentor",
+          labelKey: "socraticMentor",
+          icon: Sparkles,
+        },
+        {
+          href: "/student/talent/career",
+          labelKey: "careerHorizon",
+          icon: Briefcase,
+        },
+        {
+          href: "/student/talent/cohorts",
+          labelKey: "cohorts",
+          icon: Users,
+        },
+        {
+          href: "/student/talent/showcase",
+          labelKey: "showcase",
+          icon: Star,
+        },
+      ],
+    },
+    {
       titleKey: "me",
       items: [
         { href: "/student/progress", labelKey: "progress", icon: TrendingUp },
@@ -103,6 +144,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
           labelKey: "diagnostic",
           icon: ClipboardCheck,
         },
+        { href: "/student/my-school", labelKey: "mySchool", icon: School },
         { href: "/classes", labelKey: "classes", icon: School },
         { href: "/tutors", labelKey: "tutors", icon: GraduationCap },
         { href: "/invitations", labelKey: "invitations", icon: Mail },
@@ -150,8 +192,24 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
       ],
     },
     {
+      titleKey: "talent",
+      items: [
+        {
+          href: "/teacher/talent-roster",
+          labelKey: "talentRoster",
+          icon: Brain,
+        },
+        {
+          href: "/teacher/talent-challenges",
+          labelKey: "talentChallenges",
+          icon: Target,
+        },
+      ],
+    },
+    {
       titleKey: "me",
       items: [
+        { href: "/teacher/my-school", labelKey: "mySchool", icon: School },
         { href: "/invitations", labelKey: "invitations", icon: Mail },
         { href: "/my-requests", labelKey: "myRequests", icon: Send },
         { href: "/messages", labelKey: "messages", icon: MessageSquare },
@@ -296,6 +354,12 @@ export const NAV_BY_ROLE: Record<UserRole, NavSection[]> = {
       ],
     },
     {
+      titleKey: "talent",
+      items: [
+        { href: "/admin/talent", labelKey: "talentHealth", icon: Brain },
+      ],
+    },
+    {
       titleKey: "system",
       items: [
         { href: "/admin/audit", labelKey: "audit", icon: ScrollText },
@@ -347,6 +411,7 @@ export const SECTION_LABELS: Record<string, string> = {
   platform: "sections.platform",
   moderation: "sections.moderation",
   system: "sections.system",
+  talent: "sections.talent",
 };
 
 export function getNavForRole(role: UserRole): NavSection[] {

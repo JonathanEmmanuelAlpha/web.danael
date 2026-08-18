@@ -21,6 +21,8 @@ export const createContentSchema = z.object({
   title: z.string().min(2, "Title too short").max(200),
   description: z.string().max(2000).optional(),
   subjectId: z.uuid().optional(),
+  /** Skill the content targets (granular targeting). */
+  skillId: z.uuid().optional(),
   level: z.enum(LEVEL_VALUES).optional(),
   series: z.enum(SERIES_VALUES).optional(),
   schoolId: z.uuid().optional(),
@@ -45,6 +47,8 @@ export const updateContentSchema = z.object({
   title: z.string().min(2).max(200).optional(),
   description: z.string().max(2000).optional(),
   subjectId: z.uuid().nullable().optional(),
+  /** Skill the content targets. */
+  skillId: z.uuid().nullable().optional(),
   level: z.enum(LEVEL_VALUES).nullable().optional(),
   series: z.enum(SERIES_VALUES).nullable().optional(),
   schoolId: z.uuid().nullable().optional(),
@@ -69,6 +73,7 @@ export const listContentsQuerySchema = z.object({
   level: z.enum(LEVEL_VALUES).optional(),
   series: z.enum(SERIES_VALUES).optional(),
   subjectId: z.uuid().optional(),
+  skillId: z.uuid().optional(),
   schoolId: z.uuid().optional(),
   classId: z.uuid().optional(),
   visibility: z.enum(CONTENT_VISIBILITY_VALUES).optional(),

@@ -15,17 +15,24 @@ import {
   updateSubjectSchema,
   assignSubjectSchema,
   updateClassSubjectSchema,
+  createSubjectSkillSchema,
+  updateSubjectSkillSchema,
+  listSubjectSkillsSchema,
   type CreateSubjectInput,
   type UpdateSubjectInput,
   type AssignSubjectInput,
   type UpdateClassSubjectInput,
+  type CreateSubjectSkillInput,
+  type UpdateSubjectSkillInput,
+  type ListSubjectSkillsInput,
 } from "@/server/validators/subjects";
 import * as subjectsService from "@/server/services/subjects";
 import * as classesService from "@/server/services/classes";
-import type { Subject } from "@/server/db/schema/schools";
+import type { Subject, SubjectSkill } from "@/server/db/schema/schools";
 import type {
   ClassSubjectWithRelations,
-} from "@/server/services/classes";
+  SubjectWithSkills,
+} from "@/server/services/subjects";
 
 /* ── Mutations ─────────────────────────────────────────────── */
 
@@ -216,6 +223,192 @@ export async function listSubjectsAction(): Promise<ApiResponse<Subject[]>> {
   }
 }
 
+/**
+ * List all subjects with their skills attached. Used by the admin
+ * subjects manager to render the detailed subject cards (each with
+ * its grid of skills).
+ */
+export async function listSubjectsWithSkillsAction(): Promise<ApiResponse<SubjectWithSkills[]>> {
+  try {
+    await requireSession();
+    const items = await subjectsService.listSubjectsWithSkills();
+    return { success: true, data: items };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("listSubjectsWithSkillsAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not load subjects with skills" },
+    };
+  }
+}
+
+/* ── Subject skills mutations ─────────────────────────────── */
+
+export async function listSubjectSkillsAction(
+  input: ListSubjectSkillsInput,
+): Promise<ApiResponse<SubjectSkill[]>> {
+  try {
+    await requireSession();
+    const parsed = listSubjectSkillsSchema.safeParse(input);
+    if (!parsed.success) {
+      throw AppError.validation("Invalid input", parsed.error.flatten());
+    }
+    const items = await subjectsService.listSubjectSkills(parsed.data);
+    return { success: true, data: items };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("listSubjectSkillsAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not load subject skills" },
+    };
+  }
+}
+
+export async function createSubjectSkillAction(
+  input: CreateSubjectSkillInput,
+): Promise<ApiResponse<SubjectSkill>> {
+  try {
+    const session = await requireSession();
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    if (dbUser.role !== "platform_admin" && dbUser.role !== "school_admin") {
+      throw AppError.unauthorized(
+        "Only platform or school admins can create subject skills",
+      );
+    }
+
+    const parsed = createSubjectSkillSchema.safeParse(input);
+    if (!parsed.success) {
+      throw AppError.validation("Invalid input", parsed.error.flatten());
+    }
+
+    const skill = await subjectsService.createSubjectSkill(parsed.data);
+    logger.info("Subject skill created", {
+      skillId: skill.id,
+      subjectId: parsed.data.subjectId,
+      byUserId: dbUser.id,
+      clerkId: session.clerkId,
+    });
+    revalidatePath("/admin/subjects");
+    revalidatePath("/school/subjects");
+    return { success: true, data: skill };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("createSubjectSkillAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not create subject skill" },
+    };
+  }
+}
+
+export async function updateSubjectSkillAction(
+  input: UpdateSubjectSkillInput,
+): Promise<ApiResponse<SubjectSkill>> {
+  try {
+    const session = await requireSession();
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    if (dbUser.role !== "platform_admin" && dbUser.role !== "school_admin") {
+      throw AppError.unauthorized(
+        "Only platform or school admins can update subject skills",
+      );
+    }
+
+    const parsed = updateSubjectSkillSchema.safeParse(input);
+    if (!parsed.success) {
+      throw AppError.validation("Invalid input", parsed.error.flatten());
+    }
+
+    const skill = await subjectsService.updateSubjectSkill(parsed.data.id, parsed.data);
+    logger.info("Subject skill updated", {
+      skillId: skill.id,
+      byUserId: dbUser.id,
+      clerkId: session.clerkId,
+    });
+    revalidatePath("/admin/subjects");
+    revalidatePath("/school/subjects");
+    return { success: true, data: skill };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("updateSubjectSkillAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not update subject skill" },
+    };
+  }
+}
+
+export async function deleteSubjectSkillAction(
+  id: string,
+): Promise<ApiResponse<{ id: string }>> {
+  try {
+    const session = await requireSession();
+    const dbUser = await getCurrentDbUser();
+    if (!dbUser) throw AppError.notFound("User profile not found");
+
+    if (dbUser.role !== "platform_admin" && dbUser.role !== "school_admin") {
+      throw AppError.unauthorized(
+        "Only platform or school admins can delete subject skills",
+      );
+    }
+
+    await subjectsService.deleteSubjectSkill(id);
+    logger.info("Subject skill deleted", {
+      skillId: id,
+      byUserId: dbUser.id,
+      clerkId: session.clerkId,
+    });
+    revalidatePath("/admin/subjects");
+    revalidatePath("/school/subjects");
+    return { success: true, data: { id } };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("deleteSubjectSkillAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not delete subject skill" },
+    };
+  }
+}
+
+/**
+ * Bulk-fetch skills by their ids (used by content/quiz/assignment
+ * detail pages to display the associated skill badge).
+ */
+export async function getSubjectSkillsByIdsAction(
+  ids: string[],
+): Promise<ApiResponse<SubjectSkill[]>> {
+  try {
+    await requireSession();
+    const items = await subjectsService.getSubjectSkillsByIds(ids);
+    return { success: true, data: items };
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { success: false, error: { code: err.code, message: err.message } };
+    }
+    logger.error("getSubjectSkillsByIdsAction failed", { error: String(err) });
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Could not load skills" },
+    };
+  }
+}
+
 export async function deleteSubjectAction(
   id: string,
 ): Promise<ApiResponse<{ id: string }>> {
@@ -238,6 +431,7 @@ export async function deleteSubjectAction(
     });
     revalidatePath("/admin/subjects");
     revalidatePath("/school/subjects");
+    revalidatePath("/library");
     return { success: true, data: { id } };
   } catch (err) {
     if (err instanceof AppError) {

@@ -19,7 +19,7 @@ import {
 
 import { pgRef } from "./_env";
 import { users } from "./users";
-import { schools } from "./schools";
+import { schools, subjects, subjectSkills } from "./schools";
 import {
   competitionScopeEnum,
   competitionStatusEnum,
@@ -43,6 +43,14 @@ export const competitions = pgTable(
     schoolId: uuid("school_id").references(() => pgRef(schools.id), {
       onDelete: "cascade",
     }),
+    /** Optional subject the competition focuses on. */
+    subjectId: uuid("subject_id").references(() => pgRef(subjects.id), {
+      onDelete: "set null",
+    }),
+    /** Optional skill the competition targets (granular targeting). */
+    skillId: uuid("skill_id").references(() => pgRef(subjectSkills.id), {
+      onDelete: "set null",
+    }),
     startAt: timestamp("start_at", { withTimezone: true }).notNull(),
     endAt: timestamp("end_at", { withTimezone: true }).notNull(),
     status: competitionStatusEnum("status").notNull().default("draft"),
@@ -60,6 +68,8 @@ export const competitions = pgTable(
     levelIdx: pgIndex("competitions_level_idx").on(t.level),
     seriesIdx: pgIndex("competitions_series_idx").on(t.series),
     schoolIdx: pgIndex("competitions_school_id_idx").on(t.schoolId),
+    subjectIdx: pgIndex("competitions_subject_id_idx").on(t.subjectId),
+    skillIdx: pgIndex("competitions_skill_id_idx").on(t.skillId),
     statusIdx: pgIndex("competitions_status_idx").on(t.status),
     dateIdx: pgIndex("competitions_start_end_idx").on(t.startAt, t.endAt),
   }),

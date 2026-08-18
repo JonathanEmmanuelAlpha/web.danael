@@ -22,7 +22,7 @@ import {
 
 import { pgRef } from "./_env";
 import { users } from "./users";
-import { subjects } from "./schools";
+import { subjects, subjectSkills } from "./schools";
 import {
   quizTypeEnum,
   quizQuestionTypeEnum,
@@ -46,6 +46,11 @@ export const quizzes = pgTable(
     subjectId: uuid("subject_id").references(() => pgRef(subjects.id), {
       onDelete: "set null",
     }),
+    /** Primary skill the quiz targets. A quiz can also test multiple
+     *  skills via its questions (each question has its own skillId). */
+    skillId: uuid("skill_id").references(() => pgRef(subjectSkills.id), {
+      onDelete: "set null",
+    }),
     level: levelEnum("level"),
     series: seriesEnum("series"),
     type: quizTypeEnum("type").notNull().default("practice"),
@@ -67,6 +72,7 @@ export const quizzes = pgTable(
   },
   (t) => ({
     subjectIdx: pgIndex("quizzes_subject_id_idx").on(t.subjectId),
+    skillIdx: pgIndex("quizzes_skill_id_idx").on(t.skillId),
     levelIdx: pgIndex("quizzes_level_idx").on(t.level),
     seriesIdx: pgIndex("quizzes_series_idx").on(t.series),
     publishedIdx: pgIndex("quizzes_is_published_idx").on(t.isPublished),
@@ -107,6 +113,15 @@ export const quizQuestions = pgTable(
     /** AI generation metadata (null for verified questions). */
     generatedByModel: pgText("generated_by_model"),
     generatedForSkillId: uuid("generated_for_skill_id"),
+    /**
+     * Skill this question tests (FK to subject_skills).
+     * Required by spec: each question targets exactly one skill.
+     * For AI-generated questions, this is set at generation time
+     * and can be re-assigned during teacher review.
+     */
+    skillId: uuid("skill_id").references(() => pgRef(subjectSkills.id), {
+      onDelete: "set null",
+    }),
     /** Teacher who verified this question (null if still generated). */
     verifiedBy: uuid("verified_by"),
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
@@ -122,6 +137,7 @@ export const quizQuestions = pgTable(
     quizIdx: pgIndex("quiz_questions_quiz_id_idx").on(t.quizId),
     positionIdx: pgIndex("quiz_questions_position_idx").on(t.position),
     sourceIdx: pgIndex("quiz_questions_source_idx").on(t.source),
+    skillIdx: pgIndex("quiz_questions_skill_id_idx").on(t.skillId),
     verifiedByIdx: pgIndex("quiz_questions_verified_by_idx").on(t.verifiedBy),
   }),
 );

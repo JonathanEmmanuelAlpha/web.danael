@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 import { z } from "zod";
 import { SectionCard } from "@/components/shared/section-card";
 import {
@@ -30,12 +31,13 @@ import {
   SERIES_VALUES,
   DIFFICULTY_VALUES,
 } from "@/server/db/schema/enums";
-import type { Subject } from "@/server/db/schema/schools";
+import type { Subject, SubjectSkill } from "@/server/db/schema/schools";
 import type { ContentWithRelations } from "@/server/services/contents";
 import {
   createContentAction,
   updateContentAction,
 } from "@/server/actions/contents";
+import { listSubjectSkillsAction } from "@/server/actions/subjects";
 
 export interface ContentFormProps {
   subjects: Subject[];
@@ -50,6 +52,7 @@ const contentSchema = z.object({
   title: z.string().refine((v) => v.trim().length > 0, "Title is required"),
   description: z.string().max(2000),
   subjectId: z.string(),
+  skillId: z.string(),
   level: z.string(),
   series: z.string(),
   visibility: z.string().min(1),
@@ -91,12 +94,17 @@ export function ContentForm({
   const isEdit = Boolean(initialContent);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  // Skills available for the currently selected subject.
+  const [availableSkills, setAvailableSkills] = useState<SubjectSkill[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+
   const form = useForm({
     defaultValues: {
       type: initialContent?.type ?? "epreuve",
       title: initialContent?.title ?? "",
       description: initialContent?.description ?? "",
       subjectId: initialContent?.subjectId ?? "",
+      skillId: initialContent?.skillId ?? "",
       level: initialContent?.level ?? "",
       series: initialContent?.series ?? "",
       visibility: initialContent?.visibility ?? "public",
@@ -119,6 +127,7 @@ export function ContentForm({
         title: value.title.trim(),
         description: value.description.trim() || undefined,
         subjectId: value.subjectId || undefined,
+        skillId: value.skillId || undefined,
         level: (value.level || undefined) as
           | (typeof LEVEL_VALUES)[number]
           | undefined,
@@ -155,6 +164,33 @@ export function ContentForm({
       router.refresh();
     },
   });
+
+  // Watch subjectId to dynamically load its skills.
+  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+
+  useEffect(() => {
+    if (!watchedSubjectId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAvailableSkills([]);
+      return;
+    }
+    let cancelled = false;
+    setSkillsLoading(true);
+    listSubjectSkillsAction({
+      subjectId: watchedSubjectId,
+      includeInactive: false,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success) setAvailableSkills(res.data);
+      })
+      .finally(() => {
+        if (!cancelled) setSkillsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [watchedSubjectId]);
 
   return (
     <SectionCard title={isEdit ? t("editContent") : t("newContent")}>
@@ -237,7 +273,7 @@ export function ContentForm({
           </form.Field>
         </div>
 
-        {/* Subject + Level + Series */}
+        {/* Subject + Skill + Level */}
         <div className="grid gap-4 sm:grid-cols-3">
           <form.Field name="subjectId">
             {(field) => (
@@ -259,6 +295,38 @@ export function ContentForm({
               />
             )}
           </form.Field>
+          <form.Field name="skillId">
+            {(field) => {
+              const opts = availableSkills.map((s) => ({
+                value: s.id,
+                label: s.name,
+              }));
+              return (
+                <SelectField
+                  field={field}
+                  label={
+                    <>
+                      {t("skillLabel")}{" "}
+                      <span className="text-xs text-muted-foreground">
+                        ({tCommon("optional")})
+                      </span>
+                    </>
+                  }
+                  placeholder={
+                    !watchedSubjectId
+                      ? t("skillSelectSubjectFirst")
+                      : skillsLoading
+                        ? t("skillLoading")
+                        : opts.length === 0
+                          ? t("skillEmpty")
+                          : t("skillPlaceholder")
+                  }
+                  options={opts}
+                  disabled={!watchedSubjectId || skillsLoading}
+                />
+              );
+            }}
+          </form.Field>
           <form.Field name="level">
             {(field) => (
               <SelectField
@@ -279,6 +347,10 @@ export function ContentForm({
               />
             )}
           </form.Field>
+        </div>
+
+        {/* Series */}
+        <div className="grid gap-4 sm:grid-cols-3">
           <form.Field name="series">
             {(field) => (
               <SelectField

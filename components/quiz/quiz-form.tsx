@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Plus, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 import { z } from "zod";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -19,9 +20,10 @@ import {
   FormErrorBanner,
 } from "@/components/forms/tanstack-fields";
 import { QUIZ_TYPE_VALUES, DIFFICULTY_VALUES } from "@/server/db/schema/enums";
-import type { Subject } from "@/server/db/schema/schools";
+import type { Subject, SubjectSkill } from "@/server/db/schema/schools";
 import type { CreateQuizInput } from "@/server/validators/quizzes";
 import type { QuizQuestionInput } from "@/server/validators/quizzes";
+import { listSubjectSkillsAction } from "@/server/actions/subjects";
 import { QuestionBuilder } from "./question-builder";
 
 interface QuizFormProps {
@@ -31,6 +33,8 @@ interface QuizFormProps {
     title: string;
     description: string | null;
     subjectId: string | null;
+    /** Primary skill the quiz targets (FK to subject_skills). */
+    skillId: string | null;
     level: string | null;
     series: string | null;
     type: (typeof QUIZ_TYPE_VALUES)[number];
@@ -52,6 +56,7 @@ const quizSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   description: z.string().max(2000).optional().or(z.literal("")),
   subjectId: z.string(),
+  skillId: z.string().optional(),
   level: z.string(),
   series: z.string(),
   type: z.enum(["practice", "exam", "homework", "diagnostic"]),
@@ -86,6 +91,10 @@ export function QuizForm({
     initialQuestions.length > 0 ? initialQuestions : [makeEmptyQuestion(0)],
   );
 
+  // Skills available for the currently selected subject.
+  const [availableSkills, setAvailableSkills] = useState<SubjectSkill[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+
   function addQuestion() {
     setQuestions((qs) => [...qs, makeEmptyQuestion(qs.length)]);
   }
@@ -105,6 +114,7 @@ export function QuizForm({
       title: initialQuiz?.title ?? "",
       description: initialQuiz?.description ?? "",
       subjectId: initialQuiz?.subjectId ?? "none",
+      skillId: initialQuiz?.skillId ?? "",
       level: initialQuiz?.level ?? "none",
       series: initialQuiz?.series ?? "none",
       type: initialQuiz?.type ?? "practice",
@@ -158,6 +168,7 @@ export function QuizForm({
         title: value.title.trim(),
         description: value.description?.trim() || undefined,
         subjectId: value.subjectId === "none" ? undefined : value.subjectId,
+        skillId: value.skillId || undefined,
         level:
           value.level === "none"
             ? undefined
@@ -190,6 +201,36 @@ export function QuizForm({
       router.refresh();
     },
   });
+
+  // Watch subjectId to dynamically load its skills. The quiz form uses
+  // "none" as the empty-subject sentinel (vs "" in content-form), so we
+  // treat that value as "no subject".
+  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+  const hasSubject = Boolean(watchedSubjectId) && watchedSubjectId !== "none";
+
+  useEffect(() => {
+    if (!hasSubject) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAvailableSkills([]);
+      return;
+    }
+    let cancelled = false;
+    setSkillsLoading(true);
+    listSubjectSkillsAction({
+      subjectId: watchedSubjectId as string,
+      includeInactive: false,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success) setAvailableSkills(res.data);
+      })
+      .finally(() => {
+        if (!cancelled) setSkillsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [watchedSubjectId, hasSubject]);
 
   return (
     <div className="space-y-6">
@@ -255,6 +296,39 @@ export function QuizForm({
                     ]}
                   />
                 )}
+              </form.Field>
+
+              <form.Field name="skillId">
+                {(field) => {
+                  const opts = availableSkills.map((s) => ({
+                    value: s.id,
+                    label: s.name,
+                  }));
+                  return (
+                    <SelectField
+                      field={field}
+                      label={
+                        <>
+                          {t("skillLabel")}{" "}
+                          <span className="text-xs text-muted-foreground">
+                            ({tCommon("optional")})
+                          </span>
+                        </>
+                      }
+                      placeholder={
+                        !hasSubject
+                          ? t("skillSelectSubjectFirst")
+                          : skillsLoading
+                            ? t("skillLoading")
+                            : opts.length === 0
+                              ? t("skillEmpty")
+                              : t("skillPlaceholder")
+                      }
+                      options={opts}
+                      disabled={!hasSubject || skillsLoading}
+                    />
+                  );
+                }}
               </form.Field>
 
               <form.Field name="level">

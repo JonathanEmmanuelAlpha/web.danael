@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Eye, Download, Clock, BookOpen } from "lucide-react";
+import {
+  Eye,
+  Download,
+  Clock,
+  BookOpen,
+  Sparkles,
+  School,
+  Users,
+  User,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ContentTypeBadge } from "./content-type-badge";
@@ -74,6 +83,15 @@ export function ContentCard({ content, href, className }: ContentCardProps) {
               {content.subject.name}
             </Badge>
           )}
+          {content.skill && (
+            <Badge variant="violet" size="sm">
+              <Sparkles className="size-3" aria-hidden />
+              {content.skill.name}
+              {content.skill.difficulty
+                ? ` · ${content.skill.difficulty}`
+                : ""}
+            </Badge>
+          )}
           {content.level && (
             <Badge variant="outline" size="sm">
               {tClasses(`levelLabels.${content.level}` as const)}
@@ -110,6 +128,45 @@ export function ContentCard({ content, href, className }: ContentCardProps) {
           </div>
           {content.year && <span className="text-xs">{content.year}</span>}
         </div>
+
+        {(content.school || content.class || content.uploader) && (
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/50 pt-2 text-xs text-muted-foreground">
+            {content.school && (
+              <span className="inline-flex items-center gap-1">
+                <School className="size-3" aria-hidden />
+                {content.school.name}
+              </span>
+            )}
+            {content.class && (
+              <>
+                {content.school && (
+                  <span aria-hidden className="text-muted-foreground/50">
+                    ·
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1">
+                  <Users className="size-3" aria-hidden />
+                  {content.class.name}
+                </span>
+              </>
+            )}
+            {content.uploader && (
+              <>
+                {(content.school || content.class) && (
+                  <span aria-hidden className="text-muted-foreground/50">
+                    ·
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1">
+                  <User className="size-3" aria-hidden />
+                  {[content.uploader.firstName, content.uploader.lastName]
+                    .filter(Boolean)
+                    .join(" ")}
+                </span>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );

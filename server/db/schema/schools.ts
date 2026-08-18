@@ -211,6 +211,69 @@ export type Subject = typeof subjects.$inferSelect;
 export type NewSubject = typeof subjects.$inferInsert;
 
 /* -------------------------------------------------------------
+ * subject_skills — granular skills attached to a subject
+ *
+ * Each subject (e.g. "Mathématiques") can have multiple skills
+ * (e.g. "Algèbre", "Géométrie", "Analyse", "Probabilités"). Skills
+ * are the atomic targeting unit for contents, assignments, quizzes
+ * and competitions — letting students practice exactly what they
+ * need rather than a whole subject.
+ * ------------------------------------------------------------ */
+
+export const subjectSkills = pgTable(
+  "subject_skills",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    subjectId: uuid("subject_id")
+      .notNull()
+      .references(() => pgRef(subjects.id), { onDelete: "cascade" }),
+    /** Skill name, e.g. "Algèbre", "Géométrie analytique". */
+    name: pgText("name").notNull(),
+    /** Optional longer description of what the skill covers. */
+    description: pgText("description"),
+    /**
+     * Difficulty to *understand* the skill (independent from the
+     * difficulty of any individual question).
+     *  - "easy": foundational concept, usually taught early
+     *  - "medium": standard concept
+     *  - "advanced": requires solid prerequisites
+     *  - "hard": complex/abstract concept, mastery level
+     */
+    difficulty: pgText("difficulty").notNull().default("medium"),
+    /** Optional slug for URL/filtering. */
+    slug: pgText("slug"),
+    /** Optional icon (emoji or lucide name). */
+    icon: pgText("icon"),
+    /** Optional color token (e.g. "primary", "violet") for UI badges. */
+    color: pgText("color"),
+    /** Optional link to a skill_node from the learning graph. */
+    skillNodeId: uuid("skill_node_id"),
+    isActive: boolean("is_active").default(true).notNull(),
+    /** Order within the subject (manual sort). */
+    position: pgInteger("position").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdateFn(() => new Date())
+      .notNull(),
+  },
+  (t) => ({
+    subjectIdx: pgIndex("subject_skills_subject_id_idx").on(t.subjectId),
+    subjectNameIdx: pgUniqueIndex("subject_skills_subject_name_uniq").on(
+      t.subjectId,
+      t.name,
+    ),
+    difficultyIdx: pgIndex("subject_skills_difficulty_idx").on(t.difficulty),
+    activeIdx: pgIndex("subject_skills_is_active_idx").on(t.isActive),
+  }),
+);
+
+export type SubjectSkill = typeof subjectSkills.$inferSelect;
+export type NewSubjectSkill = typeof subjectSkills.$inferInsert;
+
+/* -------------------------------------------------------------
  * class_subjects — subject taught in a class with coefficient
  * ------------------------------------------------------------ */
 

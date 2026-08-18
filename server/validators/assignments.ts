@@ -47,6 +47,8 @@ export const createAssignmentSchema = z.object({
   description: z.string().max(5000).optional(),
   classId: z.uuid(),
   subjectId: z.uuid().optional(),
+  /** Skill the assignment targets (granular targeting). */
+  skillId: z.uuid().optional(),
   /** `teacherId` is resolved server-side but accepted for parity. */
   teacherId: z.uuid(),
   dueAt: z.iso.datetime().optional(),
@@ -65,6 +67,7 @@ export const updateAssignmentSchema = z.object({
   description: z.string().max(5000).nullable().optional(),
   classId: z.uuid().optional(),
   subjectId: z.uuid().nullable().optional(),
+  skillId: z.uuid().nullable().optional(),
   dueAt: z.iso.datetime().nullable().optional(),
   points: z.number().int().min(0).max(1000).nullable().optional(),
   allowLateSubmission: z.boolean().optional(),

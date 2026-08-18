@@ -31,6 +31,8 @@ export const quizQuestionSchema = z.object({
   points: z.number().int().min(0).max(100).default(1),
   explanation: z.string().max(2000).optional(),
   difficulty: z.enum(DIFFICULTY_VALUES).default("medium"),
+  /** Skill this question tests (FK to subject_skills). */
+  skillId: z.uuid().optional(),
   position: z.number().int().min(0).default(0),
   options: z.array(quizOptionSchema).max(10).default([]),
 });
@@ -46,6 +48,8 @@ export const createQuizSchema = z.object({
   title: z.string().min(2, "Title too short").max(200),
   description: z.string().max(2000).optional(),
   subjectId: z.uuid().optional(),
+  /** Primary skill the quiz targets (questions can target other skills). */
+  skillId: z.uuid().optional(),
   level: z.enum(LEVEL_VALUES).optional(),
   series: z.enum(SERIES_VALUES).optional(),
   type: z.enum(QUIZ_TYPE_VALUES).default("practice"),
@@ -67,6 +71,7 @@ export const updateQuizSchema = z.object({
   title: z.string().min(2).max(200).optional(),
   description: z.string().max(2000).nullable().optional(),
   subjectId: z.uuid().nullable().optional(),
+  skillId: z.uuid().nullable().optional(),
   level: z.enum(LEVEL_VALUES).nullable().optional(),
   series: z.enum(SERIES_VALUES).nullable().optional(),
   type: z.enum(QUIZ_TYPE_VALUES).optional(),
@@ -86,6 +91,7 @@ export const addQuizQuestionSchema = z.object({
   points: z.number().int().min(0).max(100).default(1),
   explanation: z.string().max(2000).optional(),
   difficulty: z.enum(DIFFICULTY_VALUES).default("medium"),
+  skillId: z.uuid().optional(),
   position: z.number().int().min(0).default(0),
   options: z.array(quizOptionSchema).max(10).default([]),
 });
@@ -101,6 +107,7 @@ export const updateQuizQuestionSchema = z.object({
   points: z.number().int().min(0).max(100).optional(),
   explanation: z.string().max(2000).nullable().optional(),
   difficulty: z.enum(DIFFICULTY_VALUES).optional(),
+  skillId: z.uuid().nullable().optional(),
   position: z.number().int().min(0).optional(),
   options: z.array(quizOptionSchema).max(10).default([]),
 });
@@ -111,6 +118,7 @@ export const updateQuizQuestionSchema = z.object({
 export const listQuizzesQuerySchema = z.object({
   search: z.string().max(200).optional(),
   subjectId: z.uuid().optional(),
+  skillId: z.uuid().optional(),
   level: z.enum(LEVEL_VALUES).optional(),
   series: z.enum(SERIES_VALUES).optional(),
   type: z.enum(QUIZ_TYPE_VALUES).optional(),

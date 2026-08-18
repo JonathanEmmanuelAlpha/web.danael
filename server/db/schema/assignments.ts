@@ -22,7 +22,7 @@ import {
 
 import { pgRef } from "./_env";
 import { users } from "./users";
-import { classes, subjects } from "./schools";
+import { classes, subjects, subjectSkills } from "./schools";
 import { files, contents } from "./contents";
 import {
   assignmentStatusEnum,
@@ -48,6 +48,10 @@ export const assignments = pgTable(
     subjectId: uuid("subject_id").references(() => pgRef(subjects.id), {
       onDelete: "set null",
     }),
+    /** Skill the assignment targets (granular targeting). */
+    skillId: uuid("skill_id").references(() => pgRef(subjectSkills.id), {
+      onDelete: "set null",
+    }),
     teacherId: uuid("teacher_id")
       .notNull()
       .references(() => pgRef(users.id), { onDelete: "cascade" }),
@@ -68,6 +72,7 @@ export const assignments = pgTable(
   (t) => ({
     classIdx: pgIndex("assignments_class_id_idx").on(t.classId),
     subjectIdx: pgIndex("assignments_subject_id_idx").on(t.subjectId),
+    skillIdx: pgIndex("assignments_skill_id_idx").on(t.skillId),
     teacherIdx: pgIndex("assignments_teacher_id_idx").on(t.teacherId),
     statusIdx: pgIndex("assignments_status_idx").on(t.status),
     dueIdx: pgIndex("assignments_due_at_idx").on(t.dueAt),

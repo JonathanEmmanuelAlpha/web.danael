@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Trash2, X, Link as LinkIcon, Type, FileText } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +24,12 @@ import {
 } from "@/components/forms/tanstack-fields";
 import { createAssignmentAction, updateAssignmentAction } from "@/server/actions/assignments";
 import { listClassesAction } from "@/server/actions/classes";
-import { listSubjectsAction } from "@/server/actions/subjects";
+import {
+  listSubjectsAction,
+  listSubjectSkillsAction,
+} from "@/server/actions/subjects";
 import type { ClassWithRelations } from "@/server/services/classes";
-import type { Subject } from "@/server/db/schema/schools";
+import type { Subject, SubjectSkill } from "@/server/db/schema/schools";
 import type { AssignmentWithRelations } from "@/server/services/assignments";
 
 interface AssignmentFormProps {
@@ -54,6 +58,7 @@ const assignmentSchema = z.object({
   description: z.string().max(5000).optional().or(z.literal("")),
   classId: z.string().min(1, "La classe est requise"),
   subjectId: z.string(),
+  skillId: z.string().optional(),
   dueAt: z.date().nullable().optional(),
   points: z.number().min(0).max(1000).optional(),
   allowLate: z.boolean(),
@@ -90,6 +95,8 @@ export function AssignmentForm({
 
   const [classes, setClasses] = useState<ClassWithRelations[] | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [availableSkills, setAvailableSkills] = useState<SubjectSkill[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
   const [items, setItems] = useState<ItemDraft[]>(
     assignment?.items.map((it) => ({
       key: it.id,
@@ -140,6 +147,7 @@ export function AssignmentForm({
       description: assignment?.description ?? "",
       classId: assignment?.classId ?? defaultClassId ?? "",
       subjectId: assignment?.subjectId ?? "none",
+      skillId: assignment?.skillId ?? "",
       dueAt: assignment?.dueAt ? new Date(assignment.dueAt) : null,
       points: assignment?.points ?? 20,
       allowLate: assignment?.allowLateSubmission ?? false,
@@ -170,6 +178,7 @@ export function AssignmentForm({
         description: value.description?.trim() || undefined,
         classId: value.classId,
         subjectId: value.subjectId === "none" ? undefined : value.subjectId,
+        skillId: value.skillId || undefined,
         dueAt: dueAtIso,
         points: value.points,
         allowLateSubmission: value.allowLate,
@@ -189,6 +198,7 @@ export function AssignmentForm({
           description: payload.description ?? null,
           classId: payload.classId,
           subjectId: payload.subjectId ?? null,
+          skillId: payload.skillId ?? null,
           dueAt: payload.dueAt ?? null,
           points: payload.points ?? null,
           allowLateSubmission: payload.allowLateSubmission,
@@ -217,6 +227,34 @@ export function AssignmentForm({
       router.push(`/assignments/${res.data.id}`);
     },
   });
+
+  // Watch subjectId to dynamically load its skills.
+  const watchedSubjectId = useStore(form.store, (state) => state.values.subjectId);
+  const hasSubject = !!watchedSubjectId && watchedSubjectId !== "none";
+
+  useEffect(() => {
+    if (!hasSubject) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAvailableSkills([]);
+      return;
+    }
+    let cancelled = false;
+    setSkillsLoading(true);
+    listSubjectSkillsAction({
+      subjectId: watchedSubjectId,
+      includeInactive: false,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success) setAvailableSkills(res.data);
+      })
+      .finally(() => {
+        if (!cancelled) setSkillsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [watchedSubjectId, hasSubject]);
 
   return (
     <form
@@ -252,8 +290,8 @@ export function AssignmentForm({
         )}
       </form.Field>
 
-      {/* Class + Subject */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Class + Subject + Skill */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {classes === null ? (
           <div className="space-y-2">
             <Label>{t("className")}</Label>
@@ -291,6 +329,39 @@ export function AssignmentForm({
               ]}
             />
           )}
+        </form.Field>
+
+        <form.Field name="skillId">
+          {(field) => {
+            const opts = availableSkills.map((s) => ({
+              value: s.id,
+              label: s.name,
+            }));
+            return (
+              <SelectField
+                field={field}
+                label={
+                  <>
+                    {t("skillLabel")}{" "}
+                    <span className="text-xs text-muted-foreground">
+                      ({tCommon("optional")})
+                    </span>
+                  </>
+                }
+                placeholder={
+                  !hasSubject
+                    ? t("skillSelectSubjectFirst")
+                    : skillsLoading
+                      ? t("skillLoading")
+                      : opts.length === 0
+                        ? t("skillEmpty")
+                        : t("skillPlaceholder")
+                }
+                options={opts}
+                disabled={!hasSubject || skillsLoading}
+              />
+            );
+          }}
         </form.Field>
       </div>
 

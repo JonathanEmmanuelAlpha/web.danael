@@ -22,7 +22,7 @@ import {
 
 import { pgRef } from "./_env";
 import { users } from "./users";
-import { schools, classes, subjects } from "./schools";
+import { schools, classes, subjects, subjectSkills } from "./schools";
 import {
   contentTypeEnum,
   contentVisibilityEnum,
@@ -84,6 +84,10 @@ export const contents = pgTable(
     subjectId: uuid("subject_id").references(() => pgRef(subjects.id), {
       onDelete: "set null",
     }),
+    /** Skill the content targets (granular targeting — see subject_skills). */
+    skillId: uuid("skill_id").references(() => pgRef(subjectSkills.id), {
+      onDelete: "set null",
+    }),
     level: levelEnum("level"),
     series: seriesEnum("series"),
     schoolId: uuid("school_id").references(() => pgRef(schools.id), {
@@ -132,6 +136,7 @@ export const contents = pgTable(
   (t) => ({
     typeIdx: pgIndex("contents_type_idx").on(t.type),
     subjectIdx: pgIndex("contents_subject_id_idx").on(t.subjectId),
+    skillIdx: pgIndex("contents_skill_id_idx").on(t.skillId),
     levelIdx: pgIndex("contents_level_idx").on(t.level),
     schoolIdx: pgIndex("contents_school_id_idx").on(t.schoolId),
     classIdx: pgIndex("contents_class_id_idx").on(t.classId),

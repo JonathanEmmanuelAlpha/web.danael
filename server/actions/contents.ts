@@ -36,6 +36,7 @@ import type {
   NoteWithAuthor,
   ContentReport,
   ContentVersion,
+  ViewerScope,
 } from "@/server/services/contents";
 
 /* ── Helpers ───────────────────────────────────────────────── */
@@ -186,11 +187,17 @@ export async function publishContentAction(
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
 
-    const existing = await contentsService.getContentById(id);
-    const canModify = await canModifyContent(existing, dbUser.id, dbUser.role);
-    if (!canModify) {
-      throw AppError.forbidden("You can only publish your own contents");
+    // Only platform_admin / content_moderator can publish content.
+    // Teachers and school_admins create drafts; an admin reviews and publishes.
+    if (!hasPermission(dbUser.role, "content:publish")) {
+      throw AppError.unauthorized(
+        "Only platform administrators can publish content. " +
+          "Teachers and school admins can submit drafts for review.",
+      );
     }
+
+    const existing = await contentsService.getContentById(id);
+    if (!existing) throw AppError.notFound("Content not found");
 
     const published = await contentsService.publishContent(id);
     logger.info("Content published", {
@@ -201,6 +208,7 @@ export async function publishContentAction(
     revalidatePath("/library");
     revalidatePath(`/contents/${id}`);
     revalidatePath("/contents");
+    revalidatePath("/admin/contents");
     return { success: true, data: published };
   } catch (err) {
     if (err instanceof AppError) {
@@ -463,11 +471,28 @@ export async function listContentsAction(
   filters: ListContentsQuery,
 ): Promise<ApiResponse<ContentListResult>> {
   try {
+    const dbUser = await getCurrentDbUser();
+    // Require a session but allow anonymous browse of public content?
+    // For now: require a session so we can apply visibility scoping.
     await requireSession();
+
     const parsed = listContentsQuerySchema.safeParse(filters);
     if (!parsed.success) {
       throw AppError.validation("Invalid filters", parsed.error.flatten());
     }
+
+    // If we know who the viewer is, apply visibility scoping. Otherwise
+    // (no dbUser — e.g. pre-onboarding), fall back to the base listing
+    // (which already filters to published + non-archived by default).
+    if (dbUser) {
+      const viewer: ViewerScope = { userId: dbUser.id, role: dbUser.role };
+      const result = await contentsService.listContentsForViewer(
+        viewer,
+        parsed.data,
+      );
+      return { success: true, data: result };
+    }
+
     const result = await contentsService.listContents(parsed.data);
     return { success: true, data: result };
   } catch (err) {

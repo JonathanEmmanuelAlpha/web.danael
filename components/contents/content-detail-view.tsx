@@ -14,6 +14,9 @@ import {
   Loader2,
   PlayCircle,
   AlertTriangle,
+  Sparkles,
+  School,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -70,6 +73,7 @@ export function ContentDetailView({
   useEffect(() => {
     if (!content.file?.key) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingUrl((_) => {
       if (isUploadthing) return false;
 
@@ -182,6 +186,13 @@ export function ContentDetailView({
               value={content.subject.name}
             />
           )}
+          {content.skill && (
+            <MetaItem
+              icon={Sparkles}
+              label={t("skillLabel")}
+              value={content.skill.name}
+            />
+          )}
           {content.level && (
             <MetaItem
               icon={BookOpen}
@@ -215,6 +226,24 @@ export function ContentDetailView({
               icon={Calendar}
               label={t("year")}
               value={String(content.year)}
+            />
+          )}
+          {content.school && (
+            <MetaItem
+              icon={School}
+              label={t("schoolLabel")}
+              value={content.school.name}
+            />
+          )}
+          {content.class && (
+            <MetaItem
+              icon={Users}
+              label={t("classLabel")}
+              value={
+                content.class.level
+                  ? `${content.class.name} · ${content.class.level}`
+                  : content.class.name
+              }
             />
           )}
           {content.uploader && (

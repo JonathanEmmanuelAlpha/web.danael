@@ -190,7 +190,7 @@ export async function completeProfileAction(
 
 export async function completeStudentOnboardingAction(
   input: z.infer<typeof studentOnboardingSchema>,
-): Promise<ApiResponse<{ completed: boolean }>> {
+): Promise<ApiResponse<{ completed: boolean; redirectTo?: string }>> {
   try {
     const dbUser = await getCurrentDbUser();
     if (!dbUser) throw AppError.notFound("User profile not found");
@@ -215,7 +215,13 @@ export async function completeStudentOnboardingAction(
     logger.info("Onboarding: student completed", { userId: dbUser.id });
     revalidatePath("/dashboard");
 
-    return { success: true, data: { completed: true } };
+    // After completing onboarding, students are redirected to the
+    // Talent Discovery Assessment (TDA) — see /student/talent/assessment.
+    // The redirect is handled client-side in the onboarding page.
+    return {
+      success: true,
+      data: { completed: true, redirectTo: "/student/talent/assessment" },
+    };
   } catch (err) {
     if (err instanceof AppError) {
       return {

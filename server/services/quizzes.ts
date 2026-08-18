@@ -142,6 +142,7 @@ export async function createQuiz(
       title: input.title,
       description: input.description,
       subjectId: input.subjectId,
+      skillId: input.skillId,
       level: input.level,
       series: input.series,
       type: input.type,
@@ -186,6 +187,7 @@ export async function updateQuiz(
       input.title !== undefined ||
       input.description !== undefined ||
       input.subjectId !== undefined ||
+      input.skillId !== undefined ||
       input.level !== undefined ||
       input.series !== undefined ||
       input.type !== undefined ||
@@ -1134,6 +1136,7 @@ async function addQuestionToQuiz(
       points: input.points,
       explanation: input.explanation,
       difficulty: input.difficulty,
+      skillId: input.skillId,
       position: input.position,
     } satisfies NewQuizQuestion)
     .returning();

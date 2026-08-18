@@ -26,3 +26,4 @@ export * from "./payments";
 export * from "./tutoring";
 export * from "./admin";
 export * from "./learning";
+export * from "./talent";

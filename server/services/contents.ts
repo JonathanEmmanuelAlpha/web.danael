@@ -5,7 +5,7 @@
  * the server actions wrapping these functions, not here.
  */
 
-import { and, count, desc, eq, ilike, or, sql, asc, SQL } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql, asc, SQL } from "drizzle-orm";
 
 import { getDb } from "@/server/db";
 import {
@@ -16,8 +16,12 @@ import {
   favorites,
   files,
   subjects,
+  subjectSkills,
   users,
   schools,
+  classes,
+  classMembers,
+  schoolMembers,
 } from "@/server/db/schema";
 import { AppError } from "@/lib/api-response";
 import type {
@@ -55,12 +59,25 @@ export type ContentFile = Pick<
 
 export type SchoolInfo = { id: string; name: string };
 
+/** Compact skill info embedded in content relations. */
+export type SkillInfo = {
+  id: string;
+  name: string;
+  difficulty: string;
+  subjectId: string | null;
+};
+
+/** Compact class info embedded in content relations (origin tracking). */
+export type ClassInfo = { id: string; name: string; level: string | null };
+
 export type ContentWithRelations = Content & {
   subject: SubjectInfo | null;
+  skill: SkillInfo | null;
   uploader: Uploader | null;
   file: ContentFile | null;
   thumbnail: ContentFile | null;
   school: SchoolInfo | null;
+  class: ClassInfo | null;
 };
 
 export type ContentListItem = Pick<
@@ -72,6 +89,10 @@ export type ContentListItem = Pick<
   | "level"
   | "series"
   | "subjectId"
+  | "skillId"
+  | "schoolId"
+  | "classId"
+  | "uploadedBy"
   | "visibility"
   | "publicationStatus"
   | "thumbnailFileId"
@@ -85,8 +106,11 @@ export type ContentListItem = Pick<
   | "updatedAt"
 > & {
   subject: SubjectInfo | null;
+  skill: SkillInfo | null;
   uploader: Pick<Uploader, "id" | "firstName" | "lastName"> | null;
   thumbnail: Pick<File, "fileUrl" | "id"> | null;
+  school: SchoolInfo | null;
+  class: ClassInfo | null;
 };
 
 export type ContentListResult = {
@@ -124,6 +148,7 @@ export async function createContent(
       title: input.title,
       description: input.description,
       subjectId: input.subjectId,
+      skillId: input.skillId,
       level: input.level,
       series: input.series,
       schoolId: input.schoolId,
@@ -175,6 +200,7 @@ export async function updateContent(
   if (input.title !== undefined) updates.title = input.title;
   if (input.description !== undefined) updates.description = input.description;
   if (input.subjectId !== undefined) updates.subjectId = input.subjectId;
+  if (input.skillId !== undefined) updates.skillId = input.skillId;
   if (input.level !== undefined) updates.level = input.level;
   if (input.series !== undefined) updates.series = input.series;
   if (input.schoolId !== undefined) updates.schoolId = input.schoolId;
@@ -303,13 +329,17 @@ export async function getContentById(
     .select({
       content: contents,
       subject: subjects,
+      skill: subjectSkills,
       uploader: users,
       school: schools,
+      class: classes,
     })
     .from(contents)
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
+    .leftJoin(subjectSkills, eq(subjectSkills.id, contents.skillId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
     .leftJoin(schools, eq(schools.id, contents.schoolId))
+    .leftJoin(classes, eq(classes.id, contents.classId))
     .where(eq(contents.id, id))
     .limit(1);
 
@@ -359,11 +389,22 @@ export async function getContentById(
   return {
     ...content,
     subject: row.subject?.id ? (row.subject as SubjectInfo) : null,
+    skill: row.skill?.id
+      ? {
+          id: row.skill.id,
+          name: row.skill.name,
+          difficulty: row.skill.difficulty,
+          subjectId: row.skill.subjectId,
+        }
+      : null,
     uploader: row.uploader?.id ? (row.uploader as Uploader) : null,
     file,
     thumbnail,
     school: row.school?.id
       ? { id: row.school.id, name: row.school.name }
+      : null,
+    class: row.class?.id
+      ? { id: row.class.id, name: row.class.name, level: row.class.level }
       : null,
   };
 }
@@ -397,6 +438,8 @@ export async function listContents(
     conditions.push(eq(contents.series, filters.series) as never);
   if (filters.subjectId)
     conditions.push(eq(contents.subjectId, filters.subjectId) as never);
+  if (filters.skillId)
+    conditions.push(eq(contents.skillId, filters.skillId) as never);
   if (filters.schoolId)
     conditions.push(eq(contents.schoolId, filters.schoolId) as never);
   if (filters.classId)
@@ -448,6 +491,10 @@ export async function listContents(
       level: contents.level,
       series: contents.series,
       subjectId: contents.subjectId,
+      skillId: contents.skillId,
+      schoolId: contents.schoolId,
+      classId: contents.classId,
+      uploadedBy: contents.uploadedBy,
       visibility: contents.visibility,
       publicationStatus: contents.publicationStatus,
       thumbnailFileId: contents.thumbnailFileId,
@@ -460,13 +507,19 @@ export async function listContents(
       createdAt: contents.createdAt,
       updatedAt: contents.updatedAt,
       subject: subjects,
+      skill: subjectSkills,
       uploader: users,
       thumbnail: files,
+      school: schools,
+      class: classes,
     })
     .from(contents)
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
+    .leftJoin(subjectSkills, eq(subjectSkills.id, contents.skillId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
     .leftJoin(files, eq(files.id, contents.thumbnailFileId))
+    .leftJoin(schools, eq(schools.id, contents.schoolId))
+    .leftJoin(classes, eq(classes.id, contents.classId))
     .where(where)
     .orderBy(...orderBy)
     .limit(filters.pageSize)
@@ -488,6 +541,10 @@ export async function listContents(
     level: r.level,
     series: r.series,
     subjectId: r.subjectId,
+    skillId: r.skillId,
+    schoolId: r.schoolId,
+    classId: r.classId,
+    uploadedBy: r.uploadedBy,
     visibility: r.visibility,
     publicationStatus: r.publicationStatus,
     thumbnailFileId: r.thumbnailFileId,
@@ -500,11 +557,23 @@ export async function listContents(
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
+    skill: r.skill?.id
+      ? {
+          id: r.skill.id,
+          name: r.skill.name,
+          difficulty: r.skill.difficulty,
+          subjectId: r.skill.subjectId,
+        }
+      : null,
     uploader: r.uploader?.id
       ? (r.uploader as ContentListItem["uploader"])
       : null,
     thumbnail: r.thumbnail?.id
       ? (r.thumbnail as ContentListItem["thumbnail"])
+      : null,
+    school: r.school?.id ? { id: r.school.id, name: r.school.name } : null,
+    class: r.class?.id
+      ? { id: r.class.id, name: r.class.name, level: r.class.level }
       : null,
   }));
 
@@ -553,6 +622,10 @@ export async function searchContents(
       level: contents.level,
       series: contents.series,
       subjectId: contents.subjectId,
+      skillId: contents.skillId,
+      schoolId: contents.schoolId,
+      classId: contents.classId,
+      uploadedBy: contents.uploadedBy,
       visibility: contents.visibility,
       publicationStatus: contents.publicationStatus,
       thumbnailFileId: contents.thumbnailFileId,
@@ -565,13 +638,19 @@ export async function searchContents(
       createdAt: contents.createdAt,
       updatedAt: contents.updatedAt,
       subject: subjects,
+      skill: subjectSkills,
       uploader: users,
       thumbnail: files,
+      school: schools,
+      class: classes,
     })
     .from(contents)
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
+    .leftJoin(subjectSkills, eq(subjectSkills.id, contents.skillId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
     .leftJoin(files, eq(files.id, contents.thumbnailFileId))
+    .leftJoin(schools, eq(schools.id, contents.schoolId))
+    .leftJoin(classes, eq(classes.id, contents.classId))
     .where(where)
     .orderBy(desc(contents.viewsCount), desc(contents.createdAt))
     .limit(input.pageSize)
@@ -593,6 +672,10 @@ export async function searchContents(
     level: r.level,
     series: r.series,
     subjectId: r.subjectId,
+    skillId: r.skillId,
+    schoolId: r.schoolId,
+    classId: r.classId,
+    uploadedBy: r.uploadedBy,
     visibility: r.visibility,
     publicationStatus: r.publicationStatus,
     thumbnailFileId: r.thumbnailFileId,
@@ -605,11 +688,23 @@ export async function searchContents(
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
+    skill: r.skill?.id
+      ? {
+          id: r.skill.id,
+          name: r.skill.name,
+          difficulty: r.skill.difficulty,
+          subjectId: r.skill.subjectId,
+        }
+      : null,
     uploader: r.uploader?.id
       ? (r.uploader as ContentListItem["uploader"])
       : null,
     thumbnail: r.thumbnail?.id
       ? (r.thumbnail as ContentListItem["thumbnail"])
+      : null,
+    school: r.school?.id ? { id: r.school.id, name: r.school.name } : null,
+    class: r.class?.id
+      ? { id: r.class.id, name: r.class.name, level: r.class.level }
       : null,
   }));
 
@@ -696,6 +791,10 @@ export async function listFavorites(
       level: contents.level,
       series: contents.series,
       subjectId: contents.subjectId,
+      skillId: contents.skillId,
+      schoolId: contents.schoolId,
+      classId: contents.classId,
+      uploadedBy: contents.uploadedBy,
       visibility: contents.visibility,
       publicationStatus: contents.publicationStatus,
       thumbnailFileId: contents.thumbnailFileId,
@@ -708,14 +807,20 @@ export async function listFavorites(
       createdAt: contents.createdAt,
       updatedAt: contents.updatedAt,
       subject: subjects,
+      skill: subjectSkills,
       uploader: users,
       thumbnail: files,
+      school: schools,
+      class: classes,
     })
     .from(favorites)
     .innerJoin(contents, eq(contents.id, favorites.contentId))
     .leftJoin(subjects, eq(subjects.id, contents.subjectId))
+    .leftJoin(subjectSkills, eq(subjectSkills.id, contents.skillId))
     .leftJoin(users, eq(users.id, contents.uploadedBy))
     .leftJoin(files, eq(files.id, contents.thumbnailFileId))
+    .leftJoin(schools, eq(schools.id, contents.schoolId))
+    .leftJoin(classes, eq(classes.id, contents.classId))
     .where(where)
     .orderBy(desc(favorites.createdAt))
     .limit(pageSize)
@@ -739,6 +844,10 @@ export async function listFavorites(
       level: r.level,
       series: r.series,
       subjectId: r.subjectId,
+      skillId: r.skillId,
+      schoolId: r.schoolId,
+      classId: r.classId,
+      uploadedBy: r.uploadedBy,
       visibility: r.visibility,
       publicationStatus: r.publicationStatus,
       thumbnailFileId: r.thumbnailFileId,
@@ -751,11 +860,23 @@ export async function listFavorites(
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
       subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
+      skill: r.skill?.id
+        ? {
+            id: r.skill.id,
+            name: r.skill.name,
+            difficulty: r.skill.difficulty,
+            subjectId: r.skill.subjectId,
+          }
+        : null,
       uploader: r.uploader?.id
         ? (r.uploader as ContentListItem["uploader"])
         : null,
       thumbnail: r.thumbnail?.id
         ? (r.thumbnail as ContentListItem["thumbnail"])
+        : null,
+      school: r.school?.id ? { id: r.school.id, name: r.school.name } : null,
+      class: r.class?.id
+        ? { id: r.class.id, name: r.class.name, level: r.class.level }
         : null,
     },
   }));
@@ -872,4 +993,242 @@ export async function getContentFileKey(
     .where(eq(contents.id, contentId))
     .limit(1);
   return rows.at(0)?.key ?? null;
+}
+
+/* -- Visibility-filtered listing -------------------------------------------
+ *
+ * The base `listContents` returns content purely based on the provided filters
+ * (visibility / publicationStatus / etc.) without checking WHO is asking.
+ * This is fine for admin / teacher-own-content views.
+ *
+ * `listContentsForViewer` adds an extra visibility layer for "student-like"
+ * viewers (students, parents, tutors): they only see content they are allowed
+ * to see based on the visibility clause:
+ *
+ *   - visibility = "public"               → everyone (published only)
+ *   - visibility = "unlisted"             → only members of the same school
+ *   - visibility = "school_private"       → only members of the same school
+ *   - visibility = "class_private"        → only members of the same class
+ *
+ * The function returns the same shape as `listContents` so callers can swap
+ * one for the other transparently.
+ * ------------------------------------------------------------------------ */
+
+export interface ViewerScope {
+  userId: string;
+  role: string;
+}
+
+export async function listContentsForViewer(
+  viewer: ViewerScope,
+  filters: ListContentsQuery,
+): Promise<ContentListResult> {
+  // Platform admins / moderators see everything (they have content:edit:any).
+  if (
+    viewer.role === "platform_admin" ||
+    viewer.role === "content_moderator"
+  ) {
+    return listContents(filters);
+  }
+
+  const db = await getDb();
+
+  // Resolve the viewer's memberships up-front (single round-trip each).
+  const schoolRows = await db
+    .select({ schoolId: schoolMembers.schoolId })
+    .from(schoolMembers)
+    .where(
+      and(
+        eq(schoolMembers.userId, viewer.userId),
+        eq(schoolMembers.status, "active"),
+      ),
+    );
+  const classRows = await db
+    .select({ classId: classMembers.classId })
+    .from(classMembers)
+    .where(eq(classMembers.userId, viewer.userId));
+
+  const viewerSchoolIds = schoolRows.map((r) => r.schoolId);
+  const viewerClassIds = classRows.map((r) => r.classId);
+
+  // Build the visibility clause:
+  //   visibility = 'public'
+  //   OR (visibility IN ('school_private','unlisted') AND schoolId IN viewerSchoolIds)
+  //   OR (visibility = 'class_private' AND classId IN viewerClassIds)
+  // The `inArray` with empty array evaluates to false in Postgres, which is what
+  // we want for users with no school/class memberships.
+  const visibilityClauses: SQL<unknown>[] = [
+    eq(contents.visibility, "public") as never,
+  ];
+  if (viewerSchoolIds.length > 0) {
+    visibilityClauses.push(
+      and(
+        inArray(contents.visibility, ["school_private", "unlisted"]),
+        inArray(contents.schoolId, viewerSchoolIds),
+      ) as never,
+    );
+  }
+  if (viewerClassIds.length > 0) {
+    visibilityClauses.push(
+      and(
+        eq(contents.visibility, "class_private"),
+        inArray(contents.classId, viewerClassIds),
+      ) as never,
+    );
+  }
+
+  const conditions: SQL<unknown>[] = [or(...visibilityClauses) as never];
+
+  // Force publicationStatus = published unless the viewer is the uploader
+  // (so they can still see their own drafts via this same list call) or
+  // an explicit override was passed.
+  if (filters.uploadedBy === viewer.userId) {
+    // Self-content: allow all statuses (the uploader is reviewing their own work).
+  } else if (filters.publicationStatus) {
+    conditions.push(
+      eq(contents.publicationStatus, filters.publicationStatus) as never,
+    );
+  } else {
+    conditions.push(eq(contents.publicationStatus, "published") as never);
+  }
+
+  // Apply the rest of the filters identically to listContents.
+  if (filters.search) {
+    const needle = `%${filters.search}%`;
+    conditions.push(
+      or(
+        ilike(contents.title, needle),
+        ilike(contents.description, needle),
+      ) as never,
+    );
+  }
+  if (filters.type) conditions.push(eq(contents.type, filters.type) as never);
+  if (filters.level)
+    conditions.push(eq(contents.level, filters.level) as never);
+  if (filters.series)
+    conditions.push(eq(contents.series, filters.series) as never);
+  if (filters.subjectId)
+    conditions.push(eq(contents.subjectId, filters.subjectId) as never);
+  if (filters.skillId)
+    conditions.push(eq(contents.skillId, filters.skillId) as never);
+  if (filters.schoolId)
+    conditions.push(eq(contents.schoolId, filters.schoolId) as never);
+  if (filters.classId)
+    conditions.push(eq(contents.classId, filters.classId) as never);
+  // If the caller passed an explicit visibility, intersect it with the
+  // viewer-scoped clause (e.g. "show me only the public ones I can see").
+  if (filters.visibility)
+    conditions.push(eq(contents.visibility, filters.visibility) as never);
+  if (filters.difficulty)
+    conditions.push(eq(contents.difficulty, filters.difficulty) as never);
+  if (filters.uploadedBy)
+    conditions.push(eq(contents.uploadedBy, filters.uploadedBy) as never);
+
+  const where = and(...conditions);
+
+  const orderBy =
+    filters.sort === "popular"
+      ? [desc(contents.viewsCount)]
+      : filters.sort === "downloads"
+        ? [desc(contents.downloadsCount)]
+        : filters.sort === "title"
+          ? [asc(contents.title)]
+          : [desc(contents.createdAt)];
+
+  const offset = (filters.page - 1) * filters.pageSize;
+
+  const rows = await db
+    .select({
+      id: contents.id,
+      type: contents.type,
+      title: contents.title,
+      description: contents.description,
+      level: contents.level,
+      series: contents.series,
+      subjectId: contents.subjectId,
+      skillId: contents.skillId,
+      schoolId: contents.schoolId,
+      classId: contents.classId,
+      uploadedBy: contents.uploadedBy,
+      visibility: contents.visibility,
+      publicationStatus: contents.publicationStatus,
+      thumbnailFileId: contents.thumbnailFileId,
+      fileId: contents.fileId,
+      year: contents.year,
+      difficulty: contents.difficulty,
+      durationMinutes: contents.durationMinutes,
+      viewsCount: contents.viewsCount,
+      downloadsCount: contents.downloadsCount,
+      createdAt: contents.createdAt,
+      updatedAt: contents.updatedAt,
+      subject: subjects,
+      skill: subjectSkills,
+      uploader: users,
+      thumbnail: files,
+      school: schools,
+      class: classes,
+    })
+    .from(contents)
+    .leftJoin(subjects, eq(subjects.id, contents.subjectId))
+    .leftJoin(subjectSkills, eq(subjectSkills.id, contents.skillId))
+    .leftJoin(users, eq(users.id, contents.uploadedBy))
+    .leftJoin(files, eq(files.id, contents.thumbnailFileId))
+    .leftJoin(schools, eq(schools.id, contents.schoolId))
+    .leftJoin(classes, eq(classes.id, contents.classId))
+    .where(where)
+    .orderBy(...orderBy)
+    .limit(filters.pageSize)
+    .offset(offset);
+
+  const totalRow = await db
+    .select({ c: count() })
+    .from(contents)
+    .where(where);
+  const total = Number(totalRow.at(0)?.c ?? 0);
+
+  const items: ContentListItem[] = rows.map((r) => ({
+    id: r.id,
+    type: r.type,
+    title: r.title,
+    description: r.description,
+    level: r.level,
+    series: r.series,
+    subjectId: r.subjectId,
+    skillId: r.skillId,
+    schoolId: r.schoolId,
+    classId: r.classId,
+    uploadedBy: r.uploadedBy,
+    visibility: r.visibility,
+    publicationStatus: r.publicationStatus,
+    thumbnailFileId: r.thumbnailFileId,
+    fileId: r.fileId,
+    year: r.year,
+    difficulty: r.difficulty,
+    durationMinutes: r.durationMinutes,
+    viewsCount: r.viewsCount,
+    downloadsCount: r.downloadsCount,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+    subject: r.subject?.id ? (r.subject as SubjectInfo) : null,
+    skill: r.skill?.id
+      ? {
+          id: r.skill.id,
+          name: r.skill.name,
+          difficulty: r.skill.difficulty,
+          subjectId: r.skill.subjectId,
+        }
+      : null,
+    uploader: r.uploader?.id
+      ? (r.uploader as ContentListItem["uploader"])
+      : null,
+    thumbnail: r.thumbnail?.id
+      ? (r.thumbnail as ContentListItem["thumbnail"])
+      : null,
+    school: r.school?.id ? { id: r.school.id, name: r.school.name } : null,
+    class: r.class?.id
+      ? { id: r.class.id, name: r.class.name, level: r.class.level }
+      : null,
+  }));
+
+  return { items, total, page: filters.page, pageSize: filters.pageSize };
 }

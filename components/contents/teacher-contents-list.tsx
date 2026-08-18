@@ -28,6 +28,9 @@ import type { ContentListItem } from "@/server/services/contents";
 
 export interface TeacherContentsListProps {
   teacherId: string;
+  /** Show the "Publish" button. Defaults to false. Only platform_admin /
+   *  content_moderator should publish content (see permissions.ts). */
+  canPublish?: boolean;
 }
 
 /**
@@ -36,10 +39,13 @@ export interface TeacherContentsListProps {
  * Shows the publication status, views count, and quick actions:
  *  - view (link to /contents/[id])
  *  - edit (link to /contents/[id]/edit)
- *  - publish (publish a draft)
+ *  - publish (publish a draft) — only if `canPublish` is true
  *  - delete (archive)
  */
-export function TeacherContentsList({ teacherId }: TeacherContentsListProps) {
+export function TeacherContentsList({
+  teacherId,
+  canPublish = false,
+}: TeacherContentsListProps) {
   const t = useTranslations("Contents");
   const tCommon = useTranslations("Common");
   const [items, setItems] = useState<ContentListItem[] | null>(null);
@@ -185,7 +191,8 @@ export function TeacherContentsList({ teacherId }: TeacherContentsListProps) {
                 </Link>
               </Button>
               {c.publicationStatus !== "published" &&
-                c.publicationStatus !== "archived" && (
+                c.publicationStatus !== "archived" &&
+                canPublish && (
                   <Button
                     variant="ghost"
                     size="sm"

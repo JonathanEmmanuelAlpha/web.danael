@@ -146,6 +146,14 @@ export const studentSkillStates = pgTable(
     forgettingRate: pgReal("forgetting_rate").default(0.5).notNull(),
     /** Trend: +1 improving, 0 stable, -1 declining. */
     trend: pgInteger("trend").default(0).notNull(),
+    /** Weekly velocity (mastery delta per week) — used by Talent Score. */
+    velocity: pgReal("velocity").default(0).notNull(),
+    /** Transfer score 0-1 (success on transfer-tagged questions). */
+    transferScore: pgReal("transfer_score").default(0).notNull(),
+    /** Joy signal 0-1 (from emotional check-ins + implicit signals). */
+    joyScore: pgReal("joy_score").default(0.5).notNull(),
+    /** Bayesian talent confidence 0-1 (alpha / (alpha + beta)). */
+    talentConfidence: pgReal("talent_confidence").default(0.286).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

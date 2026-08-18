@@ -108,7 +108,8 @@ const ROLE_PERMISSIONS: Record<UserRole, ReadonlySet<Permission>> = {
     "content:create",
     "content:edit:own",
     "content:delete:own",
-    "content:publish",
+    // Publication is reserved to platform_admin / content_moderator.
+    // Teachers create drafts and submit them for review.
     "content:download",
     "assignment:create",
     "assignment:edit:own",
@@ -134,7 +135,8 @@ const ROLE_PERMISSIONS: Record<UserRole, ReadonlySet<Permission>> = {
     "content:create",
     "content:edit:own",
     "content:delete:own",
-    "content:publish",
+    // Publication is reserved to platform_admin / content_moderator.
+    // School admins create drafts and submit them for review.
     "content:download",
     "assignment:create",
     "assignment:grade",

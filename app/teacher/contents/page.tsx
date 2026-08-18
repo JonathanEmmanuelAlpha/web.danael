@@ -50,7 +50,10 @@ export default async function ContentsPage() {
             </Button>
           }
         />
-        <TeacherContentsList teacherId={user.id} />
+        <TeacherContentsList
+          teacherId={user.id}
+          canPublish={hasPermission(role, "content:publish")}
+        />
       </div>
     </>
   );
