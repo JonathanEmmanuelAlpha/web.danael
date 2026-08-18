@@ -74,8 +74,7 @@ interface TeacherQuestionsValidationProps {
  *  - Empty state when no questions exist
  */
 export function TeacherQuestionsValidation({
-  teacherId,
-  subjects,
+  teacherId, subjects
 }: TeacherQuestionsValidationProps) {
   const t = useTranslations("AiQuestions");
 

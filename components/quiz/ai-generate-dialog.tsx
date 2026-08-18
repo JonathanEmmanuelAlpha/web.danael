@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { z } from "zod";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,18 +24,12 @@ import {
   SubmitButton,
   FormErrorBanner,
 } from "@/components/forms/tanstack-fields";
-import {
-  generateQuestionsAction,
-  listSkillsForFilterAction,
-} from "@/server/actions/ai-questions";
+import { generateQuestionsAction } from "@/server/actions/ai-questions";
 import {
   DIFFICULTY_VALUES,
   QUIZ_QUESTION_TYPE_VALUES,
 } from "@/server/db/schema/enums";
-import type {
-  SkillOption,
-  SubjectOption,
-} from "@/server/services/ai-questions";
+import type { SubjectOption } from "@/server/services/ai-questions";
 import {
   Select,
   SelectContent,
@@ -43,6 +37,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { listSubjectSkillsAction } from "@/server/actions/subjects";
+import type { SubjectSkill } from "@/server/db/schema";
 
 interface AiGenerateDialogProps {
   /** Triggered when questions are successfully generated. */
@@ -79,37 +75,14 @@ export function AiGenerateDialog({
 
   const [open, setOpen] = React.useState(false);
   const [subjectId, setSubjectId] = React.useState<string>("");
-  const [skills, setSkills] = React.useState<SkillOption[]>([]);
+  const [skills, setSkills] = React.useState<SubjectSkill[]>([]);
   const [loadingSkills, setLoadingSkills] = React.useState(false);
   const [placeholderNotice, setPlaceholderNotice] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-    // Use a microtask to defer the setLoading call so we don't trigger the
-    // react-hooks/set-state-in-effect lint rule (which would otherwise flag
-    // a synchronous setState inside an effect).
-    Promise.resolve().then(() => {
-      if (cancelled) return;
-      setLoadingSkills(true);
-    });
-    listSkillsForFilterAction(subjectId ? { subjectId } : {})
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success && res.data) setSkills(res.data);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoadingSkills(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [open]);
 
   const form = useForm({
     defaultValues: {
       skillId: "",
+      subjectId: "",
       count: 5,
       difficulty: "medium",
       questionTypes: ["single_choice"],
@@ -139,6 +112,36 @@ export function AiGenerateDialog({
       setOpen(false);
     },
   });
+
+  // Watch subjectId to dynamically load its skills.
+  const watchedSubjectId = useSelector(
+    form.store,
+    (state) => state.values.subjectId,
+  );
+
+  React.useEffect(() => {
+    if (!watchedSubjectId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSkills([]);
+      return;
+    }
+    let cancelled = false;
+    setLoadingSkills(true);
+    listSubjectSkillsAction({
+      subjectId: watchedSubjectId,
+      includeInactive: false,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success) setSkills(res.data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSkills(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [watchedSubjectId]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -170,47 +173,37 @@ export function AiGenerateDialog({
           }}
           className="space-y-5"
         >
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Subject */}
-            <div className="space-y-1.5">
-              <Label className="text-xs">{t("subject")}</Label>
-              <Select
-                value={subjectId || "all"}
-                onValueChange={(v) => {
-                  setSubjectId(v === "all" ? "" : v);
-                }}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder={t("allSubjects")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("allSubjects")}</SelectItem>
-                  {subjects.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <form.Field name="skillId">
-              {(field) => {
-                return (
-                  <SelectField
-                    field={field}
-                    label={t("skill")}
-                    placeholder={loadingSkills ? "…" : t("selectSkill")}
-                    disabled={!subjectId || loadingSkills}
-                    required
-                    options={skills.map((s) => ({
-                      value: s.id,
-                      label: `${s.name} (${s.code})`,
-                    }))}
-                  />
-                );
-              }}
-            </form.Field>
-          </div>
+          <form.Field name="subjectId">
+            {(field) => (
+              <SelectField
+                field={field}
+                label={t("subject")}
+                placeholder={t("subject")}
+                options={subjects.map((s) => ({
+                  value: s.id,
+                  label: s.name,
+                }))}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="skillId">
+            {(field) => {
+              return (
+                <SelectField
+                  field={field}
+                  label={t("skill")}
+                  placeholder={loadingSkills ? "…" : t("selectSkill")}
+                  disabled={!subjectId || loadingSkills}
+                  required
+                  options={skills.map((s) => ({
+                    value: s.id,
+                    label: `${s.name} (${s.difficulty})`,
+                  }))}
+                />
+              );
+            }}
+          </form.Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <form.Field name="count">
